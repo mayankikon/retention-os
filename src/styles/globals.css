@@ -52,8 +52,10 @@
   --color-brand-accent: var(--brand-accent);
   --color-surface-elevated: var(--surface-elevated);
 
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-sans: var(--font-saira);
+  --font-mono: var(--font-saira);
+
+  --font-weight-semibold: 500;
 
   --radius-sm: var(--radius-sm);
   --radius-md: var(--radius-md);
@@ -63,11 +65,21 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans);
 }
 
 @layer base {
-  * {
+  *,
+  *::before,
+  *::after {
     @apply border-border;
+  }
+
+  html,
+  body,
+  button,
+  input,
+  textarea,
+  select {
+    font-family: var(--font-saira), sans-serif;
   }
 }
