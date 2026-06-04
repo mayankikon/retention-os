@@ -16,16 +16,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { CampaignStatusBadge } from "@/components/campaigns/CampaignStatusBadge";
-import { formatTimestamp, formatRelativeTime } from "@/lib/dates";
 import { getTimeZoneLabel } from "@/data/campaign-setup.defaults";
-import { formatMessageCount } from "@/lib/format";
+import { formatConversionRate, formatMessageCount } from "@/lib/format";
 import type { Campaign } from "@/types/campaign";
 
 const columnHelper = createColumnHelper<Campaign>();
@@ -58,6 +52,10 @@ const columns = [
     header: "Messages",
     cell: (info) => formatMessageCount(info.getValue()),
   }),
+  columnHelper.accessor("conversionRate", {
+    header: "Conversion Rate",
+    cell: (info) => formatConversionRate(info.getValue()),
+  }),
   columnHelper.accessor("createdBy", {
     header: "Created By",
     cell: (info) => {
@@ -73,16 +71,6 @@ const columns = [
         </div>
       );
     },
-  }),
-  columnHelper.accessor("lastUpdatedAt", {
-    header: "Last Updated",
-    cell: (info) => (
-      <TimestampCell iso={info.getValue()} label="Last updated" />
-    ),
-  }),
-  columnHelper.accessor("group", {
-    header: "Group",
-    cell: (info) => info.getValue(),
   }),
 ];
 
@@ -135,34 +123,5 @@ export function CampaignTable({ campaigns }: CampaignTableProps) {
         </Table>
       </div>
     </TooltipProvider>
-  );
-}
-
-function TimestampCell({
-  iso,
-  label,
-  className,
-}: {
-  iso: string;
-  label: string;
-  className?: string;
-}) {
-  return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <time
-          dateTime={iso}
-          className={
-            className ??
-            "text-sm text-foreground underline decoration-dotted decoration-muted-foreground underline-offset-2"
-          }
-        >
-          {formatTimestamp(iso)}
-        </time>
-      </TooltipTrigger>
-      <TooltipContent>
-        {label}: {formatRelativeTime(iso)}
-      </TooltipContent>
-    </Tooltip>
   );
 }

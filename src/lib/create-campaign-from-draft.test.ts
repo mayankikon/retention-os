@@ -36,4 +36,14 @@ describe("createCampaignFromDraft", () => {
     const campaign = createCampaignFromDraft(draft, MOCK_CURRENT_USER);
     expect(campaign.timeZone).toBe("PST");
   });
+
+  it("initializes conversion rate to zero for new campaigns", () => {
+    const draft = {
+      ...createDefaultSetupDraft(),
+      campaignName: "New campaign",
+    };
+
+    const campaign = createCampaignFromDraft(draft, MOCK_CURRENT_USER);
+    expect(campaign.conversionRate).toBe(0);
+  });
 });

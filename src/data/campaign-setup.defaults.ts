@@ -1,6 +1,14 @@
-import type { CampaignSetupDraft, SetupStepMeta } from "@/types/campaign-setup";
+import type {
+  CampaignMessageTemplateId,
+  CampaignSetupDraft,
+  SetupStepMeta,
+} from "@/types/campaign-setup";
 import { SCHEDULE_DAYS } from "@/types/campaign-setup";
-import { DEALERS } from "@/data/lookups";
+import {
+  DEFAULT_MILEAGE_SERVICE_TRIGGER,
+  DEFAULT_TIME_SERVICE_TRIGGER,
+} from "@/data/service-triggers";
+import { getCampaignMessageTemplate } from "@/data/campaign-message-templates";
 
 export const SETUP_STEP_META: SetupStepMeta[] = [
   {
@@ -40,34 +48,6 @@ export const DEFAULT_REMINDER_2 =
   "Hey [@FN@], I'll stop bugging you about the [@MOD@] oil change for now! Just wanted to make sure you were taken care of. If you still need that service later, the link below stays active. BOOK NOW: [@DSP@] PHONE: (Dealer DID)";
 
 export const DEFAULT_REMINDER_3 = "";
-
-export const SERVICE_INTERVAL_OPTIONS = [
-  {
-    value: "every_180_days_5000_mile",
-    label: "Every 180 Days / 5000 Mile",
-  },
-] as const;
-
-export const CAMPAIGN_TYPE_OPTIONS = [
-  {
-    value: "predefined" as const,
-    label: "Predefined",
-    description: "Standard campaign type for dealership setup",
-    disabled: false,
-  },
-  {
-    value: "custom" as const,
-    label: "Custom",
-    description: "Handled by Leadership",
-    disabled: true,
-  },
-  {
-    value: "push" as const,
-    label: "Push",
-    description: "Handled by Leadership",
-    disabled: true,
-  },
-];
 
 export const TIME_ZONE_SCHEDULE_REFERENCE = [
   {
@@ -111,30 +91,45 @@ export function getTimeZoneLabel(timeZone: string): string {
   );
 }
 
-export const SUBFLEET_OPTIONS = DEALERS.filter(
-  (dealer) => dealer !== "All Dealerships",
-).map((dealer) => ({ value: dealer, label: dealer }));
-
 export function createDefaultSetupDraft(): CampaignSetupDraft {
+  const oilChangeTemplate = getCampaignMessageTemplate("oil_change");
+
   return {
     campaignName: "",
     campaignImageFileName: null,
     campaignImagePreviewUrl: null,
-    primaryPromoText: DEFAULT_PRIMARY_PROMO,
+    messageTemplateId: "oil_change",
+    primaryPromoText: oilChangeTemplate?.primaryPromoText ?? DEFAULT_PRIMARY_PROMO,
     dealerUrl: "",
-    additionalUrl: "",
-    remindersEnabled: true,
-    reminder1Text: DEFAULT_REMINDER_1,
-    reminder2Text: DEFAULT_REMINDER_2,
-    reminder3Text: DEFAULT_REMINDER_3,
-    dealerDid: "",
+    deliveryChannels: ["sms"],
+    reminder1Enabled: true,
+    reminder1Text: oilChangeTemplate?.reminder1Text ?? DEFAULT_REMINDER_1,
+    reminder1ImageFileName: null,
+    reminder1ImagePreviewUrl: null,
+    reminder1UsePrimaryImage: true,
+    reminder2Enabled: true,
+    reminder2Text: oilChangeTemplate?.reminder2Text ?? DEFAULT_REMINDER_2,
+    reminder2ImageFileName: null,
+    reminder2ImagePreviewUrl: null,
+    reminder2UsePrimaryImage: true,
+    reminder3Enabled: false,
+    reminder3Text: oilChangeTemplate?.reminder3Text ?? DEFAULT_REMINDER_3,
+    reminder3ImageFileName: null,
+    reminder3ImagePreviewUrl: null,
+    reminder3UsePrimaryImage: true,
     campaignType: "predefined",
-    serviceInterval: SERVICE_INTERVAL_OPTIONS[0].value,
+    serviceTriggerTypes: ["time"],
+    timeServiceTriggerPreset: DEFAULT_TIME_SERVICE_TRIGGER,
+    mileageServiceTriggerPreset: DEFAULT_MILEAGE_SERVICE_TRIGGER,
+    oemMake: "",
+    oemModel: "",
     subfleets: [],
-    deliveryFrequency: "ongoing",
     scheduleDays: [...SCHEDULE_DAYS],
     timeZone: "CST",
     testPhoneNumber: "",
+    suppressionListFileName: null,
+    suppressionListEntryCount: null,
+    tcpaComplianceConfirmed: false,
   };
 }
 

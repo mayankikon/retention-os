@@ -23,6 +23,7 @@ export function createCampaignFromDraft(
     timeZone: draft.timeZone,
     status: "scheduled",
     messages: 0,
+    conversionRate: 0,
     createdBy: {
       id: user.id,
       name: user.name,

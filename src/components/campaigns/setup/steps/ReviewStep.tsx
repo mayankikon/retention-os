@@ -1,10 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { AlertCircle, Send } from "lucide-react";
+import { AlertCircle, Send, ShieldCheck } from "lucide-react";
 import { FormField } from "@/components/campaigns/setup/FormField";
+import { SuppressionListUpload } from "@/components/campaigns/setup/SuppressionListUpload";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import type { CampaignSetupDraft } from "@/types/campaign-setup";
 
 interface ReviewStepProps {
@@ -39,31 +42,69 @@ export function ReviewStep({
 
   return (
     <div className="space-y-6">
-      <section className="rounded-md border border-border p-4">
-        <h3 className="text-sm font-semibold">Quality assurance</h3>
-        <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm text-muted-foreground">
-          <li>Send a campaign test to your mobile device.</li>
-          <li>
-            Verify variables (name, vehicle, [@DSP@]) and the campaign image.
-          </li>
-          <li>Activate to launch the campaign.</li>
-        </ol>
+      <section className="space-y-4 rounded-md border border-border p-4">
+        <div>
+          <h3 className="text-sm font-semibold">Audience suppression</h3>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Exclude opted-out customers and numbers on your do-not-contact list
+            before launch.
+          </p>
+        </div>
+
+        <SuppressionListUpload
+          fileName={draft.suppressionListFileName}
+          entryCount={draft.suppressionListEntryCount}
+          error={errors.suppressionListFileName}
+          onChange={(fileName, entryCount) =>
+            onChange({
+              suppressionListFileName: fileName,
+              suppressionListEntryCount: entryCount,
+            })
+          }
+        />
       </section>
 
-      <div className="space-y-3 rounded-md border border-border bg-muted/20 p-4 text-sm">
-        <h4 className="font-medium">Configuration checklist</h4>
-        <ul className="space-y-1 text-muted-foreground">
-          <li>Name: {draft.campaignName || "—"}</li>
-          <li>Image: {draft.campaignImageFileName ?? "Missing"}</li>
-          <li>Dealer DID in reminders: {draft.dealerDid || "Missing"}</li>
-          <li>
-            Subfleets:{" "}
-            {draft.subfleets.length > 0
-              ? draft.subfleets.join(", ")
-              : "None selected"}
-          </li>
-        </ul>
-      </div>
+      <section className="space-y-3 rounded-md border border-border bg-muted/20 p-4">
+        <div className="flex items-start gap-2">
+          <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-brand-primary" />
+          <div>
+            <h3 className="text-sm font-semibold">TCPA compliance</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Federal TCPA rules require consent for marketing texts and timely
+              honoring of opt-out requests (including STOP replies).
+            </p>
+          </div>
+        </div>
+
+        <label className="flex items-start gap-3 text-sm">
+          <Checkbox
+            id="tcpaComplianceConfirmed"
+            checked={draft.tcpaComplianceConfirmed}
+            onChange={(event) =>
+              onChange({ tcpaComplianceConfirmed: event.target.checked })
+            }
+            className="mt-0.5"
+            aria-invalid={Boolean(errors.tcpaComplianceConfirmed)}
+          />
+          <span>
+            <Label
+              htmlFor="tcpaComplianceConfirmed"
+              className="cursor-pointer font-medium text-foreground"
+            >
+              I confirm TCPA compliance for this campaign
+            </Label>
+            <span className="mt-1 block text-muted-foreground">
+              I have excluded opted-out and suppressed phone numbers from this
+              audience, verified consent where required, and will honor STOP and
+              other opt-out requests in compliance with TCPA guidelines.
+            </span>
+          </span>
+        </label>
+
+        {errors.tcpaComplianceConfirmed ? (
+          <p className="text-sm text-destructive">{errors.tcpaComplianceConfirmed}</p>
+        ) : null}
+      </section>
 
       <FormField
         label="Test mobile number"
@@ -115,10 +156,15 @@ export function ReviewStep({
           type="button"
           className="w-full sm:w-auto"
           onClick={onActivate}
-          disabled={isActivating}
+          disabled={isActivating || !draft.tcpaComplianceConfirmed}
         >
           {isActivating ? "Activating…" : "Activate campaign"}
         </Button>
+        {!draft.tcpaComplianceConfirmed ? (
+          <p className="mt-2 text-sm text-muted-foreground">
+            Confirm TCPA compliance above to enable activation.
+          </p>
+        ) : null}
       </div>
     </div>
   );

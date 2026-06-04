@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FileText, LayoutList } from "lucide-react";
+import { FileText, LayoutList, Map } from "lucide-react";
 import { AppTitleBar } from "@/components/layout/AppTitleBar";
 import { cn } from "@/lib/utils";
 
@@ -16,6 +16,7 @@ const SIDEBAR_INSET_X = "px-5";
 interface AppShellProps {
   children: React.ReactNode;
   className?: string;
+  contentClassName?: string;
 }
 
 const NAV_ITEMS = [
@@ -28,6 +29,11 @@ const NAV_ITEMS = [
     href: "/campaigns/redlines",
     label: "Redlines",
     icon: FileText,
+  },
+  {
+    href: "/story-map",
+    label: "Story map",
+    icon: Map,
   },
 ] as const;
 
@@ -43,7 +49,11 @@ function isNavItemActive(href: string, pathname: string): boolean {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function AppShell({ children, className }: AppShellProps) {
+export function AppShell({
+  children,
+  className,
+  contentClassName,
+}: AppShellProps) {
   const pathname = usePathname();
 
   return (
@@ -102,7 +112,9 @@ export function AppShell({ children, className }: AppShellProps) {
             className,
           )}
         >
-          <div className="mx-auto max-w-7xl">{children}</div>
+          <div className={cn("mx-auto max-w-7xl", contentClassName)}>
+            {children}
+          </div>
         </main>
       </div>
     </div>

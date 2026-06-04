@@ -8,7 +8,17 @@ function hoursFromNow(offsetHours: number): string {
   return date.toISOString();
 }
 
-export const mockCampaigns: Campaign[] = [
+function deriveMockConversionRate(
+  row: Omit<Campaign, "conversionRate">,
+): number {
+  if (row.messages === 0) return 0;
+  if (row.status === "scheduled" || row.status === "draft") return 0;
+
+  const sequence = Number.parseInt(row.id.replace("cmp-", ""), 10);
+  return Math.round((2.4 + (sequence % 15) * 0.9) * 10) / 10;
+}
+
+const campaignRows: Omit<Campaign, "conversionRate">[] = [
   {
     id: "cmp-001",
     name: "Spring Service Reminder",
@@ -400,3 +410,8 @@ export const mockCampaigns: Campaign[] = [
     nextUpdateAt: hoursFromNow(1),
   },
 ];
+
+export const mockCampaigns: Campaign[] = campaignRows.map((row) => ({
+  ...row,
+  conversionRate: deriveMockConversionRate(row),
+}));

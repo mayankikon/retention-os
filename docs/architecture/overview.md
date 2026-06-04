@@ -18,7 +18,7 @@ Web UI for Ikon's Smart Marketing Campaign Manager. Phase 1 delivers the **Campa
 
 ### Campaign list (Phase 1)
 
-- Campaign list with columns: Name, Dealer, Time Zone, Status, Messages, **Created By**, Last/Next update, Group
+- Campaign list with columns: Name, Dealer, Time Zone, Status, Messages, Conversion Rate, **Created By**
 - Filters: Dealership, Time Zone, Status
 - Search by campaign name
 - Pagination (10 per page)

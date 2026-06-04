@@ -34,7 +34,7 @@ Query parameters (mirror URL state):
 }
 ```
 
-**Campaign object** — see `src/types/campaign.ts` (`createdBy` includes `id`, `name`, `initials`; `createdAt` ISO timestamp).
+**Campaign object** — see `src/types/campaign.ts` (`createdBy` includes `id`, `name`, `initials`; `createdAt` ISO timestamp; `conversionRate` percentage 0–100 for list display).
 
 **POST /campaigns** (proposed) — create from setup wizard; `createdBy` and `createdAt` set server-side from session.
 

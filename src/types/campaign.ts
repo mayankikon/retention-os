@@ -27,6 +27,8 @@ export interface Campaign {
   timeZone: CampaignTimeZone;
   status: CampaignStatus;
   messages: number;
+  /** Percentage 0–100 (e.g. 12.5 = 12.5%). */
+  conversionRate: number;
   createdBy: CampaignCreator;
   createdAt: string;
   group: string;

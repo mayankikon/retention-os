@@ -1,4 +1,6 @@
 import type { CampaignSetupDraft, SetupStepId } from "@/types/campaign-setup";
+import { validateServiceTriggerFields } from "@/lib/service-triggers";
+import { validateDeliveryChannels } from "@/lib/delivery-channels";
 
 export interface StepValidationResult {
   isValid: boolean;
@@ -18,10 +20,6 @@ export function validateGeneralStep(
     errors.campaignName = "Campaign name is required.";
   }
 
-  if (!draft.campaignImageFileName) {
-    errors.campaignImage = "Upload a 2×3 logo or storefront image.";
-  }
-
   if (!draft.timeZone) {
     errors.timeZone = "Select a dealership time zone.";
   }
@@ -38,6 +36,8 @@ export function validateMessagingStep(
     errors.primaryPromoText = "Primary promo text is required.";
   }
 
+  Object.assign(errors, validateDeliveryChannels(draft));
+
   return { isValid: Object.keys(errors).length === 0, errors };
 }
 
@@ -46,18 +46,14 @@ export function validateRemindersStep(
 ): StepValidationResult {
   const errors: Record<string, string> = {};
 
-  if (!hasText(draft.dealerDid)) {
-    errors.dealerDid =
-      "Dealer DID is required and must appear in each reminder.";
+  if (draft.reminder1Enabled && !hasText(draft.reminder1Text)) {
+    errors.reminder1Text = "Reminder 1 text is required when enabled.";
   }
-
-  if (draft.remindersEnabled) {
-    if (!hasText(draft.reminder1Text)) {
-      errors.reminder1Text = "Reminder 1 text is required when enabled.";
-    }
-    if (!hasText(draft.reminder2Text)) {
-      errors.reminder2Text = "Reminder 2 text is required when enabled.";
-    }
+  if (draft.reminder2Enabled && !hasText(draft.reminder2Text)) {
+    errors.reminder2Text = "Reminder 2 text is required when enabled.";
+  }
+  if (draft.reminder3Enabled && !hasText(draft.reminder3Text)) {
+    errors.reminder3Text = "Reminder 3 text is required when enabled.";
   }
 
   return { isValid: Object.keys(errors).length === 0, errors };
@@ -68,17 +64,7 @@ export function validateConfigurationStep(
 ): StepValidationResult {
   const errors: Record<string, string> = {};
 
-  if (draft.campaignType !== "predefined") {
-    errors.campaignType = "Select Predefined unless directed by Leadership.";
-  }
-
-  if (!hasText(draft.serviceInterval)) {
-    errors.serviceInterval = "Select a service interval.";
-  }
-
-  if (draft.subfleets.length === 0) {
-    errors.subfleets = "Select at least one rooftop (subfleet).";
-  }
+  Object.assign(errors, validateServiceTriggerFields(draft));
 
   if (draft.scheduleDays.length === 0) {
     errors.scheduleDays = "Schedule must include Monday through Saturday.";
@@ -89,7 +75,7 @@ export function validateConfigurationStep(
 
 export function validateReviewStep(
   draft: CampaignSetupDraft,
-  options: { requireTestSend: boolean },
+  options: { requireTestSend?: boolean; requireTcpaCompliance?: boolean } = {},
 ): StepValidationResult {
   const errors: Record<string, string> = {};
 
@@ -98,13 +84,18 @@ export function validateReviewStep(
       "Enter a mobile number to send a campaign test before activating.";
   }
 
+  if (options.requireTcpaCompliance && !draft.tcpaComplianceConfirmed) {
+    errors.tcpaComplianceConfirmed =
+      "Confirm TCPA compliance and opt-out suppression before activating.";
+  }
+
   return { isValid: Object.keys(errors).length === 0, errors };
 }
 
 export function validateSetupStep(
   stepId: SetupStepId,
   draft: CampaignSetupDraft,
-  options?: { requireTestSend?: boolean },
+  options?: { requireTestSend?: boolean; requireTcpaCompliance?: boolean },
 ): StepValidationResult {
   switch (stepId) {
     case "general":
@@ -118,6 +109,7 @@ export function validateSetupStep(
     case "review":
       return validateReviewStep(draft, {
         requireTestSend: options?.requireTestSend ?? false,
+        requireTcpaCompliance: options?.requireTcpaCompliance ?? false,
       });
     default:
       return { isValid: true, errors: {} };

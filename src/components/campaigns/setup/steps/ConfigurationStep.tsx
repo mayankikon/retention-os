@@ -2,7 +2,6 @@
 
 import { FormField } from "@/components/campaigns/setup/FormField";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -11,14 +10,28 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  CAMPAIGN_TYPE_OPTIONS,
   getTimeZoneLabel,
-  SERVICE_INTERVAL_OPTIONS,
-  SUBFLEET_OPTIONS,
   TIME_ZONE_SCHEDULE_REFERENCE,
 } from "@/data/campaign-setup.defaults";
+import {
+  getOemMakes,
+  getOemModelsForMake,
+  getOemServiceSchedule,
+  MILEAGE_SERVICE_TRIGGER_OPTIONS,
+  SERVICE_TRIGGER_TYPE_OPTIONS,
+  TIME_SERVICE_TRIGGER_OPTIONS,
+} from "@/data/service-triggers";
 import { CONFIGURATION_DAY_LABELS } from "@/lib/format-schedule";
-import type { CampaignSetupDraft, ScheduleDay } from "@/types/campaign-setup";
+import {
+  getServiceTriggerSummaries,
+  isServiceTriggerEnabled,
+  toggleServiceTriggerType,
+} from "@/lib/service-triggers";
+import type {
+  CampaignSetupDraft,
+  ScheduleDay,
+  ServiceTriggerType,
+} from "@/types/campaign-setup";
 import { SCHEDULE_DAYS } from "@/types/campaign-setup";
 import { cn } from "@/lib/utils";
 
@@ -33,12 +46,18 @@ export function ConfigurationStep({
   errors,
   onChange,
 }: ConfigurationStepProps) {
-  const toggleSubfleet = (value: string, checked: boolean) => {
-    const next = checked
-      ? [...draft.subfleets, value]
-      : draft.subfleets.filter((s) => s !== value);
-    onChange({ subfleets: next });
-  };
+  const oemModels = draft.oemMake ? getOemModelsForMake(draft.oemMake) : [];
+  const oemSchedule =
+    draft.oemMake && draft.oemModel
+      ? getOemServiceSchedule(draft.oemMake, draft.oemModel)
+      : undefined;
+  const serviceTriggerError =
+    errors.serviceTriggerTypes ??
+    errors.timeServiceTriggerPreset ??
+    errors.mileageServiceTriggerPreset ??
+    errors.oemMake ??
+    errors.oemModel;
+  const selectedSummaries = getServiceTriggerSummaries(draft);
 
   const toggleDay = (day: ScheduleDay, checked: boolean) => {
     const next = checked
@@ -47,108 +66,201 @@ export function ConfigurationStep({
     onChange({ scheduleDays: next });
   };
 
+  const handleTriggerTypeToggle = (
+    triggerType: ServiceTriggerType,
+    enabled: boolean,
+  ) => {
+    onChange(toggleServiceTriggerType(draft, triggerType, enabled));
+  };
+
   return (
     <div className="space-y-6">
       <FormField
-        label="Campaign type"
-        error={errors.campaignType}
+        label="Service triggers"
+        error={serviceTriggerError}
+        hint="Select one or more triggers. Outreach fires when any enabled condition is met."
         required
       >
-        <div className="space-y-2">
-          {CAMPAIGN_TYPE_OPTIONS.map((option) => (
-            <label
-              key={option.value}
-              className={cn(
-                "flex cursor-pointer items-start gap-3 rounded-md border border-border p-3",
-                draft.campaignType === option.value && "border-brand-primary bg-muted/50",
-                option.disabled && "cursor-not-allowed opacity-60",
-              )}
-            >
-              <input
-                type="radio"
-                name="campaignType"
-                value={option.value}
-                checked={draft.campaignType === option.value}
-                disabled={option.disabled}
-                onChange={() => onChange({ campaignType: option.value })}
-                className="mt-1"
-              />
-              <span>
-                <span className="font-medium">{option.label}</span>
-                <span className="block text-xs text-muted-foreground">
-                  {option.description}
-                </span>
-              </span>
-            </label>
-          ))}
-        </div>
-      </FormField>
+        <div className="space-y-3">
+          {SERVICE_TRIGGER_TYPE_OPTIONS.map((option) => {
+            const isEnabled = isServiceTriggerEnabled(draft, option.value);
 
-      <FormField
-        label="Services"
-        htmlFor="serviceInterval"
-        error={errors.serviceInterval}
-        required
-      >
-        <Select
-          value={draft.serviceInterval}
-          onValueChange={(value) => onChange({ serviceInterval: value })}
-        >
-          <SelectTrigger id="serviceInterval">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {SERVICE_INTERVAL_OPTIONS.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>
-                {opt.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </FormField>
+            return (
+              <div
+                key={option.value}
+                className={cn(
+                  "rounded-md border border-border p-3",
+                  isEnabled && "border-brand-primary bg-muted/50",
+                )}
+              >
+                <label className="flex cursor-pointer items-start gap-3">
+                  <Checkbox
+                    checked={isEnabled}
+                    onChange={(event) =>
+                      handleTriggerTypeToggle(option.value, event.target.checked)
+                    }
+                    className="mt-0.5"
+                    aria-label={option.label}
+                  />
+                  <span>
+                    <span className="font-medium">{option.label}</span>
+                    <span className="block text-xs text-muted-foreground">
+                      {option.description}
+                    </span>
+                  </span>
+                </label>
 
-      <FormField
-        label="Subfleets"
-        error={errors.subfleets}
-        hint="Select the rooftop(s) for this campaign."
-        required
-      >
-        <div className="grid gap-2 sm:grid-cols-2">
-          {SUBFLEET_OPTIONS.map((opt) => (
-            <label
-              key={opt.value}
-              className="flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm hover:bg-muted/50"
-            >
-              <Checkbox
-                checked={draft.subfleets.includes(opt.value)}
-                onChange={(e) => toggleSubfleet(opt.value, e.target.checked)}
-              />
-              {opt.label}
-            </label>
-          ))}
-        </div>
-      </FormField>
+                {isEnabled && option.value === "time" ? (
+                  <div className="mt-3 pl-7">
+                    <Select
+                      value={draft.timeServiceTriggerPreset}
+                      onValueChange={(value) =>
+                        onChange({ timeServiceTriggerPreset: value })
+                      }
+                    >
+                      <SelectTrigger
+                        id="timeServiceTriggerPreset"
+                        aria-label="Time interval"
+                      >
+                        <SelectValue placeholder="Select time interval" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {TIME_SERVICE_TRIGGER_OPTIONS.map((preset) => (
+                          <SelectItem key={preset.value} value={preset.value}>
+                            {preset.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {errors.timeServiceTriggerPreset ? (
+                      <p className="mt-2 text-sm text-destructive">
+                        {errors.timeServiceTriggerPreset}
+                      </p>
+                    ) : null}
+                  </div>
+                ) : null}
 
-      <FormField label="Delivery frequency" required>
-        <div className="flex flex-wrap gap-4">
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="radio"
-              name="deliveryFrequency"
-              checked={draft.deliveryFrequency === "ongoing"}
-              onChange={() => onChange({ deliveryFrequency: "ongoing" })}
-            />
-            Ongoing
-          </label>
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="radio"
-              name="deliveryFrequency"
-              checked={draft.deliveryFrequency === "send_once"}
-              onChange={() => onChange({ deliveryFrequency: "send_once" })}
-            />
-            Send once
-          </label>
+                {isEnabled && option.value === "mileage" ? (
+                  <div className="mt-3 pl-7">
+                    <Select
+                      value={draft.mileageServiceTriggerPreset}
+                      onValueChange={(value) =>
+                        onChange({ mileageServiceTriggerPreset: value })
+                      }
+                    >
+                      <SelectTrigger
+                        id="mileageServiceTriggerPreset"
+                        aria-label="Mileage interval"
+                      >
+                        <SelectValue placeholder="Select mileage interval" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {MILEAGE_SERVICE_TRIGGER_OPTIONS.map((preset) => (
+                          <SelectItem key={preset.value} value={preset.value}>
+                            {preset.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {errors.mileageServiceTriggerPreset ? (
+                      <p className="mt-2 text-sm text-destructive">
+                        {errors.mileageServiceTriggerPreset}
+                      </p>
+                    ) : null}
+                  </div>
+                ) : null}
+
+                {isEnabled && option.value === "oem" ? (
+                  <div className="mt-3 space-y-4 pl-7">
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <FormField
+                        label="Make"
+                        htmlFor="oemMake"
+                        error={errors.oemMake}
+                        required
+                      >
+                        <Select
+                          value={draft.oemMake || undefined}
+                          onValueChange={(value) =>
+                            onChange({ oemMake: value, oemModel: "" })
+                          }
+                        >
+                          <SelectTrigger id="oemMake">
+                            <SelectValue placeholder="Select make" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {getOemMakes().map((make) => (
+                              <SelectItem key={make} value={make}>
+                                {make}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FormField>
+
+                      <FormField
+                        label="Model"
+                        htmlFor="oemModel"
+                        error={errors.oemModel}
+                        required
+                      >
+                        <Select
+                          value={draft.oemModel || undefined}
+                          onValueChange={(value) => onChange({ oemModel: value })}
+                          disabled={!draft.oemMake}
+                        >
+                          <SelectTrigger id="oemModel">
+                            <SelectValue
+                              placeholder={
+                                draft.oemMake
+                                  ? "Select model"
+                                  : "Choose make first"
+                              }
+                            />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {oemModels.map((model) => (
+                              <SelectItem key={model} value={model}>
+                                {model}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FormField>
+                    </div>
+
+                    {oemSchedule ? (
+                      <div className="rounded-md border border-border bg-background p-3 text-sm">
+                        <p className="font-medium text-foreground">
+                          {oemSchedule.make} {oemSchedule.model} OEM schedule
+                        </p>
+                        <p className="mt-1 text-muted-foreground">
+                          Trigger: every{" "}
+                          {oemSchedule.intervalMiles.toLocaleString("en-US")} miles or{" "}
+                          {oemSchedule.intervalDays} days — {oemSchedule.summary}
+                        </p>
+                      </div>
+                    ) : null}
+                  </div>
+                ) : null}
+              </div>
+            );
+          })}
+
+          {errors.serviceTriggerTypes ? (
+            <p className="text-sm text-destructive">{errors.serviceTriggerTypes}</p>
+          ) : null}
+
+          {selectedSummaries.length > 0 ? (
+            <div className="rounded-md border border-border bg-muted/20 p-3 text-sm">
+              <p className="font-medium text-foreground">Active triggers</p>
+              <ul className="mt-2 space-y-1 text-muted-foreground">
+                {selectedSummaries.map((summary) => (
+                  <li key={summary}>{summary}</li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
         </div>
       </FormField>
 

@@ -17,11 +17,11 @@ flowchart LR
 
 | Step | Route `?step=` | SOP section | Key fields |
 |------|----------------|-------------|------------|
-| General | `general` | General Identification | Name (SM template), 2×3 image |
-| Messaging | `messaging` | Messaging & Variables | Primary promo, Dealer URL, Additional URL |
-| Reminders | `reminders` | Reminder Sequences | Enable, DID, Reminder 1–3 |
-| Configuration | `configuration` | Standard Configuration | Type, Services, Subfleets, Frequency, Schedule |
-| Review | `review` | QA & Activation | Test send, Activate |
+| General | `general` | General Identification | Name (SM template), dealership time zone |
+| Messaging | `messaging` | Messaging & Variables | Delivery channels, templates, primary promo, dealer URL, optional image |
+| Reminders | `reminders` | Reminder Sequences | Enable 1–3 reminders, text + image or reuse primary image |
+| Configuration | `configuration` | Standard Configuration | Service triggers (multi-select), schedule |
+| Review | `review` | QA & Activation | Test send, suppression list, TCPA confirmation, Activate |
 
 ## Components
 
@@ -31,7 +31,7 @@ flowchart LR
 | Shell | `StepShellLayout.tsx`, `StepperHeader.tsx`, `MessagePreviewPanel.tsx` |
 | Steps | `setup/steps/*.tsx` |
 | Success | `ConfirmationView.tsx` |
-| Message preview | `MessagePreviewPanel.tsx` — sticky phone mockup; `preview-message.ts` resolves variables with sample data |
+| Message preview | `MessagePreviewPanel.tsx` — SMS device + email inbox mockups; channel tabs when both enabled |
 
 ## Validation
 

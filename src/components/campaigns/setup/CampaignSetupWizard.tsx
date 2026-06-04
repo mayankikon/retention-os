@@ -96,9 +96,18 @@ export function CampaignSetupWizard() {
     if (!isTestSent) {
       const testResult = validateSetupStep("review", draft, {
         requireTestSend: true,
+        requireTcpaCompliance: true,
       });
       if (!testResult.isValid) {
         setErrors(testResult.errors);
+        return;
+      }
+    } else {
+      const complianceResult = validateSetupStep("review", draft, {
+        requireTcpaCompliance: true,
+      });
+      if (!complianceResult.isValid) {
+        setErrors(complianceResult.errors);
         return;
       }
     }

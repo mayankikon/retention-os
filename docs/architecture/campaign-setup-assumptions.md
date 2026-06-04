@@ -12,24 +12,22 @@ Standard Operating Procedure for Campaign Setup in Smart Marketing Campaign Mana
 |-----------|---------|-------|
 | Preparation & user provisioning (Planet X, Super Admin user) | Callout only | Operational; not in wizard |
 | + New Campaign | `/campaigns/new` | Entry from list “Create campaign” |
-| General Identification | Step `general` | Name template + image upload |
-| Messaging & Variables | Step `messaging` | Default templates pre-filled |
-| Reminder Sequences | Step `reminders` | DID + 3 reminders |
-| Standard Configuration | Step `configuration` | Predefined type, 180d/5k service, subfleets, ongoing/once, Mon–Sat + TZ table |
-| QA & Activation | Step `review` | Test send + Activate |
+| General Identification | Step `general` | Name template, dealership time zone |
+| Messaging & Variables | Step `messaging` | Delivery channels (SMS/email), templates, primary promo, dealer URL, optional image |
+| Reminder Sequences | Step `reminders` | Per-reminder enable toggles, optional image or reuse primary image |
+| Standard Configuration | Step `configuration` | Service triggers (multi-select time / mileage / OEM), Mon–Sat + TZ table |
+| QA & Activation | Step `review` | Test send, optional suppression list upload, TCPA compliance confirmation, Activate |
 
 ## Defaults (from SOP)
 
 - Primary promo and Reminder 1/2 copy: `src/data/campaign-setup.defaults.ts`
-- Service interval: Every 180 Days / 5000 Mile
-- Campaign type: Predefined (Custom/Push disabled)
+- Service triggers: one or more of time, mileage, or OEM make/model (`src/data/service-triggers.ts`); default time preset 180 days / 5,000 miles
+- Campaign type: Predefined (only supported type in wizard)
 - Schedule days: Monday–Saturday
-- Delivery: Ongoing (Send once optional)
 
 ## Deferred / mock
 
 - Real API persistence and Planet X DSP sync
-- Leadership-only campaign types (UI disabled)
 - Official Ikon design tokens (placeholder CSS until provided)
 
 ## Open items

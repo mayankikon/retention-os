@@ -7,18 +7,11 @@ const PREVIEW_SAMPLE_VALUES: Record<string, string> = {
   "(Dealer DID)": "(555) 123-4567",
 };
 
-export function resolveMessagePreviewText(
-  template: string,
-  dealerDid?: string,
-): string {
+export function resolveMessagePreviewText(template: string): string {
   let resolved = template;
 
   for (const [token, sample] of Object.entries(PREVIEW_SAMPLE_VALUES)) {
-    if (token === "(Dealer DID)" && dealerDid?.trim()) {
-      resolved = resolved.split(token).join(dealerDid.trim());
-    } else {
-      resolved = resolved.split(token).join(sample);
-    }
+    resolved = resolved.split(token).join(sample);
   }
 
   return resolved.trim();

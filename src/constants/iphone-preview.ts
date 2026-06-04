@@ -17,8 +17,8 @@ export const IPHONE_DEVICE_OUTER_RADIUS_PX = 44;
 /** Inner screen corner radius at full design size. */
 export const IPHONE_SCREEN_RADIUS_PX = 36;
 
-/** Visual scale for the setup wizard preview (half of full size). */
-export const IPHONE_PREVIEW_SCALE = 0.5;
+/** Visual scale for the setup wizard preview (~72% of full device size). */
+export const IPHONE_PREVIEW_SCALE = 0.72;
 
 export const IPHONE_PREVIEW_OUTER_WIDTH_PX = Math.round(
   IPHONE_DEVICE_OUTER_WIDTH_PX * IPHONE_PREVIEW_SCALE,

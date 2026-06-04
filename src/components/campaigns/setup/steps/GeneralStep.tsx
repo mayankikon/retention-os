@@ -22,23 +22,6 @@ interface GeneralStepProps {
 }
 
 export function GeneralStep({ draft, errors, onChange }: GeneralStepProps) {
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) {
-      onChange({
-        campaignImageFileName: null,
-        campaignImagePreviewUrl: null,
-      });
-      return;
-    }
-
-    const previewUrl = URL.createObjectURL(file);
-    onChange({
-      campaignImageFileName: file.name,
-      campaignImagePreviewUrl: previewUrl,
-    });
-  };
-
   return (
     <div className="space-y-6">
       <FormField
@@ -81,29 +64,6 @@ export function GeneralStep({ draft, errors, onChange }: GeneralStepProps) {
             ))}
           </SelectContent>
         </Select>
-      </FormField>
-
-      <FormField
-        label="Campaign image"
-        htmlFor="campaignImage"
-        hint="Upload a 2×3 logo or high-quality storefront image."
-        error={errors.campaignImage}
-        required
-      >
-        <Input
-          id="campaignImage"
-          type="file"
-          accept="image/*"
-          onChange={handleImageChange}
-          className="cursor-pointer file:mr-4 file:rounded-md file:border-0 file:bg-muted file:px-3 file:py-1 file:text-sm"
-        />
-        {draft.campaignImagePreviewUrl ? (
-          <img
-            src={draft.campaignImagePreviewUrl}
-            alt="Campaign preview"
-            className="mt-3 max-h-40 rounded-md border border-border object-contain"
-          />
-        ) : null}
       </FormField>
     </div>
   );

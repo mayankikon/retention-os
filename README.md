@@ -28,6 +28,7 @@ Open [http://localhost:3000/campaigns](http://localhost:3000/campaigns).
 | `/campaigns/new` | Campaign setup wizard (SOP-aligned, 5 steps) |
 | `/campaigns/redlines` | Engineering handoff / interaction specs |
 | `/campaigns/[id]` | Detail stub |
+| `/story-map` | Story map roadmap (features on Jun 2026–Jun 2027 timeline) |
 
 ## Documentation
 

@@ -17,15 +17,6 @@ describe("resolveMessagePreviewText", () => {
     expect(result).toContain("schedule.dealer.com");
     expect(result).toContain("(555) 123-4567");
   });
-
-  it("uses dealer DID when provided", () => {
-    const result = resolveMessagePreviewText(
-      "Call us at (Dealer DID)",
-      "(800) 555-0199",
-    );
-
-    expect(result).toBe("Call us at (800) 555-0199");
-  });
 });
 
 describe("getPreviewSenderName", () => {

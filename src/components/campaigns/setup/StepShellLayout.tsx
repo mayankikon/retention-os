@@ -31,11 +31,13 @@ export function StepShellLayout({
         completedSteps={completedSteps}
       />
 
-      <div className="grid gap-8 lg:grid-cols-[1fr_220px]">
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,360px)]">
         <div className="min-w-0 rounded-lg border border-border bg-card p-6 shadow-sm">
           {children}
         </div>
-        <MessagePreviewPanel draft={draft} currentStepId={currentStepId} />
+        <div className="min-w-0">
+          <MessagePreviewPanel draft={draft} currentStepId={currentStepId} />
+        </div>
       </div>
     </div>
   );
