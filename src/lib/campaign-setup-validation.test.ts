@@ -15,14 +15,16 @@ function validDraft(): CampaignSetupDraft {
     ...createDefaultSetupDraft(),
     campaignName: "SM ABC Motors PST 2/17 JT",
     campaignImageFileName: "logo.png",
+    subfleets: ["Ikon Motors North"],
   };
 }
 
 describe("validateGeneralStep", () => {
-  it("requires campaign name", () => {
+  it("requires campaign name and dealership", () => {
     const result = validateGeneralStep(createDefaultSetupDraft());
     expect(result.isValid).toBe(false);
     expect(result.errors.campaignName).toBeDefined();
+    expect(result.errors.dealership).toBeDefined();
     expect(result.errors.campaignImage).toBeUndefined();
   });
 

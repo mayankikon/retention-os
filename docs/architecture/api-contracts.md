@@ -38,6 +38,27 @@ Query parameters (mirror URL state):
 
 **POST /campaigns** (proposed) — create from setup wizard; `createdBy` and `createdAt` set server-side from session.
 
+## Planned: Get campaign detail
+
+**`GET /campaigns/:id`**
+
+Returns a single `Campaign` object (see `src/types/campaign.ts`) plus derived analytics:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `recipientsSent` | integer | Customers the campaign was sent to |
+| `openedCount` | integer | Messages opened |
+| `clickedCount` | integer | Link clicks |
+| `revenueGenerated` | number | Estimated attributed revenue (USD) |
+
+Phase 1 derives analytics client-side via `getCampaignAnalytics()` from mock/list fields.
+
+## Planned: Campaign changelog
+
+**`GET /campaigns/:id/changelog`**
+
+Returns `CampaignChangelogEntry[]` — see `src/types/campaign-detail.ts` (`timestamp`, `actor`, `action`, `summary`, optional `details`). Phase 1 builds mock changelog from campaign lifecycle in `buildCampaignChangelog()`.
+
 ## Data refresh
 
 Global indicator values may come from a separate `GET /campaigns/sync-status` or be embedded in the list response.

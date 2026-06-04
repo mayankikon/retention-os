@@ -50,10 +50,16 @@ export function MessagePreviewPanel({
     enabledChannels.length === 0
       ? "Select at least one delivery channel to preview."
       : enabledChannels.length === 1 && enabledChannels[0] === "email"
-        ? "Preview the email your customer receives for the current step."
+        ? currentStepId === "reminders"
+          ? "Preview the reminder emails your customers receive."
+          : "Preview the primary email your customer receives."
         : enabledChannels.length === 1
-          ? "How customers see your SMS — scroll inside the device for more messages."
-          : "Switch channels to preview SMS and email side by side.";
+          ? currentStepId === "reminders"
+            ? "How customers see your reminder SMS — scroll inside the device for more messages."
+            : "How customers see your primary SMS."
+          : currentStepId === "reminders"
+            ? "Switch channels to preview reminder SMS and email."
+            : "Switch channels to preview primary SMS and email.";
 
   return (
     <aside
@@ -140,18 +146,24 @@ function buildPreviewMessages(
     imagePreviewUrl: string | null;
   }> = [];
 
-  const primaryBody = resolveMessagePreviewText(draft.primaryPromoText);
+  const isRemindersStep = currentStepId === "reminders";
 
-  if (primaryBody) {
-    messages.push({
-      id: "primary",
-      label:
-        currentStepId === "messaging" || currentStepId === "general"
-          ? "Primary promo"
-          : "",
-      body: primaryBody,
-      imagePreviewUrl: draft.campaignImagePreviewUrl,
-    });
+  if (!isRemindersStep) {
+    const primaryBody = resolveMessagePreviewText(draft.primaryPromoText);
+
+    if (primaryBody) {
+      messages.push({
+        id: "primary",
+        label:
+          currentStepId === "messaging" || currentStepId === "general"
+            ? "Primary promo"
+            : "",
+        body: primaryBody,
+        imagePreviewUrl: draft.campaignImagePreviewUrl,
+      });
+    }
+
+    return messages;
   }
 
   const reminderConfigs = [
@@ -186,7 +198,7 @@ function buildPreviewMessages(
 
     messages.push({
       id: reminder.id,
-      label: currentStepId === "reminders" ? reminder.label : "",
+      label: reminder.label,
       body,
       imagePreviewUrl: getReminderImagePreviewUrl(draft, reminder.index),
     });
@@ -207,7 +219,7 @@ function getHighlightedMessageId(
       return "primary";
     case "reminders": {
       const enabled = getEnabledReminderIndices(draft);
-      if (enabled.length === 0) return "primary";
+      if (enabled.length === 0) return null;
       return `reminder${enabled[0]}`;
     }
     default:

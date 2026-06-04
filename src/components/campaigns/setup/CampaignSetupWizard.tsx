@@ -27,7 +27,13 @@ const stepParser = parseAsStringLiteral(SETUP_STEPS).withDefault("general");
 export function CampaignSetupWizard() {
   const currentUser = useCurrentUser();
   const [step, setStep] = useQueryState("step", stepParser);
-  const [draft, setDraft] = useState<CampaignSetupDraft>(createDefaultSetupDraft);
+  const [draft, setDraft] = useState<CampaignSetupDraft>(() => {
+    const base = createDefaultSetupDraft();
+    if (currentUser.dealership) {
+      return { ...base, subfleets: [currentUser.dealership] };
+    }
+    return base;
+  });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [completedSteps, setCompletedSteps] = useState<Set<SetupStepId>>(
     () => new Set(),

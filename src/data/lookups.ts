@@ -39,6 +39,14 @@ export const dealerFilterOptions = DEALERS.map((dealer) => ({
   label: dealer,
 }));
 
+/** Assignable dealerships for campaign setup (excludes the list filter sentinel). */
+export const dealershipOptions = DEALERS.filter(
+  (dealer) => dealer !== "All Dealerships",
+).map((dealer) => ({
+  value: dealer,
+  label: dealer,
+}));
+
 export const timeZoneFilterOptions = [
   { value: FILTER_ALL, label: "All Time Zones" },
   ...CAMPAIGN_TIME_ZONES.map((timeZone) => ({

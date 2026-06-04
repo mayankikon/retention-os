@@ -7,6 +7,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   Table,
@@ -79,6 +80,8 @@ interface CampaignTableProps {
 }
 
 export function CampaignTable({ campaigns }: CampaignTableProps) {
+  const router = useRouter();
+
   const table = useReactTable({
     data: campaigns,
     columns,
@@ -111,6 +114,13 @@ export function CampaignTable({ campaigns }: CampaignTableProps) {
                 key={row.id}
                 tabIndex={0}
                 className="cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring active:bg-muted/80"
+                onClick={() => router.push(`/campaigns/${row.original.id}`)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    router.push(`/campaigns/${row.original.id}`);
+                  }
+                }}
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>

@@ -1,9 +1,19 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { Suspense } from "react";
 import { AppShell } from "@/components/layout/AppShell";
+import { CampaignDetailView } from "@/components/campaigns/detail/CampaignDetailView";
 
 interface CampaignDetailPageProps {
   params: Promise<{ id: string }>;
+}
+
+function CampaignDetailFallback() {
+  return (
+    <div className="animate-pulse space-y-6">
+      <div className="h-8 w-48 rounded bg-muted" />
+      <div className="h-24 rounded-lg bg-muted" />
+      <div className="h-64 rounded-lg bg-muted" />
+    </div>
+  );
 }
 
 export default async function CampaignDetailPage({
@@ -13,16 +23,9 @@ export default async function CampaignDetailPage({
 
   return (
     <AppShell>
-      <div className="rounded-lg border border-border bg-card p-6">
-        <h1 className="text-xl font-semibold">Campaign {id}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Campaign detail view is out of scope for Phase 1. This route exists so
-          list row links resolve correctly.
-        </p>
-        <Button asChild variant="outline" className="mt-4">
-          <Link href="/campaigns">Back to list</Link>
-        </Button>
-      </div>
+      <Suspense fallback={<CampaignDetailFallback />}>
+        <CampaignDetailView campaignId={id} />
+      </Suspense>
     </AppShell>
   );
 }

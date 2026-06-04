@@ -11,10 +11,11 @@ src/
 │   │   ├── error.tsx
 │   │   ├── new/page.tsx        # Campaign setup wizard
 │   │   ├── redlines/page.tsx   # Engineering handoff specs
-│   │   └── [id]/page.tsx       # Detail stub (out of scope)
+│   │   └── [id]/page.tsx       # Campaign detail (Details + Change log tabs)
 │   └── story-map/page.tsx      # Story map roadmap board
 ├── components/
-│   ├── campaigns/              # List + setup feature components
+│   ├── campaigns/              # List + detail + setup feature components
+│   │   ├── detail/             # Campaign detail tabs (Details, Change log)
 │   │   └── setup/              # Wizard steps, shell, confirmation
 │   ├── story-map/              # Roadmap sidebar, timeline, bars
 │   ├── layout/AppShell.tsx

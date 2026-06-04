@@ -34,4 +34,4 @@ Web UI for Ikon's Smart Marketing Campaign Manager. Phase 1 delivers the **Campa
 ## External boundaries
 
 - **In scope later**: REST/GraphQL API replacing mock data (`docs/architecture/api-contracts.md`)
-- **Out of scope**: Campaign analytics, reporting, user management, campaign detail UX (minimal stub route only)
+- **Out of scope**: Campaign analytics backend, reporting dashboards, user management

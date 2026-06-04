@@ -14,7 +14,7 @@ export const SETUP_STEP_META: SetupStepMeta[] = [
   {
     id: "general",
     label: "General",
-    description: "Campaign name and image",
+    description: "Dealership, name, and time zone",
   },
   {
     id: "messaging",

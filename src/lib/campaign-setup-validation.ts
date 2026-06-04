@@ -20,6 +20,10 @@ export function validateGeneralStep(
     errors.campaignName = "Campaign name is required.";
   }
 
+  if (draft.subfleets.length === 0 || !hasText(draft.subfleets[0] ?? "")) {
+    errors.dealership = "Select a dealership.";
+  }
+
   if (!draft.timeZone) {
     errors.timeZone = "Select a dealership time zone.";
   }

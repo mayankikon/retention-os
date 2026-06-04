@@ -13,6 +13,7 @@ import {
   CAMPAIGN_NAME_TEMPLATE_HINT,
   TIME_ZONE_OPTIONS,
 } from "@/data/campaign-setup.defaults";
+import { dealershipOptions } from "@/data/lookups";
 import type { CampaignSetupDraft } from "@/types/campaign-setup";
 
 interface GeneralStepProps {
@@ -22,8 +23,34 @@ interface GeneralStepProps {
 }
 
 export function GeneralStep({ draft, errors, onChange }: GeneralStepProps) {
+  const selectedDealership = draft.subfleets[0] ?? "";
+
   return (
     <div className="space-y-6">
+      <FormField
+        label="Dealership"
+        htmlFor="dealership"
+        hint="The store this campaign will run for."
+        error={errors.dealership}
+        required
+      >
+        <Select
+          value={selectedDealership || undefined}
+          onValueChange={(value) => onChange({ subfleets: [value] })}
+        >
+          <SelectTrigger id="dealership" aria-invalid={Boolean(errors.dealership)}>
+            <SelectValue placeholder="Select dealership" />
+          </SelectTrigger>
+          <SelectContent>
+            {dealershipOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </FormField>
+
       <FormField
         label="Campaign name"
         htmlFor="campaignName"
