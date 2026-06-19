@@ -1,5 +1,6 @@
 "use client";
 
+import { AudienceFilters } from "@/components/campaigns/setup/AudienceFilters";
 import { FormField } from "@/components/campaigns/setup/FormField";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -263,6 +264,8 @@ export function ConfigurationStep({
           ) : null}
         </div>
       </FormField>
+
+      <AudienceFilters draft={draft} errors={errors} onChange={onChange} />
 
       <FormField
         label="Define schedule"

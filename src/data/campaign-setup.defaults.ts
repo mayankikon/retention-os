@@ -29,7 +29,7 @@ export const SETUP_STEP_META: SetupStepMeta[] = [
   {
     id: "configuration",
     label: "Configuration",
-    description: "Type, services, schedule",
+    description: "Type, services, audience, schedule",
   },
   {
     id: "review",
@@ -130,6 +130,7 @@ export function createDefaultSetupDraft(): CampaignSetupDraft {
     suppressionListFileName: null,
     suppressionListEntryCount: null,
     tcpaComplianceConfirmed: false,
+    audienceFilters: [],
   };
 }
 

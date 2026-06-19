@@ -1,13 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { AlertCircle, Send, ShieldCheck } from "lucide-react";
+import { AlertCircle, Send, ShieldCheck, Users } from "lucide-react";
 import { FormField } from "@/components/campaigns/setup/FormField";
 import { SuppressionListUpload } from "@/components/campaigns/setup/SuppressionListUpload";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  estimateAudienceReach,
+  summarizeAudienceFilters,
+} from "@/lib/audience-filters";
 import type { CampaignSetupDraft } from "@/types/campaign-setup";
 
 interface ReviewStepProps {
@@ -40,8 +44,40 @@ export function ReviewStep({
     onTestSend();
   };
 
+  const audienceSummary = summarizeAudienceFilters(draft.audienceFilters);
+  const audienceReach = estimateAudienceReach(draft.audienceFilters);
+
   return (
     <div className="space-y-6">
+      <section className="space-y-3 rounded-md border border-border bg-muted/20 p-4">
+        <div className="flex items-start gap-2">
+          <Users className="mt-0.5 h-4 w-4 shrink-0 text-brand-primary" />
+          <div>
+            <h3 className="text-sm font-semibold">Audience targeting</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {audienceSummary.length === 0
+                ? "All customers — no audience filters applied."
+                : "Customers must match every filter below."}
+            </p>
+          </div>
+        </div>
+
+        {audienceSummary.length > 0 ? (
+          <ul className="space-y-1 pl-6 text-sm text-muted-foreground">
+            {audienceSummary.map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ul>
+        ) : null}
+
+        <p className="pl-6 text-sm">
+          Estimated reach:{" "}
+          <span className="font-medium text-foreground">
+            ~{audienceReach.toLocaleString("en-US")} vehicles
+          </span>
+        </p>
+      </section>
+
       <section className="space-y-4 rounded-md border border-border p-4">
         <div>
           <h3 className="text-sm font-semibold">Audience suppression</h3>

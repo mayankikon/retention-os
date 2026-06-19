@@ -40,6 +40,26 @@ export type CampaignMessageTemplateId =
 export const DELIVERY_CHANNELS = ["sms", "email"] as const;
 export type DeliveryChannel = (typeof DELIVERY_CHANNELS)[number];
 
+export const AUDIENCE_ATTRIBUTES = [
+  "vehicleYear",
+  "vehicleMake",
+  "vehicleModel",
+  "customerName",
+  "customerZip",
+  "customerCity",
+  "installedDate",
+  "registrationDate",
+  "odometer",
+] as const;
+
+export type AudienceAttribute = (typeof AUDIENCE_ATTRIBUTES)[number];
+
+export interface AudienceFilterRule {
+  id: string;
+  attribute: AudienceAttribute;
+  value: string;
+}
+
 export interface CampaignSetupDraft {
   campaignName: string;
   campaignImageFileName: string | null;
@@ -76,6 +96,7 @@ export interface CampaignSetupDraft {
   suppressionListFileName: string | null;
   suppressionListEntryCount: number | null;
   tcpaComplianceConfirmed: boolean;
+  audienceFilters: AudienceFilterRule[];
 }
 
 export interface SetupStepMeta {

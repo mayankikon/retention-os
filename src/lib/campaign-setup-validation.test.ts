@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createDefaultSetupDraft } from "@/data/campaign-setup.defaults";
 import {
   validateAllStepsBeforeActivate,
+  validateAudienceStep,
   validateConfigurationStep,
   validateGeneralStep,
   validateMessagingStep,
@@ -94,6 +95,35 @@ describe("validateConfigurationStep", () => {
     expect(result.isValid).toBe(false);
     expect(result.errors.oemMake).toBeDefined();
     expect(result.errors.oemModel).toBeDefined();
+  });
+});
+
+describe("validateAudienceStep", () => {
+  it("is valid with no filters (targets all customers)", () => {
+    const draft = { ...validDraft(), audienceFilters: [] };
+    expect(validateAudienceStep(draft).isValid).toBe(true);
+  });
+
+  it("is valid when every added rule is complete", () => {
+    const draft = {
+      ...validDraft(),
+      audienceFilters: [
+        { id: "a", attribute: "vehicleMake" as const, value: "Honda" },
+      ],
+    };
+    expect(validateAudienceStep(draft).isValid).toBe(true);
+  });
+
+  it("flags an incomplete rule by its id", () => {
+    const draft = {
+      ...validDraft(),
+      audienceFilters: [
+        { id: "a", attribute: "vehicleMake" as const, value: "" },
+      ],
+    };
+    const result = validateAudienceStep(draft);
+    expect(result.isValid).toBe(false);
+    expect(result.errors["audience.a"]).toBeDefined();
   });
 });
 
