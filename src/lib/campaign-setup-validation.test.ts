@@ -100,14 +100,16 @@ describe("validateConfigurationStep", () => {
 });
 
 describe("validateAudienceStep", () => {
-  it("is valid with no filters (targets all customers)", () => {
+  it("is valid when audience targeting is not selected", () => {
     const draft = { ...validDraft(), audienceFilters: [] };
     expect(validateAudienceStep(draft).isValid).toBe(true);
   });
 
-  it("is valid when every added rule is complete", () => {
+  it("is valid when every added rule is complete in audience mode", () => {
     const draft = {
       ...validDraft(),
+      serviceTriggerMode: "audience" as const,
+      serviceTriggerTypes: ["audience"] as const,
       audienceFilters: [
         { id: "a", attribute: "vehicleMake" as const, value: "Honda" },
       ],
@@ -115,9 +117,23 @@ describe("validateAudienceStep", () => {
     expect(validateAudienceStep(draft).isValid).toBe(true);
   });
 
+  it("requires at least one filter in audience mode", () => {
+    const draft = {
+      ...validDraft(),
+      serviceTriggerMode: "audience" as const,
+      serviceTriggerTypes: ["audience"] as const,
+      audienceFilters: [],
+    };
+    const result = validateAudienceStep(draft);
+    expect(result.isValid).toBe(false);
+    expect(result.errors.audienceFilters).toBeDefined();
+  });
+
   it("flags an incomplete rule by its id", () => {
     const draft = {
       ...validDraft(),
+      serviceTriggerMode: "audience" as const,
+      serviceTriggerTypes: ["audience"] as const,
       audienceFilters: [
         { id: "a", attribute: "vehicleMake" as const, value: "" },
       ],
@@ -125,6 +141,21 @@ describe("validateAudienceStep", () => {
     const result = validateAudienceStep(draft);
     expect(result.isValid).toBe(false);
     expect(result.errors["audience.a"]).toBeDefined();
+  });
+
+  it("rejects a model that does not belong to the selected make", () => {
+    const draft = {
+      ...validDraft(),
+      serviceTriggerMode: "audience" as const,
+      serviceTriggerTypes: ["audience"] as const,
+      audienceFilters: [
+        { id: "a", attribute: "vehicleMake" as const, value: "Honda" },
+        { id: "b", attribute: "vehicleModel" as const, value: "Corolla" },
+      ],
+    };
+    const result = validateAudienceStep(draft);
+    expect(result.isValid).toBe(false);
+    expect(result.errors["audience.b"]).toContain("Honda");
   });
 });
 

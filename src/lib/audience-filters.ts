@@ -1,6 +1,11 @@
 import {
   getAudienceAttributeMeta,
   getAudienceValueLabel,
+  isModelValidForMake,
+  isPurchaseDateRangeComplete,
+  isPurchaseDateRangeValid,
+  parseDateRange,
+  serializeDateRange,
 } from "@/data/audience-attributes";
 import type { AudienceFilterRule } from "@/types/campaign-setup";
 
@@ -16,7 +21,20 @@ function hasText(value: string | undefined): boolean {
 
 /** A rule is applied once a value has been chosen/entered. */
 export function isRuleComplete(rule: AudienceFilterRule): boolean {
+  if (rule.attribute === "vehiclePurchaseDate") {
+    return isPurchaseDateRangeComplete(rule.value);
+  }
+
   return hasText(rule.value);
+}
+
+export function getSelectedMakeFromRules(
+  rules: AudienceFilterRule[],
+): string | undefined {
+  const makeRule = rules.find(
+    (rule) => rule.attribute === "vehicleMake" && isRuleComplete(rule),
+  );
+  return makeRule?.value.trim();
 }
 
 /** Stable, order-independent hash of a string for deterministic value nudges. */
@@ -31,16 +49,13 @@ function hashString(value: string): number {
 /** Base share of the pool a rule keeps, before the value-specific nudge. */
 function baseShrinkFactor(rule: AudienceFilterRule): number {
   switch (rule.attribute) {
-    case "customerName":
-      return 0.4;
     case "customerZip":
       return 0.45;
     case "vehicleYear":
     case "vehicleModel":
     case "customerCity":
       return 0.5;
-    case "installedDate":
-    case "registrationDate":
+    case "vehiclePurchaseDate":
       return 0.6;
     default:
       return 0.55;
@@ -75,4 +90,46 @@ export function summarizeAudienceFilters(rules: AudienceFilterRule[]): string[] 
     const meta = getAudienceAttributeMeta(rule.attribute);
     return `${meta.label}: ${getAudienceValueLabel(rule.attribute, rule.value.trim())}`;
   });
+}
+
+export function syncModelRulesAfterMakeChange(
+  rules: AudienceFilterRule[],
+  makeValue: string,
+): AudienceFilterRule[] {
+  return rules.map((rule) => {
+    if (
+      rule.attribute === "vehicleModel" &&
+      rule.value &&
+      !isModelValidForMake(makeValue, rule.value)
+    ) {
+      return { ...rule, value: "" };
+    }
+    return rule;
+  });
+}
+
+export function validatePurchaseDateRangeRule(
+  rule: AudienceFilterRule,
+): string | undefined {
+  if (rule.attribute !== "vehiclePurchaseDate") {
+    return undefined;
+  }
+
+  const { startDate, endDate } = parseDateRange(rule.value);
+  const hasStart = hasText(startDate);
+  const hasEnd = hasText(endDate);
+
+  if (!hasStart && !hasEnd) {
+    return "Select a start and end purchase date.";
+  }
+
+  if (!hasStart || !hasEnd) {
+    return "Select both a start and end purchase date.";
+  }
+
+  if (!isPurchaseDateRangeValid(rule.value)) {
+    return "Start date must be on or before the end date.";
+  }
+
+  return undefined;
 }

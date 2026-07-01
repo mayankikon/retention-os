@@ -25,10 +25,10 @@ export const SCHEDULE_DAYS = [
 
 export type ScheduleDay = (typeof SCHEDULE_DAYS)[number];
 
-export const SERVICE_TRIGGER_TYPES = ["time", "mileage", "oem"] as const;
+export const SERVICE_TRIGGER_TYPES = ["time", "mileage", "oem", "audience"] as const;
 export type ServiceTriggerType = (typeof SERVICE_TRIGGER_TYPES)[number];
 
-export const SERVICE_TRIGGER_MODES = ["interval", "oem"] as const;
+export const SERVICE_TRIGGER_MODES = ["interval", "oem", "audience"] as const;
 export type ServiceTriggerMode = (typeof SERVICE_TRIGGER_MODES)[number];
 
 export const CAMPAIGN_MESSAGE_TEMPLATE_IDS = [
@@ -48,11 +48,9 @@ export const AUDIENCE_ATTRIBUTES = [
   "vehicleYear",
   "vehicleMake",
   "vehicleModel",
-  "customerName",
   "customerZip",
   "customerCity",
-  "installedDate",
-  "registrationDate",
+  "vehiclePurchaseDate",
   "odometer",
 ] as const;
 

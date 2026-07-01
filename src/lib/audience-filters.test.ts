@@ -4,6 +4,7 @@ import {
   estimateAudienceReach,
   isRuleComplete,
   summarizeAudienceFilters,
+  validatePurchaseDateRangeRule,
 } from "@/lib/audience-filters";
 import type { AudienceFilterRule } from "@/types/campaign-setup";
 
@@ -21,6 +22,25 @@ describe("isRuleComplete", () => {
     expect(isRuleComplete(rule({ value: "" }))).toBe(false);
     expect(isRuleComplete(rule({ value: "  " }))).toBe(false);
     expect(isRuleComplete(rule({ value: "Honda" }))).toBe(true);
+  });
+
+  it("requires both purchase dates for a purchase date rule", () => {
+    expect(
+      isRuleComplete(
+        rule({
+          attribute: "vehiclePurchaseDate",
+          value: "2024-01-01|2024-12-31",
+        }),
+      ),
+    ).toBe(true);
+    expect(
+      isRuleComplete(
+        rule({
+          attribute: "vehiclePurchaseDate",
+          value: "2024-01-01|",
+        }),
+      ),
+    ).toBe(false);
   });
 });
 
@@ -53,7 +73,7 @@ describe("estimateAudienceReach", () => {
 
   it("never drops below the floor", () => {
     const many: AudienceFilterRule[] = Array.from({ length: 9 }, (_, i) =>
-      rule({ id: `r${i}`, attribute: "customerName", value: `x${i}` }),
+      rule({ id: `r${i}`, attribute: "customerZip", value: `7500${i}` }),
     );
     expect(estimateAudienceReach(many)).toBeGreaterThanOrEqual(25);
   });
@@ -73,14 +93,46 @@ describe("summarizeAudienceFilters", () => {
       rule({ id: "c", attribute: "customerZip", value: "75001" }),
     ]);
     expect(lines).toEqual([
-      "Vehicle Year: 2020",
-      "Vehicle Make: Honda",
-      "Customer Zip Code: 75001",
+      "Year: 2020",
+      "Make: Honda",
+      "Zip Code: 75001",
     ]);
   });
 
   it("omits incomplete rules", () => {
     const lines = summarizeAudienceFilters([rule({ value: "" })]);
     expect(lines).toEqual([]);
+  });
+
+  it("summarizes purchase date ranges", () => {
+    const lines = summarizeAudienceFilters([
+      rule({
+        attribute: "vehiclePurchaseDate",
+        value: "2024-01-01|2024-06-30",
+      }),
+    ]);
+    expect(lines).toEqual(["Vehicle Purchase Date: 01/01/2024 – 06/30/2024"]);
+  });
+});
+
+describe("validatePurchaseDateRangeRule", () => {
+  it("requires both start and end dates", () => {
+    expect(
+      validatePurchaseDateRangeRule({
+        id: "a",
+        attribute: "vehiclePurchaseDate",
+        value: "2024-01-01|",
+      }),
+    ).toBe("Select both a start and end purchase date.");
+  });
+
+  it("rejects ranges where start is after end", () => {
+    expect(
+      validatePurchaseDateRangeRule({
+        id: "a",
+        attribute: "vehiclePurchaseDate",
+        value: "2024-12-31|2024-01-01",
+      }),
+    ).toBe("Start date must be on or before the end date.");
   });
 });

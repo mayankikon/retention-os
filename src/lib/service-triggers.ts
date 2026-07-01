@@ -3,6 +3,13 @@ import {
   MILEAGE_SERVICE_TRIGGER_OPTIONS,
   TIME_SERVICE_TRIGGER_OPTIONS,
 } from "@/data/service-triggers";
+import {
+  getSelectedMakeFromRules,
+  isRuleComplete,
+  summarizeAudienceFilters,
+  validatePurchaseDateRangeRule,
+} from "@/lib/audience-filters";
+import { isModelValidForMake } from "@/data/audience-attributes";
 import type {
   CampaignSetupDraft,
   ServiceTriggerMode,
@@ -10,7 +17,7 @@ import type {
 } from "@/types/campaign-setup";
 
 export function getDefaultPresetForTriggerType(
-  triggerType: Exclude<ServiceTriggerType, "oem">,
+  triggerType: Exclude<ServiceTriggerType, "oem" | "audience">,
 ): string {
   switch (triggerType) {
     case "time":
@@ -27,7 +34,15 @@ export function getServiceTriggerMode(draft: CampaignSetupDraft): ServiceTrigger
     return draft.serviceTriggerMode;
   }
 
-  return draft.serviceTriggerTypes.includes("oem") ? "oem" : "interval";
+  if (draft.serviceTriggerTypes.includes("oem")) {
+    return "oem";
+  }
+
+  if (draft.serviceTriggerTypes.includes("audience")) {
+    return "audience";
+  }
+
+  return "interval";
 }
 
 export function isServiceTriggerEnabled(
@@ -55,9 +70,20 @@ export function setServiceTriggerMode(
     };
   }
 
+  if (mode === "oem") {
+    return {
+      serviceTriggerMode: "oem",
+      serviceTriggerTypes: ["oem"],
+      oemMake: draft.oemMake,
+      oemModel: draft.oemModel,
+    };
+  }
+
   return {
-    serviceTriggerMode: "oem",
-    serviceTriggerTypes: ["oem"],
+    serviceTriggerMode: "audience",
+    serviceTriggerTypes: ["audience"],
+    oemMake: "",
+    oemModel: "",
   };
 }
 
@@ -76,6 +102,15 @@ export function getServiceTriggerSummaries(draft: CampaignSetupDraft): string[] 
       `Time Interval: ${timeOption?.label ?? "Not selected"}`,
       `Mileage Interval: ${mileageOption?.label ?? "Not selected"}`,
     ];
+  }
+
+  if (mode === "audience") {
+    const audienceLines = summarizeAudienceFilters(draft.audienceFilters);
+    if (audienceLines.length === 0) {
+      return ["Audience Query: No filters added"];
+    }
+
+    return audienceLines.map((line) => `Audience Query · ${line}`);
   }
 
   if (!draft.oemMake || !draft.oemModel) {
@@ -118,6 +153,41 @@ export function validateServiceTriggerFields(
     );
     if (!hasValidMileagePreset) {
       errors.mileageServiceTriggerPreset = "Select a mileage interval.";
+    }
+
+    return errors;
+  }
+
+  if (mode === "audience") {
+    const completeRules = draft.audienceFilters.filter(isRuleComplete);
+    if (completeRules.length === 0) {
+      errors.audienceFilters = "Add at least one audience filter.";
+    }
+
+    for (const rule of draft.audienceFilters) {
+      if (rule.attribute === "vehiclePurchaseDate") {
+        const purchaseDateError = validatePurchaseDateRangeRule(rule);
+        if (purchaseDateError) {
+          errors[`audience.${rule.id}`] = purchaseDateError;
+        }
+        continue;
+      }
+
+      if (!isRuleComplete(rule)) {
+        errors[`audience.${rule.id}`] =
+          "Complete this filter or remove it (check the value and any range).";
+        continue;
+      }
+
+      if (rule.attribute === "vehicleModel") {
+        const make = getSelectedMakeFromRules(draft.audienceFilters);
+        if (!make) {
+          errors[`audience.${rule.id}`] =
+            "Add a Make filter before selecting a Model.";
+        } else if (!isModelValidForMake(make, rule.value.trim())) {
+          errors[`audience.${rule.id}`] = `Model is not available for ${make}.`;
+        }
+      }
     }
 
     return errors;

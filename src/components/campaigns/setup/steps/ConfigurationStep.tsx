@@ -57,7 +57,8 @@ export function ConfigurationStep({
     errors.timeServiceTriggerPreset ??
     errors.mileageServiceTriggerPreset ??
     errors.oemMake ??
-    errors.oemModel;
+    errors.oemModel ??
+    errors.audienceFilters;
   const selectedSummaries = getServiceTriggerSummaries(draft);
 
   const toggleDay = (day: ScheduleDay, checked: boolean) => {
@@ -76,7 +77,7 @@ export function ConfigurationStep({
       <FormField
         label="Service triggers"
         error={serviceTriggerError}
-        hint="Choose either custom time and mileage intervals or an OEM-recommended service schedule."
+        hint="Choose one targeting method: time and mileage intervals, OEM schedule, or an audience query."
         required
       >
         <fieldset className="space-y-3">
@@ -242,6 +243,17 @@ export function ConfigurationStep({
                     ) : null}
                   </div>
                 ) : null}
+
+                {isSelected && option.value === "audience" ? (
+                  <div className="mt-3 pl-7">
+                    <AudienceFilters
+                      draft={draft}
+                      errors={errors}
+                      onChange={onChange}
+                      embedded
+                    />
+                  </div>
+                ) : null}
               </div>
             );
           })}
@@ -258,8 +270,6 @@ export function ConfigurationStep({
           ) : null}
         </fieldset>
       </FormField>
-
-      <AudienceFilters draft={draft} errors={errors} onChange={onChange} />
 
       <FormField
         label="Define schedule"

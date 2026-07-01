@@ -89,4 +89,30 @@ describe("service triggers", () => {
     expect(intervalDraft.oemModel).toBe("");
     expect(intervalDraft.serviceTriggerTypes).toEqual(["time", "mileage"]);
   });
+
+  it("summarizes audience query filters", () => {
+    const draft = {
+      ...createDefaultSetupDraft(),
+      ...setServiceTriggerMode(createDefaultSetupDraft(), "audience"),
+      audienceFilters: [
+        { id: "a", attribute: "vehicleMake" as const, value: "Toyota" },
+        { id: "b", attribute: "vehicleModel" as const, value: "Corolla" },
+      ],
+    };
+
+    expect(getServiceTriggerSummaries(draft)).toEqual([
+      "Audience Query · Make: Toyota",
+      "Audience Query · Model: Corolla",
+    ]);
+  });
+
+  it("requires at least one audience filter in audience mode", () => {
+    const draft = {
+      ...createDefaultSetupDraft(),
+      ...setServiceTriggerMode(createDefaultSetupDraft(), "audience"),
+      audienceFilters: [],
+    };
+
+    expect(validateServiceTriggerFields(draft).audienceFilters).toBeDefined();
+  });
 });

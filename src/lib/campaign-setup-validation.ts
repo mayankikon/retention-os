@@ -1,7 +1,9 @@
 import type { CampaignSetupDraft, SetupStepId } from "@/types/campaign-setup";
-import { validateServiceTriggerFields } from "@/lib/service-triggers";
+import {
+  getServiceTriggerMode,
+  validateServiceTriggerFields,
+} from "@/lib/service-triggers";
 import { validateDeliveryChannels } from "@/lib/delivery-channels";
-import { isRuleComplete } from "@/lib/audience-filters";
 
 export interface StepValidationResult {
   isValid: boolean;
@@ -75,22 +77,26 @@ export function validateConfigurationStep(
     errors.scheduleDays = "Schedule must include Monday through Saturday.";
   }
 
-  Object.assign(errors, validateAudienceStep(draft).errors);
-
   return { isValid: Object.keys(errors).length === 0, errors };
 }
 
 export function validateAudienceStep(
   draft: CampaignSetupDraft,
 ): StepValidationResult {
+  if (getServiceTriggerMode(draft) !== "audience") {
+    return { isValid: true, errors: {} };
+  }
+
+  const allErrors = validateServiceTriggerFields(draft);
   const errors: Record<string, string> = {};
 
-  // The step is optional: zero filters means "all customers". Only rules the
-  // user actually added must be complete (value present, valid range).
-  for (const rule of draft.audienceFilters) {
-    if (!isRuleComplete(rule)) {
-      errors[`audience.${rule.id}`] =
-        "Complete this filter or remove it (check the value and any range).";
+  if (allErrors.audienceFilters) {
+    errors.audienceFilters = allErrors.audienceFilters;
+  }
+
+  for (const [key, value] of Object.entries(allErrors)) {
+    if (key.startsWith("audience.")) {
+      errors[key] = value;
     }
   }
 
