@@ -12,6 +12,16 @@ describe("campaign message templates", () => {
     expect(patch.reminder3Text).toBeTruthy();
   });
 
+  it("clears copy when custom is selected", () => {
+    const patch = buildMessageTemplatePatch("custom");
+
+    expect(patch.messageTemplateId).toBe("custom");
+    expect(patch.primaryPromoText).toBe("");
+    expect(patch.reminder1Text).toBe("");
+    expect(patch.reminder2Text).toBe("");
+    expect(patch.reminder3Text).toBe("");
+  });
+
   it("defaults to oil change template content", () => {
     const draft = createDefaultSetupDraft();
     expect(draft.messageTemplateId).toBe("oil_change");

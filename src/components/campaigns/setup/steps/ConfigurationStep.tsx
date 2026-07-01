@@ -19,19 +19,19 @@ import {
   getOemModelsForMake,
   getOemServiceSchedule,
   MILEAGE_SERVICE_TRIGGER_OPTIONS,
-  SERVICE_TRIGGER_TYPE_OPTIONS,
+  SERVICE_TRIGGER_MODE_OPTIONS,
   TIME_SERVICE_TRIGGER_OPTIONS,
 } from "@/data/service-triggers";
 import { CONFIGURATION_DAY_LABELS } from "@/lib/format-schedule";
 import {
+  getServiceTriggerMode,
   getServiceTriggerSummaries,
-  isServiceTriggerEnabled,
-  toggleServiceTriggerType,
+  setServiceTriggerMode,
 } from "@/lib/service-triggers";
 import type {
   CampaignSetupDraft,
   ScheduleDay,
-  ServiceTriggerType,
+  ServiceTriggerMode,
 } from "@/types/campaign-setup";
 import { SCHEDULE_DAYS } from "@/types/campaign-setup";
 import { cn } from "@/lib/utils";
@@ -47,13 +47,13 @@ export function ConfigurationStep({
   errors,
   onChange,
 }: ConfigurationStepProps) {
+  const serviceTriggerMode = getServiceTriggerMode(draft);
   const oemModels = draft.oemMake ? getOemModelsForMake(draft.oemMake) : [];
   const oemSchedule =
     draft.oemMake && draft.oemModel
       ? getOemServiceSchedule(draft.oemMake, draft.oemModel)
       : undefined;
   const serviceTriggerError =
-    errors.serviceTriggerTypes ??
     errors.timeServiceTriggerPreset ??
     errors.mileageServiceTriggerPreset ??
     errors.oemMake ??
@@ -67,11 +67,8 @@ export function ConfigurationStep({
     onChange({ scheduleDays: next });
   };
 
-  const handleTriggerTypeToggle = (
-    triggerType: ServiceTriggerType,
-    enabled: boolean,
-  ) => {
-    onChange(toggleServiceTriggerType(draft, triggerType, enabled));
+  const handleServiceTriggerModeChange = (mode: ServiceTriggerMode) => {
+    onChange(setServiceTriggerMode(draft, mode));
   };
 
   return (
@@ -79,28 +76,29 @@ export function ConfigurationStep({
       <FormField
         label="Service triggers"
         error={serviceTriggerError}
-        hint="Select one or more triggers. Outreach fires when any enabled condition is met."
+        hint="Choose either custom time and mileage intervals or an OEM-recommended service schedule."
         required
       >
-        <div className="space-y-3">
-          {SERVICE_TRIGGER_TYPE_OPTIONS.map((option) => {
-            const isEnabled = isServiceTriggerEnabled(draft, option.value);
+        <fieldset className="space-y-3">
+          <legend className="sr-only">Service trigger mode</legend>
+          {SERVICE_TRIGGER_MODE_OPTIONS.map((option) => {
+            const isSelected = serviceTriggerMode === option.value;
 
             return (
               <div
                 key={option.value}
                 className={cn(
                   "rounded-md border border-border p-3",
-                  isEnabled && "border-brand-primary bg-muted/50",
+                  isSelected && "border-brand-primary bg-muted/50",
                 )}
               >
                 <label className="flex cursor-pointer items-start gap-3">
-                  <Checkbox
-                    checked={isEnabled}
-                    onChange={(event) =>
-                      handleTriggerTypeToggle(option.value, event.target.checked)
-                    }
-                    className="mt-0.5"
+                  <input
+                    type="radio"
+                    name="serviceTriggerMode"
+                    checked={isSelected}
+                    onChange={() => handleServiceTriggerModeChange(option.value)}
+                    className="mt-1 h-4 w-4 shrink-0 accent-brand-primary"
                     aria-label={option.label}
                   />
                   <span>
@@ -111,67 +109,67 @@ export function ConfigurationStep({
                   </span>
                 </label>
 
-                {isEnabled && option.value === "time" ? (
-                  <div className="mt-3 pl-7">
-                    <Select
-                      value={draft.timeServiceTriggerPreset}
-                      onValueChange={(value) =>
-                        onChange({ timeServiceTriggerPreset: value })
-                      }
+                {isSelected && option.value === "interval" ? (
+                  <div className="mt-3 space-y-4 pl-7">
+                    <FormField
+                      label="Time Interval"
+                      htmlFor="timeServiceTriggerPreset"
+                      error={errors.timeServiceTriggerPreset}
+                      required
                     >
-                      <SelectTrigger
-                        id="timeServiceTriggerPreset"
-                        aria-label="Time interval"
+                      <Select
+                        value={draft.timeServiceTriggerPreset}
+                        onValueChange={(value) =>
+                          onChange({ timeServiceTriggerPreset: value })
+                        }
                       >
-                        <SelectValue placeholder="Select time interval" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {TIME_SERVICE_TRIGGER_OPTIONS.map((preset) => (
-                          <SelectItem key={preset.value} value={preset.value}>
-                            {preset.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {errors.timeServiceTriggerPreset ? (
-                      <p className="mt-2 text-sm text-destructive">
-                        {errors.timeServiceTriggerPreset}
-                      </p>
-                    ) : null}
+                        <SelectTrigger
+                          id="timeServiceTriggerPreset"
+                          aria-label="Time Interval"
+                        >
+                          <SelectValue placeholder="Select time interval" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {TIME_SERVICE_TRIGGER_OPTIONS.map((preset) => (
+                            <SelectItem key={preset.value} value={preset.value}>
+                              {preset.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormField>
+
+                    <FormField
+                      label="Mileage Interval"
+                      htmlFor="mileageServiceTriggerPreset"
+                      error={errors.mileageServiceTriggerPreset}
+                      required
+                    >
+                      <Select
+                        value={draft.mileageServiceTriggerPreset}
+                        onValueChange={(value) =>
+                          onChange({ mileageServiceTriggerPreset: value })
+                        }
+                      >
+                        <SelectTrigger
+                          id="mileageServiceTriggerPreset"
+                          aria-label="Mileage Interval"
+                        >
+                          <SelectValue placeholder="Select mileage interval" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {MILEAGE_SERVICE_TRIGGER_OPTIONS.map((preset) => (
+                            <SelectItem key={preset.value} value={preset.value}>
+                              {preset.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormField>
                   </div>
                 ) : null}
 
-                {isEnabled && option.value === "mileage" ? (
-                  <div className="mt-3 pl-7">
-                    <Select
-                      value={draft.mileageServiceTriggerPreset}
-                      onValueChange={(value) =>
-                        onChange({ mileageServiceTriggerPreset: value })
-                      }
-                    >
-                      <SelectTrigger
-                        id="mileageServiceTriggerPreset"
-                        aria-label="Mileage interval"
-                      >
-                        <SelectValue placeholder="Select mileage interval" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {MILEAGE_SERVICE_TRIGGER_OPTIONS.map((preset) => (
-                          <SelectItem key={preset.value} value={preset.value}>
-                            {preset.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {errors.mileageServiceTriggerPreset ? (
-                      <p className="mt-2 text-sm text-destructive">
-                        {errors.mileageServiceTriggerPreset}
-                      </p>
-                    ) : null}
-                  </div>
-                ) : null}
-
-                {isEnabled && option.value === "oem" ? (
+                {isSelected && option.value === "oem" ? (
                   <div className="mt-3 space-y-4 pl-7">
                     <div className="grid gap-4 sm:grid-cols-2">
                       <FormField
@@ -248,13 +246,9 @@ export function ConfigurationStep({
             );
           })}
 
-          {errors.serviceTriggerTypes ? (
-            <p className="text-sm text-destructive">{errors.serviceTriggerTypes}</p>
-          ) : null}
-
           {selectedSummaries.length > 0 ? (
             <div className="rounded-md border border-border bg-muted/20 p-3 text-sm">
-              <p className="font-medium text-foreground">Active triggers</p>
+              <p className="font-medium text-foreground">Active trigger</p>
               <ul className="mt-2 space-y-1 text-muted-foreground">
                 {selectedSummaries.map((summary) => (
                   <li key={summary}>{summary}</li>
@@ -262,7 +256,7 @@ export function ConfigurationStep({
               </ul>
             </div>
           ) : null}
-        </div>
+        </fieldset>
       </FormField>
 
       <AudienceFilters draft={draft} errors={errors} onChange={onChange} />

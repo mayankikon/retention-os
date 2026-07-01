@@ -70,8 +70,8 @@ export function MessagingStep({ draft, errors, onChange }: MessagingStepProps) {
   return (
     <div className="space-y-6">
       <p className="text-sm text-muted-foreground">
-        Start from an approved template or write custom copy. Templates update
-        primary promo text and all reminder messages.
+        Oil Change Campaign is selected by default. Pick another template or
+        choose Custom to write your own primary promo and reminders.
       </p>
 
       <FormField
@@ -115,8 +115,11 @@ export function MessagingStep({ draft, errors, onChange }: MessagingStepProps) {
         </div>
       </FormField>
 
-      <FormField label="Message template" hint="Applies copy to messaging and reminders.">
-        <div className="grid gap-2 sm:grid-cols-3">
+      <FormField
+        label="Message template"
+        hint="Predefined templates apply copy to messaging and reminders. Custom clears the fields so you can write from scratch."
+      >
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
           {CAMPAIGN_MESSAGE_TEMPLATES.map((template) => (
             <button
               key={template.id}
@@ -151,7 +154,7 @@ export function MessagingStep({ draft, errors, onChange }: MessagingStepProps) {
             onChange={(e) =>
               onChange({
                 primaryPromoText: e.target.value,
-                messageTemplateId: null,
+                messageTemplateId: "custom",
               })
             }
             rows={5}

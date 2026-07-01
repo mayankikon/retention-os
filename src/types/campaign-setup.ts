@@ -28,10 +28,14 @@ export type ScheduleDay = (typeof SCHEDULE_DAYS)[number];
 export const SERVICE_TRIGGER_TYPES = ["time", "mileage", "oem"] as const;
 export type ServiceTriggerType = (typeof SERVICE_TRIGGER_TYPES)[number];
 
+export const SERVICE_TRIGGER_MODES = ["interval", "oem"] as const;
+export type ServiceTriggerMode = (typeof SERVICE_TRIGGER_MODES)[number];
+
 export const CAMPAIGN_MESSAGE_TEMPLATE_IDS = [
   "oil_change",
   "service_reminder",
   "check_engine_light",
+  "custom",
 ] as const;
 
 export type CampaignMessageTemplateId =
@@ -84,6 +88,7 @@ export interface CampaignSetupDraft {
   reminder3ImagePreviewUrl: string | null;
   reminder3UsePrimaryImage: boolean;
   campaignType: CampaignType;
+  serviceTriggerMode: ServiceTriggerMode;
   serviceTriggerTypes: ServiceTriggerType[];
   timeServiceTriggerPreset: string;
   mileageServiceTriggerPreset: string;

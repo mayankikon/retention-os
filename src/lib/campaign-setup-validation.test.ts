@@ -87,6 +87,7 @@ describe("validateConfigurationStep", () => {
   it("requires OEM make and model when OEM trigger is selected", () => {
     const draft = {
       ...validDraft(),
+      serviceTriggerMode: "oem" as const,
       serviceTriggerTypes: ["oem"] as const,
       oemMake: "",
       oemModel: "",

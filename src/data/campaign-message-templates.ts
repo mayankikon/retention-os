@@ -51,6 +51,15 @@ export const CAMPAIGN_MESSAGE_TEMPLATES: CampaignMessageTemplate[] = [
     reminder3Text:
       "[@FN@], last reminder about your check-engine alert. We're here when you're ready — same-day diagnostics available. [@DSP@]",
   },
+  {
+    id: "custom",
+    label: "Custom",
+    description: "Write your own primary promo and reminder copy.",
+    primaryPromoText: "",
+    reminder1Text: "",
+    reminder2Text: "",
+    reminder3Text: "",
+  },
 ];
 
 export function getCampaignMessageTemplate(

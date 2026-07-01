@@ -1,4 +1,4 @@
-import type { ServiceTriggerType } from "@/types/campaign-setup";
+import type { ServiceTriggerMode, ServiceTriggerType } from "@/types/campaign-setup";
 
 export interface ServiceTriggerPresetOption {
   value: string;
@@ -11,6 +11,12 @@ export interface ServiceTriggerTypeOption {
   description: string;
 }
 
+export interface ServiceTriggerModeOption {
+  value: ServiceTriggerMode;
+  label: string;
+  description: string;
+}
+
 export interface OemServiceSchedule {
   make: string;
   model: string;
@@ -19,20 +25,16 @@ export interface OemServiceSchedule {
   summary: string;
 }
 
-export const SERVICE_TRIGGER_TYPE_OPTIONS: ServiceTriggerTypeOption[] = [
+export const SERVICE_TRIGGER_MODE_OPTIONS: ServiceTriggerModeOption[] = [
   {
-    value: "time",
-    label: "Time interval",
-    description: "Trigger outreach after a fixed number of days or months",
-  },
-  {
-    value: "mileage",
-    label: "Mileage interval",
-    description: "Trigger when estimated mileage reaches a threshold",
+    value: "interval",
+    label: "Timing: One-Time Interval and Mileage Interval",
+    description:
+      "Trigger outreach when either the time interval or mileage interval is reached",
   },
   {
     value: "oem",
-    label: "OEM recommended service schedule",
+    label: "OEM-Recommended Service Schedule",
     description: "Use the manufacturer schedule for a specific make and model",
   },
 ];

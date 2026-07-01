@@ -20,7 +20,7 @@ flowchart LR
 | General | `general` | General Identification | Dealership, name (SM template), time zone |
 | Messaging | `messaging` | Messaging & Variables | Delivery channels, templates, primary promo, dealer URL, optional image |
 | Reminders | `reminders` | Reminder Sequences | Enable 1–3 reminders, text + image or reuse primary image |
-| Configuration | `configuration` | Standard Configuration | Service triggers (multi-select), schedule |
+| Configuration | `configuration` | Standard Configuration | Service trigger mode (interval or OEM), schedule |
 | Review | `review` | QA & Activation | Test send, suppression list, TCPA confirmation, Activate |
 
 ## Components

@@ -3,47 +3,52 @@ import { createDefaultSetupDraft } from "@/data/campaign-setup.defaults";
 import {
   getServiceTriggerSummaries,
   getServiceTriggerSummary,
-  toggleServiceTriggerType,
+  setServiceTriggerMode,
   validateServiceTriggerFields,
 } from "@/lib/service-triggers";
 
 describe("service triggers", () => {
-  it("defaults to the SOP time trigger", () => {
+  it("defaults to interval mode with time and mileage presets", () => {
     const draft = createDefaultSetupDraft();
-    expect(draft.serviceTriggerTypes).toEqual(["time"]);
+    expect(draft.serviceTriggerMode).toBe("interval");
+    expect(draft.serviceTriggerTypes).toEqual(["time", "mileage"]);
     expect(draft.timeServiceTriggerPreset).toBe("180_days_5000_mile");
     expect(getServiceTriggerSummary(draft)).toBe(
-      "Time: 180 days / 5,000 miles (SOP default)",
+      "Time Interval: 180 days / 5,000 miles (SOP default); Mileage Interval: 2,000 miles",
     );
   });
 
-  it("allows multiple trigger types at once", () => {
+  it("uses interval mode with both time and mileage presets", () => {
     const draft = createDefaultSetupDraft();
-    const withMileage = {
+    const intervalDraft = {
       ...draft,
-      ...toggleServiceTriggerType(draft, "mileage", true),
+      ...setServiceTriggerMode(draft, "interval"),
     };
 
-    expect(withMileage.serviceTriggerTypes).toEqual(["time", "mileage"]);
-    expect(getServiceTriggerSummaries(withMileage)).toEqual([
-      "Time: 180 days / 5,000 miles (SOP default)",
-      "Mileage: 2,000 miles",
+    expect(intervalDraft.serviceTriggerMode).toBe("interval");
+    expect(intervalDraft.serviceTriggerTypes).toEqual(["time", "mileage"]);
+    expect(getServiceTriggerSummaries(intervalDraft)).toEqual([
+      "Time Interval: 180 days / 5,000 miles (SOP default)",
+      "Mileage Interval: 2,000 miles",
     ]);
   });
 
-  it("requires at least one trigger type", () => {
+  it("requires time and mileage presets in interval mode", () => {
     const draft = {
       ...createDefaultSetupDraft(),
-      serviceTriggerTypes: [] as const,
+      timeServiceTriggerPreset: "",
+      mileageServiceTriggerPreset: "",
     };
 
-    expect(validateServiceTriggerFields(draft).serviceTriggerTypes).toBeDefined();
+    const errors = validateServiceTriggerFields(draft);
+    expect(errors.timeServiceTriggerPreset).toBeDefined();
+    expect(errors.mileageServiceTriggerPreset).toBeDefined();
   });
 
-  it("requires make and model when OEM trigger is enabled", () => {
+  it("requires make and model in OEM mode", () => {
     const draft = {
       ...createDefaultSetupDraft(),
-      serviceTriggerTypes: ["oem"] as const,
+      ...setServiceTriggerMode(createDefaultSetupDraft(), "oem"),
       oemMake: "",
       oemModel: "",
     };
@@ -56,14 +61,32 @@ describe("service triggers", () => {
   it("summarizes OEM schedules from make and model", () => {
     const draft = {
       ...createDefaultSetupDraft(),
-      serviceTriggerTypes: ["oem"] as const,
+      ...setServiceTriggerMode(createDefaultSetupDraft(), "oem"),
       oemMake: "Toyota",
       oemModel: "RAV4",
     };
 
     expect(getServiceTriggerSummary(draft)).toBe(
-      "OEM: Toyota RAV4 — 10,000 mi / 12 months",
+      "OEM-Recommended Service Schedule: Toyota RAV4 — 10,000 mi / 12 months",
     );
     expect(validateServiceTriggerFields(draft)).toEqual({});
+  });
+
+  it("clears OEM fields when switching back to interval mode", () => {
+    const draft = {
+      ...createDefaultSetupDraft(),
+      ...setServiceTriggerMode(createDefaultSetupDraft(), "oem"),
+      oemMake: "Toyota",
+      oemModel: "RAV4",
+    };
+
+    const intervalDraft = {
+      ...draft,
+      ...setServiceTriggerMode(draft, "interval"),
+    };
+
+    expect(intervalDraft.oemMake).toBe("");
+    expect(intervalDraft.oemModel).toBe("");
+    expect(intervalDraft.serviceTriggerTypes).toEqual(["time", "mileage"]);
   });
 });

@@ -172,7 +172,12 @@ function ReminderTemplateField({
             <Textarea
               id={field.textareaId}
               value={textValue}
-              onChange={(e) => onChange({ [field.textKey]: e.target.value })}
+              onChange={(e) =>
+                onChange({
+                  [field.textKey]: e.target.value,
+                  messageTemplateId: "custom",
+                })
+              }
               rows={field.rows}
               hasError={Boolean(textError)}
             />

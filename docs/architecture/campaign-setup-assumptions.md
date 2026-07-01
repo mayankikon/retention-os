@@ -15,13 +15,13 @@ Standard Operating Procedure for Campaign Setup in Smart Marketing Campaign Mana
 | General Identification | Step `general` | Name template, dealership time zone |
 | Messaging & Variables | Step `messaging` | Delivery channels (SMS/email), templates, primary promo, dealer URL, optional image |
 | Reminder Sequences | Step `reminders` | Per-reminder enable toggles, optional image or reuse primary image |
-| Standard Configuration | Step `configuration` | Service triggers (multi-select time / mileage / OEM), Mon–Sat + TZ table |
+| Standard Configuration | Step `configuration` | Service trigger mode: interval (time + mileage) or OEM make/model, Mon–Sat + TZ table |
 | QA & Activation | Step `review` | Test send, optional suppression list upload, TCPA compliance confirmation, Activate |
 
 ## Defaults (from SOP)
 
 - Primary promo and Reminder 1/2 copy: `src/data/campaign-setup.defaults.ts`
-- Service triggers: one or more of time, mileage, or OEM make/model (`src/data/service-triggers.ts`); default time preset 180 days / 5,000 miles
+- Service triggers: either time + mileage intervals or OEM make/model (`src/data/service-triggers.ts`); default interval mode with time preset 180 days / 5,000 miles and mileage preset 2,000 miles
 - Campaign type: Predefined (only supported type in wizard)
 - Schedule days: Monday–Saturday
 
