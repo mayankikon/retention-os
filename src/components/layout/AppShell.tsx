@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FileText, LayoutList, Map } from "lucide-react";
+import { LayoutList } from "lucide-react";
 import { AppTitleBar } from "@/components/layout/AppTitleBar";
 import { cn } from "@/lib/utils";
 
@@ -24,16 +24,6 @@ const NAV_ITEMS = [
     href: "/campaigns",
     label: "Campaigns",
     icon: LayoutList,
-  },
-  {
-    href: "/campaigns/redlines",
-    label: "Redlines",
-    icon: FileText,
-  },
-  {
-    href: "/story-map",
-    label: "Story map",
-    icon: Map,
   },
 ] as const;
 

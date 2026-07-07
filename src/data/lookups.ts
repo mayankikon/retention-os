@@ -22,6 +22,20 @@ export const DEALERS = [
   "Summit Chevrolet",
 ] as const;
 
+/** Parent dealer group / company each dealership rolls up to (shown under the dealer name). */
+export const DEALER_GROUP_BY_DEALER: Record<string, string> = {
+  "Ikon Motors North": "Ikon Motors",
+  "Ikon Motors South": "Ikon Motors",
+  "Ikon Motors West": "Ikon Motors",
+  "Ikon Motors East": "Ikon Motors",
+  "Premier Auto Group": "Premier Auto Group",
+  "Summit Chevrolet": "Summit Automotive Group",
+};
+
+export function getDealerGroup(dealer: string): string {
+  return DEALER_GROUP_BY_DEALER[dealer] ?? dealer;
+}
+
 export const STATUS_LABELS: Record<CampaignStatus, string> = {
   scheduled: "Scheduled",
   active: "Active",

@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/table";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { CampaignStatusBadge } from "@/components/campaigns/CampaignStatusBadge";
+import { getDealerGroup } from "@/data/lookups";
 import { getTimeZoneLabel } from "@/data/campaign-setup.defaults";
 import { formatConversionRate, formatMessageCount } from "@/lib/format";
 import type { Campaign } from "@/types/campaign";
@@ -39,7 +40,19 @@ const columns = [
   }),
   columnHelper.accessor("dealer", {
     header: "Dealer",
-    cell: (info) => info.getValue(),
+    cell: (info) => {
+      const dealer = info.getValue();
+      const dealerGroup = getDealerGroup(dealer);
+
+      return (
+        <div className="flex flex-col">
+          <span className="text-foreground">{dealer}</span>
+          {dealerGroup !== dealer ? (
+            <span className="text-xs text-muted-foreground">{dealerGroup}</span>
+          ) : null}
+        </div>
+      );
+    },
   }),
   columnHelper.accessor("timeZone", {
     header: "Time Zone",
