@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutList } from "lucide-react";
+import { Building2, LayoutList } from "lucide-react";
 import { AppTitleBar } from "@/components/layout/AppTitleBar";
 import { cn } from "@/lib/utils";
 
@@ -25,6 +25,11 @@ const NAV_ITEMS = [
     label: "Campaigns",
     icon: LayoutList,
   },
+  {
+    href: "/accounts",
+    label: "Accounts",
+    icon: Building2,
+  },
 ] as const;
 
 function isNavItemActive(href: string, pathname: string): boolean {
@@ -35,6 +40,9 @@ function isNavItemActive(href: string, pathname: string): boolean {
         !pathname.startsWith("/campaigns/new") &&
         !pathname.startsWith("/campaigns/redlines"))
     );
+  }
+  if (href === "/accounts") {
+    return pathname === "/accounts" || pathname.startsWith("/accounts/");
   }
   return pathname === href || pathname.startsWith(`${href}/`);
 }
@@ -98,11 +106,11 @@ export function AppShell({
         <AppTitleBar />
         <main
           className={cn(
-            "min-w-0 flex-1 overflow-auto px-6 py-8 lg:px-10",
-            className,
+            "min-w-0 flex-1 px-6 py-8 lg:px-10",
+            className ?? "overflow-auto",
           )}
         >
-          <div className={cn("mx-auto max-w-7xl", contentClassName)}>
+          <div className={cn("mx-auto w-full max-w-7xl", contentClassName)}>
             {children}
           </div>
         </main>

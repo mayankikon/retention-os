@@ -12,8 +12,12 @@ src/
 │   │   ├── new/page.tsx        # Campaign setup wizard
 │   │   ├── redlines/page.tsx   # Engineering handoff specs
 │   │   └── [id]/page.tsx       # Campaign detail (Details + Change log tabs)
+│   ├── accounts/
+│   │   ├── page.tsx            # Dealership accounts list
+│   │   └── loading.tsx
 │   └── story-map/page.tsx      # Story map roadmap board
 ├── components/
+│   ├── accounts/               # Dealership accounts list
 │   ├── campaigns/              # List + detail + setup feature components
 │   │   ├── detail/             # Campaign detail tabs (Details, Change log)
 │   │   └── setup/              # Wizard steps, shell, confirmation
@@ -22,10 +26,14 @@ src/
 │   ├── layout/AppTitleBar.tsx
 │   └── ui/                     # Shadcn primitives
 ├── data/
+│   ├── accounts.mock.ts
 │   ├── campaigns.mock.ts
 │   ├── lookups.ts
 │   └── story-map.defaults.ts   # Predefined story map backlog features
 ├── lib/
+│   ├── account-filters.ts
+│   ├── account-search-params.ts
+│   ├── account-store.ts
 │   ├── filters.ts
 │   ├── dates.ts
 │   ├── format.ts
@@ -33,7 +41,9 @@ src/
 │   ├── campaign-search-params.ts
 │   └── story-map/              # Timeline math, constants, localStorage
 ├── styles/globals.css            # Ikon-swappable design tokens
-└── types/campaign.ts
+└── types/
+    ├── account.ts
+    └── campaign.ts
 
 docs/
 ├── architecture/

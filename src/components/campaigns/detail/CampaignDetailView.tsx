@@ -60,7 +60,7 @@ export function CampaignDetailView({ campaignId }: CampaignDetailViewProps) {
       <CampaignDetailHeader campaign={campaign} />
 
       <div
-        className="flex gap-2 border-b border-border"
+        className="flex gap-6 border-b border-border"
         role="tablist"
         aria-label="Campaign detail sections"
       >
@@ -72,10 +72,10 @@ export function CampaignDetailView({ campaignId }: CampaignDetailViewProps) {
             aria-selected={activeTab === tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={cn(
-              "rounded-t-md border border-b-0 px-4 py-2 text-sm font-medium transition-colors",
+              "-mb-px border-b-[3px] px-1 py-2.5 text-sm font-medium transition-colors",
               activeTab === tab.id
-                ? "border-border bg-card text-foreground"
-                : "border-transparent text-muted-foreground hover:text-foreground",
+                ? "border-brand-primary text-foreground"
+                : "border-transparent text-muted-foreground hover:border-muted-foreground/40 hover:text-foreground",
             )}
           >
             {tab.label}
