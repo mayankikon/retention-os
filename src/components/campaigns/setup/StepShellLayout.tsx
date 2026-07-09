@@ -32,7 +32,7 @@ export function StepShellLayout({
       />
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,360px)]">
-        <div className="min-w-0 rounded-lg border border-border bg-card p-6 shadow-sm">
+        <div className="flex h-full min-w-0 flex-col rounded-lg border border-border bg-card shadow-sm">
           {children}
         </div>
         <div className="min-w-0">

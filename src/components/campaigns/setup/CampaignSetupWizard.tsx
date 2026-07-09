@@ -187,23 +187,25 @@ export function CampaignSetupWizard() {
       completedSteps={completedSteps}
       draft={draft}
     >
-      {stepContent}
+      <div className="flex h-full min-h-0 flex-col">
+        <div className="flex-1 p-6">{stepContent}</div>
 
-      <div className="mt-8 flex flex-col-reverse gap-3 border-t border-border pt-6 sm:flex-row sm:justify-between">
-        <Button variant="ghost" asChild>
-          <Link href="/campaigns">Cancel</Link>
-        </Button>
-        <div className="flex gap-2">
-          {!isFirstStep ? (
-            <Button type="button" variant="outline" onClick={handleBack}>
-              Back
-            </Button>
-          ) : null}
-          {!isLastStep ? (
-            <Button type="button" onClick={handleNext}>
-              Continue
-            </Button>
-          ) : null}
+        <div className="mt-auto flex flex-col-reverse gap-3 border-t border-border px-6 py-6 sm:flex-row sm:justify-between">
+          <Button variant="ghost" asChild>
+            <Link href="/campaigns">Cancel</Link>
+          </Button>
+          <div className="flex gap-2">
+            {!isFirstStep ? (
+              <Button type="button" variant="outline" onClick={handleBack}>
+                Back
+              </Button>
+            ) : null}
+            {!isLastStep ? (
+              <Button type="button" onClick={handleNext}>
+                Continue
+              </Button>
+            ) : null}
+          </div>
         </div>
       </div>
     </StepShellLayout>

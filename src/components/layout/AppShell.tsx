@@ -37,7 +37,6 @@ function isNavItemActive(href: string, pathname: string): boolean {
     return (
       pathname === "/campaigns" ||
       (pathname.startsWith("/campaigns/") &&
-        !pathname.startsWith("/campaigns/new") &&
         !pathname.startsWith("/campaigns/redlines"))
     );
   }
@@ -89,7 +88,7 @@ export function AppShell({
                 className={cn(
                   "flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                   isActive
-                    ? "bg-brand-primary/10 text-brand-primary"
+                    ? "bg-muted text-foreground"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground",
                 )}
                 aria-current={isActive ? "page" : undefined}
