@@ -5,8 +5,10 @@ import { OptionalImageUpload } from "@/components/campaigns/setup/OptionalImageU
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useProductVersion } from "@/contexts/product-version-context";
 import { getReminderImagePreviewUrl } from "@/lib/reminder-setup";
 import type { CampaignSetupDraft } from "@/types/campaign-setup";
+import { CUSTOM_TEMPLATE_ID } from "@/types/template";
 import { cn } from "@/lib/utils";
 
 interface RemindersStepProps {
@@ -130,6 +132,8 @@ function ReminderTemplateField({
   errors: Record<string, string>;
   onChange: (patch: Partial<CampaignSetupDraft>) => void;
 }) {
+  const { versionId } = useProductVersion();
+  const isPocVersion = versionId === "poc_v0_5";
   const isEnabled = draft[field.enabledKey];
   const textValue = draft[field.textKey];
   const textError = isEnabled && field.textErrorKey
@@ -175,7 +179,9 @@ function ReminderTemplateField({
               onChange={(e) =>
                 onChange({
                   [field.textKey]: e.target.value,
-                  messageTemplateId: "custom",
+                  ...(isPocVersion
+                    ? {}
+                    : { messageTemplateId: CUSTOM_TEMPLATE_ID }),
                 })
               }
               rows={field.rows}

@@ -34,6 +34,8 @@ export interface Campaign {
   group: string;
   lastUpdatedAt: string;
   nextUpdateAt: string;
+  /** Linked message template id when created from a managed template. */
+  messageTemplateId?: string | null;
 }
 
 export interface CampaignFilters {

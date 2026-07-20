@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { ConfirmationView } from "@/components/campaigns/setup/ConfirmationView";
@@ -12,6 +12,7 @@ import { RemindersStep } from "@/components/campaigns/setup/steps/RemindersStep"
 import { ReviewStep } from "@/components/campaigns/setup/steps/ReviewStep";
 import { Button } from "@/components/ui/button";
 import { createDefaultSetupDraft } from "@/data/campaign-setup.defaults";
+import { useProductVersion } from "@/contexts/product-version-context";
 import { useCurrentUser } from "@/contexts/session-context";
 import { addUserCreatedCampaign } from "@/lib/campaign-store";
 import { createCampaignFromDraft } from "@/lib/create-campaign-from-draft";
@@ -19,6 +20,7 @@ import {
   validateAllStepsBeforeActivate,
   validateSetupStep,
 } from "@/lib/campaign-setup-validation";
+import { applyProductVersionToDraft } from "@/lib/product-version";
 import type { CampaignSetupDraft, SetupStepId } from "@/types/campaign-setup";
 import { SETUP_STEPS } from "@/types/campaign-setup";
 
@@ -26,6 +28,7 @@ const stepParser = parseAsStringLiteral(SETUP_STEPS).withDefault("general");
 
 export function CampaignSetupWizard() {
   const currentUser = useCurrentUser();
+  const { versionId } = useProductVersion();
   const [step, setStep] = useQueryState("step", stepParser);
   const [draft, setDraft] = useState<CampaignSetupDraft>(() => {
     const base = createDefaultSetupDraft();
@@ -51,6 +54,14 @@ export function CampaignSetupWizard() {
     setDraft((prev) => ({ ...prev, ...patch }));
     setErrors({});
   }, []);
+
+  useEffect(() => {
+    setDraft((prev) => {
+      const patch = applyProductVersionToDraft(prev, versionId);
+      if (Object.keys(patch).length === 0) return prev;
+      return { ...prev, ...patch };
+    });
+  }, [versionId]);
 
   const goToStep = useCallback(
     (nextStep: SetupStepId) => {

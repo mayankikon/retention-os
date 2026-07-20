@@ -31,6 +31,7 @@ export type ServiceTriggerType = (typeof SERVICE_TRIGGER_TYPES)[number];
 export const SERVICE_TRIGGER_MODES = ["interval", "oem", "audience"] as const;
 export type ServiceTriggerMode = (typeof SERVICE_TRIGGER_MODES)[number];
 
+/** @deprecated Prefer template store ids + CUSTOM_TEMPLATE_ID. Kept for legacy seeds. */
 export const CAMPAIGN_MESSAGE_TEMPLATE_IDS = [
   "oil_change",
   "service_reminder",
@@ -38,8 +39,8 @@ export const CAMPAIGN_MESSAGE_TEMPLATE_IDS = [
   "custom",
 ] as const;
 
-export type CampaignMessageTemplateId =
-  (typeof CAMPAIGN_MESSAGE_TEMPLATE_IDS)[number];
+/** Campaign setup template reference: managed template id or "custom". */
+export type CampaignMessageTemplateId = string;
 
 export const DELIVERY_CHANNELS = ["sms", "email"] as const;
 export type DeliveryChannel = (typeof DELIVERY_CHANNELS)[number];

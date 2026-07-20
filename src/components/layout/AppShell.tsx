@@ -3,8 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Building2, LayoutList } from "lucide-react";
+import { Building2, LayoutList, LayoutTemplate } from "lucide-react";
 import { AppTitleBar } from "@/components/layout/AppTitleBar";
+import { VersionSwitcher } from "@/components/layout/VersionSwitcher";
 import { cn } from "@/lib/utils";
 
 const LOGO_WIDTH_PX = Math.round(113 * 1.3 * 0.85);
@@ -24,6 +25,11 @@ const NAV_ITEMS = [
     href: "/campaigns",
     label: "Campaigns",
     icon: LayoutList,
+  },
+  {
+    href: "/templates",
+    label: "Templates",
+    icon: LayoutTemplate,
   },
   {
     href: "/accounts",
@@ -99,6 +105,8 @@ export function AppShell({
             );
           })}
         </nav>
+
+        <VersionSwitcher />
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">

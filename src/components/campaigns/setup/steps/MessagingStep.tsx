@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Braces } from "lucide-react";
 import { AddMessageVariableDialog } from "@/components/campaigns/setup/AddMessageVariableDialog";
 import { FormField } from "@/components/campaigns/setup/FormField";
@@ -11,16 +11,22 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
   buildMessageTemplatePatch,
-  CAMPAIGN_MESSAGE_TEMPLATES,
+  type CampaignMessageTemplate,
 } from "@/data/campaign-message-templates";
-import { DELIVERY_CHANNEL_OPTIONS } from "@/data/delivery-channels";
+import { useProductVersion } from "@/contexts/product-version-context";
+import { useTemplates } from "@/hooks/use-templates";
 import { insertTextAtCursor } from "@/lib/insert-text-at-cursor";
 import { toggleDeliveryChannel } from "@/lib/delivery-channels";
+import {
+  getAvailableDeliveryChannelOptions,
+  getAvailableMessageTemplates,
+} from "@/lib/product-version";
 import type {
   CampaignMessageTemplateId,
   CampaignSetupDraft,
   DeliveryChannel,
 } from "@/types/campaign-setup";
+import { CUSTOM_TEMPLATE_ID } from "@/types/template";
 import { cn } from "@/lib/utils";
 
 interface MessagingStepProps {
@@ -29,9 +35,29 @@ interface MessagingStepProps {
   onChange: (patch: Partial<CampaignSetupDraft>) => void;
 }
 
+const CUSTOM_PICKER_ITEM: CampaignMessageTemplate = {
+  id: CUSTOM_TEMPLATE_ID,
+  label: "Custom",
+  description: "Write your own primary promo and reminder copy.",
+  primaryPromoText: "",
+  reminder1Text: "",
+  reminder2Text: "",
+  reminder3Text: "",
+};
+
 export function MessagingStep({ draft, errors, onChange }: MessagingStepProps) {
+  const { versionId } = useProductVersion();
+  const templates = useTemplates();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [isVariableDialogOpen, setIsVariableDialogOpen] = useState(false);
+  const deliveryChannelOptions = getAvailableDeliveryChannelOptions(versionId);
+  const isPocVersion = versionId === "poc_v0_5";
+  const messageTemplates = useMemo(() => {
+    const published = getAvailableMessageTemplates(versionId);
+    if (isPocVersion) return published;
+    return [...published, CUSTOM_PICKER_ITEM];
+    // templates length/ids ensure picker refreshes after localStorage updates
+  }, [versionId, isPocVersion, templates]);
 
   const handleInsertVariable = (token: string) => {
     const textarea = textareaRef.current;
@@ -70,18 +96,23 @@ export function MessagingStep({ draft, errors, onChange }: MessagingStepProps) {
   return (
     <div className="space-y-6">
       <p className="text-sm text-muted-foreground">
-        Oil Change Campaign is selected by default. Pick another template or
-        choose Custom to write your own primary promo and reminders.
+        {isPocVersion
+          ? "POC includes Oil Change Campaign messaging over SMS only."
+          : "Oil Change Campaign is selected by default. Pick another template or choose Custom to write your own primary promo and reminders."}
       </p>
 
       <FormField
         label="Delivery channels"
         error={errors.deliveryChannels}
-        hint="Select one or more channels. The preview updates for SMS and email."
+        hint={
+          isPocVersion
+            ? "POC supports SMS only. Email is available in MVP V1.0+."
+            : "Select one or more channels. The preview updates for SMS and email."
+        }
         required
       >
         <div className="space-y-2">
-          {DELIVERY_CHANNEL_OPTIONS.map((option) => {
+          {deliveryChannelOptions.map((option) => {
             const isEnabled = draft.deliveryChannels.includes(option.value);
 
             return (
@@ -117,10 +148,21 @@ export function MessagingStep({ draft, errors, onChange }: MessagingStepProps) {
 
       <FormField
         label="Message template"
-        hint="Predefined templates apply copy to messaging and reminders. Custom clears the fields so you can write from scratch."
+        hint={
+          isPocVersion
+            ? "POC includes the Oil Change Campaign template only."
+            : "Published templates from Templates apply copy to messaging and reminders. Custom clears the fields so you can write from scratch."
+        }
       >
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-          {CAMPAIGN_MESSAGE_TEMPLATES.map((template) => (
+        <div
+          className={cn(
+            "grid gap-2",
+            messageTemplates.length <= 1
+              ? "grid-cols-1"
+              : "sm:grid-cols-2 lg:grid-cols-3",
+          )}
+        >
+          {messageTemplates.map((template) => (
             <button
               key={template.id}
               type="button"
@@ -154,7 +196,9 @@ export function MessagingStep({ draft, errors, onChange }: MessagingStepProps) {
             onChange={(e) =>
               onChange({
                 primaryPromoText: e.target.value,
-                messageTemplateId: "custom",
+                ...(isPocVersion
+                  ? {}
+                  : { messageTemplateId: CUSTOM_TEMPLATE_ID }),
               })
             }
             rows={5}

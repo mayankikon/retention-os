@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Saira } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { ProductVersionProvider } from "@/contexts/product-version-context";
 import { SessionProvider } from "@/contexts/session-context";
 import "@/styles/globals.css";
 
@@ -25,7 +26,9 @@ export default function RootLayout({
     <html lang="en" className={`${saira.variable} h-full antialiased`}>
       <body className={`${saira.className} min-h-full flex flex-col font-sans`}>
         <NuqsAdapter>
-          <SessionProvider>{children}</SessionProvider>
+          <SessionProvider>
+            <ProductVersionProvider>{children}</ProductVersionProvider>
+          </SessionProvider>
         </NuqsAdapter>
       </body>
     </html>

@@ -31,6 +31,21 @@ Web UI for Ikon's Smart Marketing Campaign Manager. Phase 1 delivers the **Campa
 - Five-step wizard at `/campaigns/new` (General → Messaging → Reminders → Configuration → Review)
 - SOP-default SMS templates, timezone schedule reference table, test send and activate (mock)
 
+### Product versions
+
+- Sidebar **Version** switcher (bottom of left nav) with selectable **POC V0.5** and **MVP V1.0**
+- Post-MVP versions (**V1.1**, **V1.2**, **V1.4**) are listed but disabled for now
+- **POC V0.5** gates: SMS only (no email channel); Oil Change Campaign template only in campaign setup
+- Version preference persists in `localStorage` (`retention-os-product-version`)
+
+### Templates
+
+- Top-level **Templates** nav (`/templates`) available in all product versions
+- Create/edit via multi-step wizard; Draft / Published / Archived statuses
+- Detail shows content, campaigns using the template, and audit history
+- Published templates populate campaign Messaging (plus Custom); POC setup still Oil Change–only
+- Persistence: `localStorage` (`retention-os-message-templates`) seeded with system templates
+
 ## External boundaries
 
 - **In scope later**: REST/GraphQL API replacing mock data (`docs/architecture/api-contracts.md`)

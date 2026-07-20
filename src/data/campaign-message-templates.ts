@@ -1,5 +1,10 @@
+import { getTemplateById } from "@/lib/template-store";
 import type { CampaignSetupDraft } from "@/types/campaign-setup";
 import type { CampaignMessageTemplateId } from "@/types/campaign-setup";
+import {
+  CUSTOM_TEMPLATE_ID,
+  type MessageTemplate,
+} from "@/types/template";
 
 export interface CampaignMessageTemplate {
   id: CampaignMessageTemplateId;
@@ -11,6 +16,7 @@ export interface CampaignMessageTemplate {
   reminder3Text: string;
 }
 
+/** Legacy static catalog — also seeds the Templates store. */
 export const CAMPAIGN_MESSAGE_TEMPLATES: CampaignMessageTemplate[] = [
   {
     id: "oil_change",
@@ -52,7 +58,7 @@ export const CAMPAIGN_MESSAGE_TEMPLATES: CampaignMessageTemplate[] = [
       "[@FN@], last reminder about your check-engine alert. We're here when you're ready — same-day diagnostics available. [@DSP@]",
   },
   {
-    id: "custom",
+    id: CUSTOM_TEMPLATE_ID,
     label: "Custom",
     description: "Write your own primary promo and reminder copy.",
     primaryPromoText: "",
@@ -62,9 +68,34 @@ export const CAMPAIGN_MESSAGE_TEMPLATES: CampaignMessageTemplate[] = [
   },
 ];
 
+export function messageTemplateToPickerItem(
+  template: MessageTemplate,
+): CampaignMessageTemplate {
+  return {
+    id: template.id,
+    label: template.heading,
+    description: template.message,
+    primaryPromoText: template.primaryPromoText,
+    reminder1Text: template.reminder1Text,
+    reminder2Text: template.reminder2Text,
+    reminder3Text: template.reminder3Text,
+  };
+}
+
 export function getCampaignMessageTemplate(
   templateId: CampaignMessageTemplateId,
 ): CampaignMessageTemplate | undefined {
+  if (templateId === CUSTOM_TEMPLATE_ID) {
+    return CAMPAIGN_MESSAGE_TEMPLATES.find(
+      (template) => template.id === CUSTOM_TEMPLATE_ID,
+    );
+  }
+
+  const stored = getTemplateById(templateId);
+  if (stored) {
+    return messageTemplateToPickerItem(stored);
+  }
+
   return CAMPAIGN_MESSAGE_TEMPLATES.find((template) => template.id === templateId);
 }
 
@@ -76,11 +107,41 @@ export function buildMessageTemplatePatch(
     return {};
   }
 
+  if (templateId === CUSTOM_TEMPLATE_ID) {
+    return {
+      messageTemplateId: CUSTOM_TEMPLATE_ID,
+      primaryPromoText: "",
+      reminder1Text: "",
+      reminder2Text: "",
+      reminder3Text: "",
+      dealerUrl: "",
+      campaignImageFileName: null,
+      campaignImagePreviewUrl: null,
+      reminder1Enabled: true,
+      reminder2Enabled: true,
+      reminder3Enabled: false,
+    };
+  }
+
+  const stored = getTemplateById(templateId);
+
   return {
     messageTemplateId: templateId,
     primaryPromoText: template.primaryPromoText,
     reminder1Text: template.reminder1Text,
     reminder2Text: template.reminder2Text,
     reminder3Text: template.reminder3Text,
+    dealerUrl: stored?.dealerUrl ?? "",
+    campaignImageFileName: stored?.campaignImageFileName ?? null,
+    campaignImagePreviewUrl: stored?.campaignImagePreviewUrl ?? null,
+    reminder1Enabled: stored?.reminder1Enabled ?? Boolean(template.reminder1Text),
+    reminder2Enabled: stored?.reminder2Enabled ?? Boolean(template.reminder2Text),
+    reminder3Enabled: stored?.reminder3Enabled ?? Boolean(template.reminder3Text),
+    reminder1ImageFileName: stored?.reminder1ImageFileName ?? null,
+    reminder1ImagePreviewUrl: stored?.reminder1ImagePreviewUrl ?? null,
+    reminder2ImageFileName: stored?.reminder2ImageFileName ?? null,
+    reminder2ImagePreviewUrl: stored?.reminder2ImagePreviewUrl ?? null,
+    reminder3ImageFileName: stored?.reminder3ImageFileName ?? null,
+    reminder3ImagePreviewUrl: stored?.reminder3ImagePreviewUrl ?? null,
   };
 }

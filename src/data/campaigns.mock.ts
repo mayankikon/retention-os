@@ -31,6 +31,7 @@ const campaignRows: Omit<Campaign, "conversionRate">[] = [
     group: "Service",
     lastUpdatedAt: hoursFromNow(-2),
     nextUpdateAt: hoursFromNow(1),
+    messageTemplateId: "service_reminder",
   },
   {
     id: "cmp-002",
@@ -44,6 +45,7 @@ const campaignRows: Omit<Campaign, "conversionRate">[] = [
     group: "Promotions",
     lastUpdatedAt: hoursFromNow(-3),
     nextUpdateAt: hoursFromNow(1),
+    messageTemplateId: "oil_change",
   },
   {
     id: "cmp-003",

@@ -33,5 +33,6 @@ export function createCampaignFromDraft(
     group: draft.subfleets[0] ?? "General",
     lastUpdatedAt: now.toISOString(),
     nextUpdateAt: nextHour.toISOString(),
+    messageTemplateId: draft.messageTemplateId,
   };
 }
