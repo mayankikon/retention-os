@@ -12,8 +12,7 @@ export function getCampaignAnalytics(campaign: Campaign): CampaignAnalytics {
   if (
     sent === 0 ||
     campaign.status === "draft" ||
-    campaign.status === "scheduled" ||
-    campaign.status === "failed"
+    campaign.status === "scheduled"
   ) {
     return {
       recipientsSent: 0,

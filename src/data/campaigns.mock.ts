@@ -8,8 +8,8 @@ function hoursFromNow(offsetHours: number): string {
   return date.toISOString();
 }
 
-function deriveMockConversionRate(
-  row: Omit<Campaign, "conversionRate">,
+function deriveMockClickThroughRate(
+  row: Omit<Campaign, "clickThroughRate">,
 ): number {
   if (row.messages === 0) return 0;
   if (row.status === "scheduled" || row.status === "draft") return 0;
@@ -18,7 +18,7 @@ function deriveMockConversionRate(
   return Math.round((2.4 + (sequence % 15) * 0.9) * 10) / 10;
 }
 
-const campaignRows: Omit<Campaign, "conversionRate">[] = [
+const campaignRows: Omit<Campaign, "clickThroughRate">[] = [
   {
     id: "cmp-001",
     name: "Spring Service Reminder",
@@ -143,7 +143,7 @@ const campaignRows: Omit<Campaign, "conversionRate">[] = [
     name: "SMS Delivery Retry Test",
     dealer: "Ikon Motors West",
     timeZone: "PST",
-    status: "failed",
+    status: "stopped",
     messages: 12,
     createdBy: { id: "u7", name: "Amy Foster", initials: "AF" },
     createdAt: hoursFromNow(-288),
@@ -299,7 +299,7 @@ const campaignRows: Omit<Campaign, "conversionRate">[] = [
     name: "Multi-Channel Sync Test",
     dealer: "Ikon Motors West",
     timeZone: "PST",
-    status: "failed",
+    status: "stopped",
     messages: 5,
     createdBy: { id: "u7", name: "Amy Foster", initials: "AF" },
     createdAt: hoursFromNow(-576),
@@ -415,5 +415,5 @@ const campaignRows: Omit<Campaign, "conversionRate">[] = [
 
 export const mockCampaigns: Campaign[] = campaignRows.map((row) => ({
   ...row,
-  conversionRate: deriveMockConversionRate(row),
+  clickThroughRate: deriveMockClickThroughRate(row),
 }));

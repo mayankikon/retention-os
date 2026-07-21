@@ -1,4 +1,4 @@
-import type { Campaign } from "@/types/campaign";
+import type { Campaign, CampaignStatus } from "@/types/campaign";
 import type { CampaignSetupDraft } from "@/types/campaign-setup";
 import type { AppUser } from "@/types/user";
 
@@ -8,22 +8,29 @@ function resolveDealer(subfleets: string[]): string {
   return subfleets.join(", ");
 }
 
+export interface CreateCampaignFromDraftOptions {
+  status?: Extract<CampaignStatus, "draft" | "scheduled" | "active">;
+  scheduledActivateAt?: string | null;
+}
+
 export function createCampaignFromDraft(
   draft: CampaignSetupDraft,
   user: AppUser,
+  options: CreateCampaignFromDraftOptions = {},
 ): Campaign {
   const now = new Date();
   const nextHour = new Date(now);
   nextHour.setHours(nextHour.getHours() + 1);
+  const status = options.status ?? "active";
 
   return {
     id: `cmp-${now.getTime()}`,
-    name: draft.campaignName.trim(),
+    name: draft.campaignName.trim() || "Untitled campaign",
     dealer: resolveDealer(draft.subfleets),
     timeZone: draft.timeZone,
-    status: "scheduled",
+    status,
     messages: 0,
-    conversionRate: 0,
+    clickThroughRate: 0,
     createdBy: {
       id: user.id,
       name: user.name,
@@ -34,5 +41,7 @@ export function createCampaignFromDraft(
     lastUpdatedAt: now.toISOString(),
     nextUpdateAt: nextHour.toISOString(),
     messageTemplateId: draft.messageTemplateId,
+    scheduledActivateAt:
+      status === "scheduled" ? (options.scheduledActivateAt ?? null) : null,
   };
 }

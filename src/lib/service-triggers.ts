@@ -17,7 +17,7 @@ import type {
 } from "@/types/campaign-setup";
 
 export function getDefaultPresetForTriggerType(
-  triggerType: Exclude<ServiceTriggerType, "oem" | "audience">,
+  triggerType: Exclude<ServiceTriggerType, "oem">,
 ): string {
   switch (triggerType) {
     case "time":
@@ -30,18 +30,11 @@ export function getDefaultPresetForTriggerType(
 }
 
 export function getServiceTriggerMode(draft: CampaignSetupDraft): ServiceTriggerMode {
-  if (draft.serviceTriggerMode) {
-    return draft.serviceTriggerMode;
-  }
-
-  if (draft.serviceTriggerTypes.includes("oem")) {
+  if (draft.serviceTriggerMode === "oem") {
     return "oem";
   }
 
-  if (draft.serviceTriggerTypes.includes("audience")) {
-    return "audience";
-  }
-
+  // Legacy "audience"-only drafts migrate to interval while keeping filters.
   return "interval";
 }
 
@@ -56,20 +49,6 @@ export function setServiceTriggerMode(
   draft: CampaignSetupDraft,
   mode: ServiceTriggerMode,
 ): Partial<CampaignSetupDraft> {
-  if (mode === "interval") {
-    return {
-      serviceTriggerMode: "interval",
-      serviceTriggerTypes: ["time", "mileage"],
-      timeServiceTriggerPreset:
-        draft.timeServiceTriggerPreset || getDefaultPresetForTriggerType("time"),
-      mileageServiceTriggerPreset:
-        draft.mileageServiceTriggerPreset ||
-        getDefaultPresetForTriggerType("mileage"),
-      oemMake: "",
-      oemModel: "",
-    };
-  }
-
   if (mode === "oem") {
     return {
       serviceTriggerMode: "oem",
@@ -80,8 +59,13 @@ export function setServiceTriggerMode(
   }
 
   return {
-    serviceTriggerMode: "audience",
-    serviceTriggerTypes: ["audience"],
+    serviceTriggerMode: "interval",
+    serviceTriggerTypes: ["time", "mileage"],
+    timeServiceTriggerPreset:
+      draft.timeServiceTriggerPreset || getDefaultPresetForTriggerType("time"),
+    mileageServiceTriggerPreset:
+      draft.mileageServiceTriggerPreset ||
+      getDefaultPresetForTriggerType("mileage"),
     oemMake: "",
     oemModel: "",
   };
@@ -89,6 +73,7 @@ export function setServiceTriggerMode(
 
 export function getServiceTriggerSummaries(draft: CampaignSetupDraft): string[] {
   const mode = getServiceTriggerMode(draft);
+  const summaries: string[] = [];
 
   if (mode === "interval") {
     const timeOption = TIME_SERVICE_TRIGGER_OPTIONS.find(
@@ -98,31 +83,31 @@ export function getServiceTriggerSummaries(draft: CampaignSetupDraft): string[] 
       (item) => item.value === draft.mileageServiceTriggerPreset,
     );
 
-    return [
+    summaries.push(
       `Time Interval: ${timeOption?.label ?? "Not selected"}`,
       `Mileage Interval: ${mileageOption?.label ?? "Not selected"}`,
-    ];
+    );
+  } else if (!draft.oemMake || !draft.oemModel) {
+    summaries.push("OEM-Recommended Service Schedule: Not selected");
+  } else {
+    const schedule = getOemServiceSchedule(draft.oemMake, draft.oemModel);
+    summaries.push(
+      schedule
+        ? `OEM-Recommended Service Schedule: ${schedule.make} ${schedule.model} — ${schedule.intervalMiles.toLocaleString("en-US")} mi / ${formatIntervalDays(schedule.intervalDays)}`
+        : `OEM-Recommended Service Schedule: ${draft.oemMake} ${draft.oemModel}`,
+    );
   }
 
-  if (mode === "audience") {
-    const audienceLines = summarizeAudienceFilters(draft.audienceFilters);
-    if (audienceLines.length === 0) {
-      return ["Audience Query: No filters added"];
-    }
-
-    return audienceLines.map((line) => `Audience Query · ${line}`);
+  const audienceLines = summarizeAudienceFilters(draft.audienceFilters);
+  if (audienceLines.length === 0) {
+    summaries.push("Audience Query: No filters added");
+  } else {
+    summaries.push(
+      ...audienceLines.map((line) => `Audience Query · ${line}`),
+    );
   }
 
-  if (!draft.oemMake || !draft.oemModel) {
-    return ["OEM-Recommended Service Schedule: Not selected"];
-  }
-
-  const schedule = getOemServiceSchedule(draft.oemMake, draft.oemModel);
-  return [
-    schedule
-      ? `OEM-Recommended Service Schedule: ${schedule.make} ${schedule.model} — ${schedule.intervalMiles.toLocaleString("en-US")} mi / ${formatIntervalDays(schedule.intervalDays)}`
-      : `OEM-Recommended Service Schedule: ${draft.oemMake} ${draft.oemModel}`,
-  ];
+  return summaries;
 }
 
 export function getServiceTriggerSummary(draft: CampaignSetupDraft): string {
@@ -132,6 +117,46 @@ export function getServiceTriggerSummary(draft: CampaignSetupDraft): string {
   }
 
   return summaries.join("; ");
+}
+
+export function validateAudienceFilterFields(
+  draft: CampaignSetupDraft,
+): Record<string, string> {
+  const errors: Record<string, string> = {};
+
+  for (const rule of draft.audienceFilters) {
+    if (rule.attribute === "vehiclePurchaseDate") {
+      const range = rule.value.trim();
+      if (!range) continue;
+      const purchaseDateError = validatePurchaseDateRangeRule(rule);
+      if (purchaseDateError) {
+        errors[`audience.${rule.id}`] = purchaseDateError;
+      }
+      continue;
+    }
+
+    if (!rule.value.trim()) {
+      continue;
+    }
+
+    if (!isRuleComplete(rule)) {
+      errors[`audience.${rule.id}`] =
+        "Complete this filter or remove it (check the value and any range).";
+      continue;
+    }
+
+    if (rule.attribute === "vehicleModel") {
+      const make = getSelectedMakeFromRules(draft.audienceFilters);
+      if (!make) {
+        errors[`audience.${rule.id}`] =
+          "Add a Make filter before selecting a Model.";
+      } else if (!isModelValidForMake(make, rule.value.trim())) {
+        errors[`audience.${rule.id}`] = `Model is not available for ${make}.`;
+      }
+    }
+  }
+
+  return errors;
 }
 
 export function validateServiceTriggerFields(
@@ -154,60 +179,26 @@ export function validateServiceTriggerFields(
     if (!hasValidMileagePreset) {
       errors.mileageServiceTriggerPreset = "Select a mileage interval.";
     }
-
-    return errors;
-  }
-
-  if (mode === "audience") {
-    const completeRules = draft.audienceFilters.filter(isRuleComplete);
-    if (completeRules.length === 0) {
-      errors.audienceFilters = "Add at least one audience filter.";
+  } else {
+    if (!draft.oemMake.trim()) {
+      errors.oemMake = "Select a vehicle make.";
     }
-
-    for (const rule of draft.audienceFilters) {
-      if (rule.attribute === "vehiclePurchaseDate") {
-        const purchaseDateError = validatePurchaseDateRangeRule(rule);
-        if (purchaseDateError) {
-          errors[`audience.${rule.id}`] = purchaseDateError;
-        }
-        continue;
-      }
-
-      if (!isRuleComplete(rule)) {
-        errors[`audience.${rule.id}`] =
-          "Complete this filter or remove it (check the value and any range).";
-        continue;
-      }
-
-      if (rule.attribute === "vehicleModel") {
-        const make = getSelectedMakeFromRules(draft.audienceFilters);
-        if (!make) {
-          errors[`audience.${rule.id}`] =
-            "Add a Make filter before selecting a Model.";
-        } else if (!isModelValidForMake(make, rule.value.trim())) {
-          errors[`audience.${rule.id}`] = `Model is not available for ${make}.`;
-        }
-      }
+    if (!draft.oemModel.trim()) {
+      errors.oemModel = "Select a vehicle model.";
     }
-
-    return errors;
+    if (
+      draft.oemMake.trim() &&
+      draft.oemModel.trim() &&
+      !getOemServiceSchedule(draft.oemMake, draft.oemModel)
+    ) {
+      errors.oemModel = "No OEM schedule is available for this make and model.";
+    }
   }
 
-  if (!draft.oemMake.trim()) {
-    errors.oemMake = "Select a vehicle make.";
-  }
-  if (!draft.oemModel.trim()) {
-    errors.oemModel = "Select a vehicle model.";
-  }
-  if (
-    draft.oemMake.trim() &&
-    draft.oemModel.trim() &&
-    !getOemServiceSchedule(draft.oemMake, draft.oemModel)
-  ) {
-    errors.oemModel = "No OEM schedule is available for this make and model.";
-  }
-
-  return errors;
+  return {
+    ...errors,
+    ...validateAudienceFilterFields(draft),
+  };
 }
 
 function formatIntervalDays(days: number): string {

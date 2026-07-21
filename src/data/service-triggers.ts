@@ -30,18 +30,13 @@ export const SERVICE_TRIGGER_MODE_OPTIONS: ServiceTriggerModeOption[] = [
     value: "interval",
     label: "Time Interval and Mileage Interval",
     description:
-      "Trigger outreach when either the time interval or mileage interval is reached",
+      "Trigger outreach when either the time interval or mileage interval is reached, then narrow with an audience query",
   },
   {
     value: "oem",
     label: "OEM-Recommended Service Schedule",
-    description: "Use the manufacturer schedule for a specific make and model",
-  },
-  {
-    value: "audience",
-    label: "Audience Query",
     description:
-      "Target customers using vehicle, location, and purchase criteria",
+      "Use the manufacturer schedule for a specific make and model, then narrow with an audience query",
   },
 ];
 

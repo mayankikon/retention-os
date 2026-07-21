@@ -33,10 +33,6 @@ const STATUS_STYLES: Record<
     label: STATUS_LABELS.draft,
     className: "bg-[var(--status-draft-bg)] text-[var(--status-draft-fg)]",
   },
-  failed: {
-    label: STATUS_LABELS.failed,
-    className: "bg-[var(--status-failed-bg)] text-[var(--status-failed-fg)]",
-  },
 };
 
 const FALLBACK_STYLE = {

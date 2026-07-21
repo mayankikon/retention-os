@@ -8,7 +8,6 @@ const STATUS_LABELS: Record<CampaignStatus, string> = {
   paused: "Paused",
   stopped: "Stopped",
   completed: "Completed",
-  failed: "Failed",
 };
 
 function hoursAfter(iso: string, hours: number): string {

@@ -3,7 +3,7 @@ import { CheckCircle2, Percent, Send, Users } from "lucide-react";
 import { getTimeZoneLabel } from "@/data/campaign-setup.defaults";
 import { formatTimestamp } from "@/lib/dates";
 import {
-  formatConversionRate,
+  formatClickThroughRate,
   formatDeliveryRate,
   formatMessageCount,
   formatOpenRate,
@@ -108,12 +108,12 @@ export function CampaignDetailsTab({
             icon={CheckCircle2}
           />
           <MetricCard
-            label="Conversion rate"
-            value={formatConversionRate(campaign.conversionRate)}
+            label="Click-through rate"
+            value={formatClickThroughRate(campaign.clickThroughRate)}
             subtext={
               hasActivity
                 ? "Of customers sent"
-                : "No conversions yet"
+                : "No clicks yet"
             }
             icon={Percent}
           />

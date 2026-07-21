@@ -25,7 +25,6 @@ import {
 import { CONFIGURATION_DAY_LABELS } from "@/lib/format-schedule";
 import {
   getServiceTriggerMode,
-  getServiceTriggerSummaries,
   setServiceTriggerMode,
 } from "@/lib/service-triggers";
 import type {
@@ -59,7 +58,6 @@ export function ConfigurationStep({
     errors.oemMake ??
     errors.oemModel ??
     errors.audienceFilters;
-  const selectedSummaries = getServiceTriggerSummaries(draft);
 
   const toggleDay = (day: ScheduleDay, checked: boolean) => {
     const next = checked
@@ -77,7 +75,7 @@ export function ConfigurationStep({
       <FormField
         label="Service triggers"
         error={serviceTriggerError}
-        hint="Choose one targeting method: time and mileage intervals, OEM schedule, or an audience query."
+        hint="Choose time and mileage intervals or an OEM schedule, then optionally narrow the audience."
         required
       >
         <fieldset className="space-y-3">
@@ -167,6 +165,18 @@ export function ConfigurationStep({
                         </SelectContent>
                       </Select>
                     </FormField>
+
+                    <div className="border-t border-border pt-4">
+                      <p className="mb-3 text-sm font-medium text-foreground">
+                        Audience query
+                      </p>
+                      <AudienceFilters
+                        draft={draft}
+                        errors={errors}
+                        onChange={onChange}
+                        embedded
+                      />
+                    </div>
                   </div>
                 ) : null}
 
@@ -241,33 +251,23 @@ export function ConfigurationStep({
                         </p>
                       </div>
                     ) : null}
-                  </div>
-                ) : null}
 
-                {isSelected && option.value === "audience" ? (
-                  <div className="mt-3 pl-7">
-                    <AudienceFilters
-                      draft={draft}
-                      errors={errors}
-                      onChange={onChange}
-                      embedded
-                    />
+                    <div className="border-t border-border pt-4">
+                      <p className="mb-3 text-sm font-medium text-foreground">
+                        Audience query
+                      </p>
+                      <AudienceFilters
+                        draft={draft}
+                        errors={errors}
+                        onChange={onChange}
+                        embedded
+                      />
+                    </div>
                   </div>
                 ) : null}
               </div>
             );
           })}
-
-          {selectedSummaries.length > 0 ? (
-            <div className="rounded-md border border-border bg-muted/20 p-3 text-sm">
-              <p className="font-medium text-foreground">Active trigger</p>
-              <ul className="mt-2 space-y-1 text-muted-foreground">
-                {selectedSummaries.map((summary) => (
-                  <li key={summary}>{summary}</li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
         </fieldset>
       </FormField>
 

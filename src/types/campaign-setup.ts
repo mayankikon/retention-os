@@ -25,10 +25,10 @@ export const SCHEDULE_DAYS = [
 
 export type ScheduleDay = (typeof SCHEDULE_DAYS)[number];
 
-export const SERVICE_TRIGGER_TYPES = ["time", "mileage", "oem", "audience"] as const;
+export const SERVICE_TRIGGER_TYPES = ["time", "mileage", "oem"] as const;
 export type ServiceTriggerType = (typeof SERVICE_TRIGGER_TYPES)[number];
 
-export const SERVICE_TRIGGER_MODES = ["interval", "oem", "audience"] as const;
+export const SERVICE_TRIGGER_MODES = ["interval", "oem"] as const;
 export type ServiceTriggerMode = (typeof SERVICE_TRIGGER_MODES)[number];
 
 /** @deprecated Prefer template store ids + CUSTOM_TEMPLATE_ID. Kept for legacy seeds. */

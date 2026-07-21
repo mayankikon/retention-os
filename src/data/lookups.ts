@@ -43,7 +43,6 @@ export const STATUS_LABELS: Record<CampaignStatus, string> = {
   stopped: "Stopped",
   completed: "Completed",
   draft: "Draft",
-  failed: "Failed",
 };
 
 export const FILTER_ALL = "all";

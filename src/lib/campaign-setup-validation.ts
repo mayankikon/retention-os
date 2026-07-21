@@ -1,8 +1,5 @@
 import type { CampaignSetupDraft, SetupStepId } from "@/types/campaign-setup";
-import {
-  getServiceTriggerMode,
-  validateServiceTriggerFields,
-} from "@/lib/service-triggers";
+import { validateServiceTriggerFields } from "@/lib/service-triggers";
 import { validateDeliveryChannels } from "@/lib/delivery-channels";
 
 export interface StepValidationResult {
@@ -83,19 +80,11 @@ export function validateConfigurationStep(
 export function validateAudienceStep(
   draft: CampaignSetupDraft,
 ): StepValidationResult {
-  if (getServiceTriggerMode(draft) !== "audience") {
-    return { isValid: true, errors: {} };
-  }
-
   const allErrors = validateServiceTriggerFields(draft);
   const errors: Record<string, string> = {};
 
-  if (allErrors.audienceFilters) {
-    errors.audienceFilters = allErrors.audienceFilters;
-  }
-
   for (const [key, value] of Object.entries(allErrors)) {
-    if (key.startsWith("audience.")) {
+    if (key.startsWith("audience.") || key === "audienceFilters") {
       errors[key] = value;
     }
   }

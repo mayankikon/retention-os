@@ -37,13 +37,14 @@ describe("createCampaignFromDraft", () => {
     expect(campaign.timeZone).toBe("PST");
   });
 
-  it("initializes conversion rate to zero for new campaigns", () => {
+  it("initializes click-through rate to zero and defaults to active", () => {
     const draft = {
       ...createDefaultSetupDraft(),
       campaignName: "New campaign",
     };
 
     const campaign = createCampaignFromDraft(draft, MOCK_CURRENT_USER);
-    expect(campaign.conversionRate).toBe(0);
+    expect(campaign.clickThroughRate).toBe(0);
+    expect(campaign.status).toBe("active");
   });
 });

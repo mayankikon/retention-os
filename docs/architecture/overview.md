@@ -18,18 +18,23 @@ Web UI for Ikon's Smart Marketing Campaign Manager. Phase 1 delivers the **Campa
 
 ### Campaign list (Phase 1)
 
-- Campaign list with columns: Name, Dealer, Time Zone, Status, Messages, Conversion Rate, **Created By**
+- Campaign list with columns: Name, Dealer, Time Zone, Status, Messages, Click-Through Rate, **Created By**
 - Filters: Dealership, Time Zone, Status
 - Search by campaign name
 - Pagination (10 per page)
-- Status badges for all campaign statuses
+- Status badges: scheduled, active, paused, stopped, completed, draft
+- Detail actions: Pause / Resume / Stop
 - Data refresh indicator (hourly cadence)
 - Empty states: no data, no search results, filtered zero
+- Success banner after activate / schedule / save draft
 
 ### Campaign setup (Phase 2)
 
 - Five-step wizard at `/campaigns/new` (General → Messaging → Reminders → Configuration → Review)
-- SOP-default SMS templates, timezone schedule reference table, test send and activate (mock)
+- Configuration: Time+Mileage or OEM trigger, each with nested audience query; schedule days
+- Review: audience reach card; Activate now / Schedule / Save draft (draft only on this step); leave-guard modal when navigating away mid-setup; Audience suppression hidden on POC V0.5
+- After activate/schedule/draft: success banner on `/campaigns` list
+- SOP-default SMS templates, timezone schedule reference table, test send (mock)
 
 ### Product versions
 

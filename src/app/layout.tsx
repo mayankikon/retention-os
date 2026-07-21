@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Saira } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { CampaignSetupLeaveGuardProvider } from "@/contexts/campaign-setup-leave-guard";
 import { ProductVersionProvider } from "@/contexts/product-version-context";
 import { SessionProvider } from "@/contexts/session-context";
 import "@/styles/globals.css";
@@ -27,7 +28,11 @@ export default function RootLayout({
       <body className={`${saira.className} min-h-full flex flex-col font-sans`}>
         <NuqsAdapter>
           <SessionProvider>
-            <ProductVersionProvider>{children}</ProductVersionProvider>
+            <ProductVersionProvider>
+              <CampaignSetupLeaveGuardProvider>
+                {children}
+              </CampaignSetupLeaveGuardProvider>
+            </ProductVersionProvider>
           </SessionProvider>
         </NuqsAdapter>
       </body>

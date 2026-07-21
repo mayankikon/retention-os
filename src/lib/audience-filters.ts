@@ -84,6 +84,13 @@ export function estimateAudienceReach(rules: AudienceFilterRule[]): number {
   return Math.max(MIN_AUDIENCE, rounded);
 }
 
+/** Simulated deliverable reach after consent / channel availability (~82–90%). */
+export function estimateDeliverableReach(targetedCustomers: number): number {
+  const rate = 0.82 + (targetedCustomers % 9) / 100;
+  const rounded = Math.round((targetedCustomers * rate) / 5) * 5;
+  return Math.max(MIN_AUDIENCE, Math.min(targetedCustomers, rounded));
+}
+
 /** Human-readable recap lines for complete rules (used by the Review step). */
 export function summarizeAudienceFilters(rules: AudienceFilterRule[]): string[] {
   return rules.filter(isRuleComplete).map((rule) => {

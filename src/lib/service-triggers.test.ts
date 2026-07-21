@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { createDefaultSetupDraft } from "@/data/campaign-setup.defaults";
 import {
+  getServiceTriggerMode,
   getServiceTriggerSummaries,
   getServiceTriggerSummary,
   setServiceTriggerMode,
@@ -13,8 +14,11 @@ describe("service triggers", () => {
     expect(draft.serviceTriggerMode).toBe("interval");
     expect(draft.serviceTriggerTypes).toEqual(["time", "mileage"]);
     expect(draft.timeServiceTriggerPreset).toBe("180_days_5000_mile");
-    expect(getServiceTriggerSummary(draft)).toBe(
-      "Time Interval: 180 days / 5,000 miles (SOP default); Mileage Interval: 2,000 miles",
+    expect(getServiceTriggerSummary(draft)).toContain(
+      "Time Interval: 180 days / 5,000 miles (SOP default)",
+    );
+    expect(getServiceTriggerSummary(draft)).toContain(
+      "Mileage Interval: 2,000 miles",
     );
   });
 
@@ -30,6 +34,7 @@ describe("service triggers", () => {
     expect(getServiceTriggerSummaries(intervalDraft)).toEqual([
       "Time Interval: 180 days / 5,000 miles (SOP default)",
       "Mileage Interval: 2,000 miles",
+      "Audience Query: No filters added",
     ]);
   });
 
@@ -66,7 +71,7 @@ describe("service triggers", () => {
       oemModel: "RAV4",
     };
 
-    expect(getServiceTriggerSummary(draft)).toBe(
+    expect(getServiceTriggerSummary(draft)).toContain(
       "OEM-Recommended Service Schedule: Toyota RAV4 — 10,000 mi / 12 months",
     );
     expect(validateServiceTriggerFields(draft)).toEqual({});
@@ -90,29 +95,33 @@ describe("service triggers", () => {
     expect(intervalDraft.serviceTriggerTypes).toEqual(["time", "mileage"]);
   });
 
-  it("summarizes audience query filters", () => {
+  it("nests audience query filters under interval or OEM", () => {
     const draft = {
       ...createDefaultSetupDraft(),
-      ...setServiceTriggerMode(createDefaultSetupDraft(), "audience"),
+      ...setServiceTriggerMode(createDefaultSetupDraft(), "interval"),
       audienceFilters: [
         { id: "a", attribute: "vehicleMake" as const, value: "Toyota" },
         { id: "b", attribute: "vehicleModel" as const, value: "Corolla" },
       ],
     };
 
+    expect(getServiceTriggerMode(draft)).toBe("interval");
     expect(getServiceTriggerSummaries(draft)).toEqual([
+      "Time Interval: 180 days / 5,000 miles (SOP default)",
+      "Mileage Interval: 2,000 miles",
       "Audience Query · Make: Toyota",
       "Audience Query · Model: Corolla",
     ]);
   });
 
-  it("requires at least one audience filter in audience mode", () => {
+  it("migrates legacy audience-only mode to interval", () => {
     const draft = {
       ...createDefaultSetupDraft(),
-      ...setServiceTriggerMode(createDefaultSetupDraft(), "audience"),
+      serviceTriggerMode: "audience" as never,
+      serviceTriggerTypes: ["audience"] as never[],
       audienceFilters: [],
     };
 
-    expect(validateServiceTriggerFields(draft).audienceFilters).toBeDefined();
+    expect(getServiceTriggerMode(draft)).toBe("interval");
   });
 });

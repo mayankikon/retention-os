@@ -21,7 +21,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { CampaignStatusBadge } from "@/components/campaigns/CampaignStatusBadge";
 import { getDealerGroup } from "@/data/lookups";
 import { getTimeZoneLabel } from "@/data/campaign-setup.defaults";
-import { formatConversionRate, formatMessageCount } from "@/lib/format";
+import { formatClickThroughRate, formatMessageCount } from "@/lib/format";
 import type { Campaign } from "@/types/campaign";
 
 const columnHelper = createColumnHelper<Campaign>();
@@ -66,9 +66,9 @@ const columns = [
     header: "Messages",
     cell: (info) => formatMessageCount(info.getValue()),
   }),
-  columnHelper.accessor("conversionRate", {
-    header: "Conversion Rate",
-    cell: (info) => formatConversionRate(info.getValue()),
+  columnHelper.accessor("clickThroughRate", {
+    header: "Click-Through Rate",
+    cell: (info) => formatClickThroughRate(info.getValue()),
   }),
   columnHelper.accessor("createdBy", {
     header: "Created By",

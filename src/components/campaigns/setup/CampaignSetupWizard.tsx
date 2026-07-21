@@ -1,9 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import Link from "next/link";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
-import { ConfirmationView } from "@/components/campaigns/setup/ConfirmationView";
 import { StepShellLayout } from "@/components/campaigns/setup/StepShellLayout";
 import { ConfigurationStep } from "@/components/campaigns/setup/steps/ConfigurationStep";
 import { GeneralStep } from "@/components/campaigns/setup/steps/GeneralStep";
@@ -12,9 +11,13 @@ import { RemindersStep } from "@/components/campaigns/setup/steps/RemindersStep"
 import { ReviewStep } from "@/components/campaigns/setup/steps/ReviewStep";
 import { Button } from "@/components/ui/button";
 import { createDefaultSetupDraft } from "@/data/campaign-setup.defaults";
+import { useCampaignSetupLeaveGuard } from "@/contexts/campaign-setup-leave-guard";
 import { useProductVersion } from "@/contexts/product-version-context";
 import { useCurrentUser } from "@/contexts/session-context";
-import { addUserCreatedCampaign } from "@/lib/campaign-store";
+import {
+  addUserCreatedCampaign,
+  setCampaignFlashMessage,
+} from "@/lib/campaign-store";
 import { createCampaignFromDraft } from "@/lib/create-campaign-from-draft";
 import {
   validateAllStepsBeforeActivate,
@@ -27,8 +30,11 @@ import { SETUP_STEPS } from "@/types/campaign-setup";
 const stepParser = parseAsStringLiteral(SETUP_STEPS).withDefault("general");
 
 export function CampaignSetupWizard() {
+  const router = useRouter();
   const currentUser = useCurrentUser();
   const { versionId } = useProductVersion();
+  const { registerSetup, unregisterSetup, clearSetup, requestNavigation } =
+    useCampaignSetupLeaveGuard();
   const [step, setStep] = useQueryState("step", stepParser);
   const [draft, setDraft] = useState<CampaignSetupDraft>(() => {
     const base = createDefaultSetupDraft();
@@ -43,8 +49,6 @@ export function CampaignSetupWizard() {
   );
   const [isTestSent, setIsTestSent] = useState(false);
   const [isActivating, setIsActivating] = useState(false);
-  const [isActivated, setIsActivated] = useState(false);
-  const [activatedName, setActivatedName] = useState("");
 
   const currentIndex = SETUP_STEPS.indexOf(step);
   const isFirstStep = currentIndex === 0;
@@ -103,11 +107,11 @@ export function CampaignSetupWizard() {
     setErrors({});
   }, [draft]);
 
-  const handleActivate = useCallback(async () => {
+  const validateLaunch = useCallback(() => {
     const preflight = validateAllStepsBeforeActivate(draft);
     if (!preflight.isValid) {
       setErrors(preflight.errors);
-      return;
+      return false;
     }
 
     if (!isTestSent) {
@@ -117,7 +121,7 @@ export function CampaignSetupWizard() {
       });
       if (!testResult.isValid) {
         setErrors(testResult.errors);
-        return;
+        return false;
       }
     } else {
       const complianceResult = validateSetupStep("review", draft, {
@@ -125,20 +129,108 @@ export function CampaignSetupWizard() {
       });
       if (!complianceResult.isValid) {
         setErrors(complianceResult.errors);
-        return;
+        return false;
       }
     }
 
+    return true;
+  }, [draft, isTestSent]);
+
+  const finishAndReturnHome = useCallback(
+    (
+      kind: "activated" | "scheduled" | "draft",
+      campaignName: string,
+      detail?: string,
+    ) => {
+      clearSetup();
+      setCampaignFlashMessage({ kind, campaignName, detail });
+      router.push("/campaigns");
+    },
+    [router, clearSetup],
+  );
+
+  const handleActivateNow = useCallback(async () => {
+    if (!validateLaunch()) return;
+
     setIsActivating(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 800));
 
-    const campaign = createCampaignFromDraft(draft, currentUser);
+    const campaign = createCampaignFromDraft(draft, currentUser, {
+      status: "active",
+    });
     addUserCreatedCampaign(campaign);
-
-    setActivatedName(draft.campaignName);
-    setIsActivated(true);
     setIsActivating(false);
-  }, [draft, isTestSent, currentUser]);
+    finishAndReturnHome("activated", campaign.name);
+  }, [draft, currentUser, validateLaunch, finishAndReturnHome]);
+
+  const handleSchedule = useCallback(
+    async (activateOnDate: string) => {
+      if (!validateLaunch()) return;
+      if (!activateOnDate) {
+        setErrors({ scheduledActivateAt: "Select an activation date." });
+        return;
+      }
+
+      setIsActivating(true);
+      await new Promise((resolve) => setTimeout(resolve, 800));
+
+      const campaign = createCampaignFromDraft(draft, currentUser, {
+        status: "scheduled",
+        scheduledActivateAt: `${activateOnDate}T12:00:00.000Z`,
+      });
+      addUserCreatedCampaign(campaign);
+      setIsActivating(false);
+      finishAndReturnHome(
+        "scheduled",
+        campaign.name,
+        `Activates ${new Date(`${activateOnDate}T12:00:00.000Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`,
+      );
+    },
+    [draft, currentUser, validateLaunch, finishAndReturnHome],
+  );
+
+  const persistDraft = useCallback(
+    (options?: { requireName?: boolean }) => {
+      const requireName = options?.requireName ?? true;
+      if (requireName && !draft.campaignName.trim()) {
+        setErrors({
+          campaignName: "Enter a campaign name before saving a draft.",
+        });
+        goToStep("general");
+        return false;
+      }
+
+      const campaign = createCampaignFromDraft(draft, currentUser, {
+        status: "draft",
+      });
+      addUserCreatedCampaign(campaign);
+      finishAndReturnHome("draft", campaign.name);
+      return true;
+    },
+    [draft, currentUser, finishAndReturnHome, goToStep],
+  );
+
+  const handleSaveDraftFromReview = useCallback(() => {
+    persistDraft({ requireName: true });
+  }, [persistDraft]);
+
+  const leaveSaveDraftRef = useRef(() => {
+    persistDraft({ requireName: false });
+  });
+  leaveSaveDraftRef.current = () => {
+    persistDraft({ requireName: false });
+  };
+
+  useEffect(() => {
+    registerSetup({
+      onSaveDraft: () => leaveSaveDraftRef.current(),
+    });
+    return () => unregisterSetup();
+  }, [registerSetup, unregisterSetup]);
+
+  const handleCancel = () => {
+    requestNavigation("/campaigns");
+  };
 
   const stepContent = useMemo(() => {
     switch (step) {
@@ -169,7 +261,9 @@ export function CampaignSetupWizard() {
             errors={errors}
             onChange={updateDraft}
             onTestSend={handleTestSend}
-            onActivate={handleActivate}
+            onActivateNow={handleActivateNow}
+            onSchedule={handleSchedule}
+            onSaveDraft={handleSaveDraftFromReview}
             isTestSent={isTestSent}
             isActivating={isActivating}
           />
@@ -185,12 +279,10 @@ export function CampaignSetupWizard() {
     isTestSent,
     isActivating,
     handleTestSend,
-    handleActivate,
+    handleActivateNow,
+    handleSchedule,
+    handleSaveDraftFromReview,
   ]);
-
-  if (isActivated) {
-    return <ConfirmationView campaignName={activatedName} />;
-  }
 
   return (
     <StepShellLayout
@@ -202,8 +294,8 @@ export function CampaignSetupWizard() {
         <div className="flex-1 p-6">{stepContent}</div>
 
         <div className="mt-auto flex flex-col-reverse gap-3 border-t border-border px-6 py-6 sm:flex-row sm:justify-between">
-          <Button variant="ghost" asChild>
-            <Link href="/campaigns">Cancel</Link>
+          <Button type="button" variant="ghost" onClick={handleCancel}>
+            Cancel
           </Button>
           <div className="flex gap-2">
             {!isFirstStep ? (

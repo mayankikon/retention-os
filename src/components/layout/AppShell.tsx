@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Building2, LayoutList, LayoutTemplate } from "lucide-react";
 import { AppTitleBar } from "@/components/layout/AppTitleBar";
 import { VersionSwitcher } from "@/components/layout/VersionSwitcher";
+import { useOptionalCampaignSetupLeaveGuard } from "@/contexts/campaign-setup-leave-guard";
 import { cn } from "@/lib/utils";
 
 const LOGO_WIDTH_PX = Math.round(113 * 1.3 * 0.85);
@@ -58,6 +59,16 @@ export function AppShell({
   contentClassName,
 }: AppShellProps) {
   const pathname = usePathname();
+  const leaveGuard = useOptionalCampaignSetupLeaveGuard();
+
+  const handleGuardedNavClick = (
+    event: React.MouseEvent<HTMLAnchorElement>,
+    href: string,
+  ) => {
+    if (!leaveGuard?.isSetupActive) return;
+    event.preventDefault();
+    leaveGuard.requestNavigation(href);
+  };
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -65,6 +76,7 @@ export function AppShell({
         <div className={cn(SIDEBAR_INSET_X, "pt-5 pb-4")}>
           <Link
             href="/campaigns"
+            onClick={(event) => handleGuardedNavClick(event, "/campaigns")}
             className="inline-flex max-w-full items-center justify-start rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             <Image
@@ -91,6 +103,7 @@ export function AppShell({
               <Link
                 key={item.href}
                 href={item.href}
+                onClick={(event) => handleGuardedNavClick(event, item.href)}
                 className={cn(
                   "flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                   isActive

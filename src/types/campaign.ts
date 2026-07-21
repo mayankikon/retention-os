@@ -5,7 +5,6 @@ export const CAMPAIGN_STATUSES = [
   "stopped",
   "completed",
   "draft",
-  "failed",
 ] as const;
 
 export type CampaignStatus = (typeof CAMPAIGN_STATUSES)[number];
@@ -27,8 +26,8 @@ export interface Campaign {
   timeZone: CampaignTimeZone;
   status: CampaignStatus;
   messages: number;
-  /** Percentage 0–100 (e.g. 12.5 = 12.5%). */
-  conversionRate: number;
+  /** Click-through rate percentage 0–100 (e.g. 12.5 = 12.5%). */
+  clickThroughRate: number;
   createdBy: CampaignCreator;
   createdAt: string;
   group: string;
@@ -36,6 +35,8 @@ export interface Campaign {
   nextUpdateAt: string;
   /** Linked message template id when created from a managed template. */
   messageTemplateId?: string | null;
+  /** ISO date when a scheduled campaign should activate. */
+  scheduledActivateAt?: string | null;
 }
 
 export interface CampaignFilters {
