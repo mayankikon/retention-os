@@ -1,4 +1,8 @@
-import { Label } from "@/components/ui/label";
+"use client";
+
+import {
+  Label,
+} from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
 import { cn } from "@/lib/utils";
 
 interface FormFieldProps {

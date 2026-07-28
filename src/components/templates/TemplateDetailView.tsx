@@ -1,18 +1,20 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Archive, Pencil, RotateCcw, Trash2 } from "lucide-react";
-import { TemplateStatusBadge } from "@/components/templates/TemplateStatusBadge";
-import { Button } from "@/components/ui/button";
 import {
+  Button,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+  buttonVariants,
+} from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
+
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Archive, Pencil, RotateCcw, Trash2 } from "lucide-react";
+import { TemplateStatusBadge } from "@/components/templates/TemplateStatusBadge";
 import { useCurrentUser } from "@/contexts/session-context";
 import { useTemplate } from "@/hooks/use-templates";
 import { formatTimestamp } from "@/lib/dates";
@@ -42,9 +44,9 @@ export function TemplateDetailView({ templateId }: TemplateDetailViewProps) {
     return (
       <div className="space-y-4">
         <h1 className="text-2xl font-semibold">Template not found</h1>
-        <Button asChild variant="outline">
-          <Link href="/templates">Back to templates</Link>
-        </Button>
+        <Link href="/templates" className={buttonVariants({ variant: "outline" })}>
+          Back to templates
+        </Link>
       </div>
     );
   }
@@ -78,7 +80,7 @@ export function TemplateDetailView({ templateId }: TemplateDetailViewProps) {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="app-shell-scrollbar-dashed app-shell-content-px app-shell-content-pt app-shell-content-pb min-h-0 flex-1 space-y-8 overflow-y-auto">
       <header className="flex flex-col gap-4 border-b border-border pb-6 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-2">
           <div className="flex flex-wrap items-center gap-3">
@@ -97,12 +99,13 @@ export function TemplateDetailView({ templateId }: TemplateDetailViewProps) {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button asChild variant="outline">
-            <Link href={`/templates/${template.id}/edit`}>
-              <Pencil className="h-4 w-4" aria-hidden />
-              Edit
-            </Link>
-          </Button>
+          <Link
+            href={`/templates/${template.id}/edit`}
+            className={`${buttonVariants({ variant: "outline" })} inline-flex items-center gap-2`}
+          >
+            <Pencil className="h-4 w-4" aria-hidden />
+            Edit
+          </Link>
           {template.status !== "published" ? (
             <Button type="button" onClick={handlePublish}>
               Publish

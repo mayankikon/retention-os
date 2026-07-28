@@ -1,7 +1,10 @@
 "use client";
 
+import {
+  Button,
+} from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
+
 import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { AppShell } from "@/components/layout/AppShell";
 
 export default function CampaignsErrorPage({

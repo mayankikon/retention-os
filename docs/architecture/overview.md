@@ -9,8 +9,8 @@ Web UI for Ikon's Smart Marketing Campaign Manager. Phase 1 delivers the **Campa
 | Layer | Technology |
 |-------|------------|
 | Framework | Next.js 16 (App Router) |
-| UI | React 19, Tailwind CSS v4, Shadcn-style primitives |
-| Table | TanStack Table v8 |
+| UI | React 19, Tailwind CSS v4, Shift design system (`@ikontechnologies-arlington/nxtg-design-shiftpackage`) — primitives + `Sidebar` / `AppGroovedMainColumn` chrome; light theme tokens aligned with new-toolbox workspace |
+| Table | Shift file-cabinet table (`TableHeaderCell` + `TableSlotCell`, 16px cell insets) |
 | URL state | nuqs |
 | Data (current) | In-memory mock (`src/data/campaigns.mock.ts`) |
 
@@ -18,7 +18,7 @@ Web UI for Ikon's Smart Marketing Campaign Manager. Phase 1 delivers the **Campa
 
 ### Campaign list (Phase 1)
 
-- Campaign list with columns: Name, Dealer, Time Zone, Status, Messages, Click-Through Rate, **Created By**
+- Campaign list with columns: Name, Dealership, Time Zone, Status, Messages, Click-Through Rate, **Created By**
 - Filters: Dealership, Time Zone, Status
 - Search by campaign name
 - Pagination (10 per page)

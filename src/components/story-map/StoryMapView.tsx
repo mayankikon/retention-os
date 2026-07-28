@@ -1,13 +1,16 @@
 "use client";
 
+import {
+  Badge,
+  Button,
+} from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
+
 import { useCallback, useMemo, useState } from "react";
 import { Link2 } from "lucide-react";
 import { DependencyLinker } from "@/components/story-map/DependencyLinker";
 import { FeatureSidebar } from "@/components/story-map/FeatureSidebar";
 import { PriorityPicker } from "@/components/story-map/PriorityPicker";
 import { RoadmapTimeline } from "@/components/story-map/RoadmapTimeline";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   FLOW_TAG_BADGE_CLASSES,
   FLOW_TAG_LABELS,
@@ -110,7 +113,7 @@ export function StoryMapView() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-8rem)] min-h-[560px] flex-col gap-4">
+    <div className="app-shell-scrollbar-dashed app-shell-content-px app-shell-content-pt app-shell-content-pb flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto">
       <header className="shrink-0 space-y-3">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>

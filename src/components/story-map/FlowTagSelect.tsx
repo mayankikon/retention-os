@@ -6,7 +6,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
+
 import { FLOW_TAG_BADGE_CLASSES, FLOW_TAG_LABELS } from "@/lib/story-map/constants";
 import { cn } from "@/lib/utils";
 import {
@@ -29,7 +30,17 @@ export function FlowTagSelect({
   className,
 }: FlowTagSelectProps) {
   return (
-    <Select value={value} onValueChange={(next) => onChange(next as StoryMapFlowTag)}>
+    <Select
+      value={value}
+      onValueChange={(next) => {
+        if (next == null) return;
+        onChange(next as StoryMapFlowTag);
+      }}
+      items={STORY_MAP_FLOW_TAGS.map((flow) => ({
+        value: flow,
+        label: FLOW_TAG_LABELS[flow],
+      }))}
+    >
       <SelectTrigger
         className={cn(
           "shrink-0 border font-medium",

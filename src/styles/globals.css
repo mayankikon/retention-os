@@ -1,21 +1,88 @@
 @import "tailwindcss";
+@import "@ikontechnologies-arlington/nxtg-design-shiftpackage/styles.css";
+@import "@ikontechnologies-arlington/nxtg-design-shiftpackage/styles/motion/card-resize.css";
 
-/* Ikon swap target — brand palette */
+/*
+ * Tailwind v4 does not scan node_modules by default. Without this `@source`,
+ * utility classes inside Shift primitives never reach the compiled CSS.
+ */
+@source "../../node_modules/@ikontechnologies-arlington/nxtg-design-shiftpackage/dist";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Bridge Shift theme primitives → semantic tokens.
+ * Light values match new-toolbox workspace (white cards on cool-gray canvas).
+ */
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
-  --card: #ffffff;
-  --card-foreground: #0f172a;
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b;
-  --border: #e2e8f0;
-  --input: #e2e8f0;
-  --ring: #1a9375;
+  --background: var(--theme-background-page);
+  --foreground: var(--theme-text-primary);
+  --card: rgb(255 255 255);
+  --card-foreground: var(--theme-text-primary);
+  --popover: rgb(255 255 255);
+  --popover-foreground: var(--theme-text-primary);
+  --primary: var(--theme-background-button-primary-default);
+  --primary-foreground: var(--theme-text-white);
+  --primary-hover: var(--theme-background-button-primary-hover);
+  --secondary: var(--theme-background-button-secondary-default);
+  --secondary-foreground: var(--theme-text-primary);
+  --muted: var(--theme-background-default);
+  --muted-foreground: var(--theme-text-tertiary);
+  --accent: var(--theme-background-accent);
+  --accent-foreground: var(--theme-text-interactive);
+  --destructive: var(--theme-background-button-destructive);
 
-  --brand-primary: #1a9375;
-  --brand-primary-hover: #158266;
-  --brand-accent: #22b894;
-  --surface-elevated: #ffffff;
+  /* Stronger than raw hairline so white cards/tables read on the gray canvas. */
+  --theme-stroke-default: rgb(225 225 225 / 0.7);
+  --theme-stroke-hairline: rgb(229 229 230 / 0.7);
+  --theme-stroke-soft: rgb(218 219 221 / 0.7);
+  --theme-stroke-hover: rgb(186 186 190 / 0.7);
+  --border: rgb(212 212 215 / 0.7);
+  --input: var(--border);
+  --input-hover: var(--theme-stroke-hover);
+  --ring: var(--theme-stroke-accent);
+  /*
+   * Keep form-control hover fill identical to resting fill — Shift primitives
+   * already intensify stroke via `hover:border-input-hover`.
+   */
+  --theme-background-input-hover: var(--card);
+
+  --brand-primary: var(--theme-background-button-primary-default);
+  --brand-primary-hover: var(--theme-background-button-primary-hover);
+  --brand-accent: var(--theme-text-interactive);
+  --surface-elevated: var(--theme-background-container);
+
+  --theme-background-sidebar: rgb(247 247 248);
+  --theme-background-shell: rgb(242 242 244);
+  --theme-background-page: rgb(247 247 248);
+  --theme-background-container: rgb(255 255 255);
+  --theme-background-default: rgb(242 242 244);
+  --theme-text-secondary: rgb(82 82 82);
+  --theme-text-tertiary: rgb(82 82 82);
+  --theme-background-button-secondary-default: rgb(252 252 252);
+  --theme-background-accent: rgb(245 250 249);
+  --theme-shell-border: var(--theme-stroke-hairline);
+  --sidebar: rgb(247 247 248);
+  --sidebar-foreground: rgb(107 107 107);
+  --sidebar-primary: var(--theme-background-button-primary-default);
+  --sidebar-primary-foreground: var(--theme-text-white);
+  --sidebar-accent: color-mix(in srgb, var(--sidebar) 92%, black 8%);
+  --sidebar-accent-foreground: var(--theme-text-primary);
+  --sidebar-border: var(--theme-shell-border);
+  --sidebar-ring: var(--theme-stroke-accent);
+  --sidebar-nav-item-active-bg: color-mix(in srgb, var(--sidebar) 92%, black 8%);
+  --sidebar-nav-item-hover-bg: var(--sidebar-nav-item-active-bg);
+  --sidebar-nav-item-muted-foreground: rgb(107 107 107);
+
+  --app-shell-panel-shadow:
+    0 0 0 1px var(--theme-stroke-hairline),
+    0 1px 2px -1px rgb(0 0 0 / 0.06),
+    0 6px 16px -4px rgb(0 0 0 / 0.07);
+  --app-shell-content-padding-x: var(--spacing-32, 32px);
+  --app-shell-content-padding-t: var(--spacing-32, 32px);
+  --app-shell-content-padding-b: var(--spacing-32, 32px);
+  --app-shell-sidebar-width: 284px;
+  --app-shell-main-column-inset-right: var(--spacing-12, 12px);
 
   --status-scheduled-bg: #e6f7f2;
   --status-scheduled-fg: #157a66;
@@ -37,20 +104,86 @@
   --radius-lg: 0.5rem;
 }
 
+.dark {
+  --background: var(--theme-background-page);
+  --foreground: var(--theme-text-primary);
+  --card: var(--theme-background-container);
+  --card-foreground: var(--theme-text-primary);
+  --popover: var(--theme-background-container);
+  --popover-foreground: var(--theme-text-primary);
+  --primary: var(--theme-background-button-primary-default);
+  --primary-foreground: var(--theme-text-white);
+  --primary-hover: var(--theme-background-button-primary-hover);
+  --secondary: var(--theme-background-button-secondary-default);
+  --secondary-foreground: var(--theme-text-primary);
+  --muted: var(--theme-background-default);
+  --muted-foreground: var(--theme-text-tertiary);
+  --accent: var(--theme-background-accent);
+  --accent-foreground: var(--theme-text-interactive);
+  --destructive: var(--theme-background-button-destructive);
+  --border: var(--theme-stroke-default);
+  --input: var(--theme-stroke-soft);
+  --input-hover: var(--theme-stroke-default);
+  --ring: var(--theme-stroke-accent);
+  --theme-background-input-hover: var(--sidebar);
+  --surface-elevated: var(--theme-background-container);
+
+  --theme-background-sidebar: rgb(45 45 45);
+  --theme-background-shell: rgb(32 32 32);
+  --sidebar: var(--theme-background-sidebar);
+  --sidebar-foreground: var(--theme-text-primary);
+  --sidebar-primary: var(--theme-background-button-primary-default);
+  --sidebar-primary-foreground: var(--theme-text-white);
+  --sidebar-accent: color-mix(in srgb, var(--sidebar) 88%, white 12%);
+  --sidebar-accent-foreground: var(--theme-text-primary);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--theme-stroke-accent);
+  --sidebar-nav-item-active-bg: color-mix(in srgb, var(--sidebar) 62%, white 38%);
+  --sidebar-nav-item-hover-bg: color-mix(in srgb, var(--sidebar) 80%, white 20%);
+  --sidebar-nav-item-muted-foreground: color-mix(
+    in srgb,
+    var(--theme-text-tertiary) 80%,
+    white 20%
+  );
+  --app-shell-panel-shadow:
+    0 0 0 1px color-mix(in srgb, white 8%, transparent),
+    0 1px 2px -1px rgb(0 0 0 / 0.35),
+    0 8px 24px -6px rgb(0 0 0 / 0.45);
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
   --color-border: var(--border);
   --color-input: var(--input);
+  --color-input-hover: var(--input-hover);
   --color-ring: var(--ring);
   --color-brand-primary: var(--brand-primary);
   --color-brand-primary-hover: var(--brand-primary-hover);
   --color-brand-accent: var(--brand-accent);
   --color-surface-elevated: var(--surface-elevated);
+  --color-shell: var(--theme-background-shell);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
 
   --font-sans: var(--font-saira);
   --font-mono: var(--font-saira);
@@ -65,6 +198,64 @@
 body {
   background: var(--background);
   color: var(--foreground);
+}
+
+@layer components {
+  /** Form controls: intensify stroke on hover; keep fill (see `--theme-background-input-hover`). */
+  .control-hover-stroke {
+    @apply hover:border-input-hover;
+  }
+
+  .app-shell-main-panel {
+    box-shadow: var(--app-shell-panel-shadow);
+  }
+
+  /**
+   * Dialog horizontal center over main shell column (right of sidebar), not full
+   * viewport — matches new-toolbox inventory / campaign wizard modals.
+   */
+  .app-shell-dialog-content {
+    left: calc(
+      50% + (var(--app-shell-sidebar-width) - var(--app-shell-main-column-inset-right)) /
+        2
+    ) !important;
+  }
+
+  /** Flat surface stroke — table / input / card chrome (1px border, no shadow). */
+  .surface-stroke-sharp {
+    border: 1px solid var(--border);
+    box-shadow: none;
+  }
+
+  .dark .surface-stroke-sharp {
+    border-color: var(--border);
+    box-shadow: none;
+  }
+
+  /** Inset for page text/actions: TitleBar bands and scrollable main regions. */
+  .app-shell-content-px {
+    padding-left: var(--app-shell-content-padding-x);
+    padding-right: var(--app-shell-content-padding-x);
+  }
+
+  .app-shell-content-pt {
+    padding-top: var(--app-shell-content-padding-t);
+  }
+
+  .app-shell-content-pb {
+    padding-bottom: var(--app-shell-content-padding-b);
+  }
+
+  /**
+   * Marker class used by new-toolbox list pages (no styles). Kept for parity when
+   * copying layout class strings from productdemo / customers pages.
+   */
+  .app-shell-content-inset-wide {
+  }
+
+  .app-shell-scrollbar-dashed {
+    scrollbar-gutter: stable;
+  }
 }
 
 @layer base {

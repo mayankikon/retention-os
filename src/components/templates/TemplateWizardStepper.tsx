@@ -28,8 +28,8 @@ export function TemplateWizardStepper({
             <li
               key={step.id}
               className={cn(
-                "flex flex-1 items-center gap-2 rounded-md px-2 py-1.5 text-sm",
-                isCurrent && "bg-muted font-medium",
+                "flex flex-1 items-center gap-2 rounded-md p-2 text-sm",
+                isCurrent && "border border-border bg-muted font-medium",
                 !isCurrent && !isComplete && !isPast && "text-muted-foreground",
               )}
             >

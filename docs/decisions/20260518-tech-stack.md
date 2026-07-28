@@ -11,9 +11,9 @@ Greenfield UI for Smart Marketing Campaign Manager list view and future setup fl
 
 - **Next.js 16** App Router with React 19
 - **Tailwind CSS v4** with CSS `@theme` tokens in `src/styles/globals.css`
-- **Shadcn-style** Radix primitives (no full CLI dependency tree)
+- **Shift design system** (`@ikontechnologies-arlington/nxtg-design-shiftpackage`) for UI primitives and theme (local `src/components/ui` removed; see `20260728-shift-design-system-package.md`)
+- **Shift file-cabinet tables** (`TableHeaderCell` + `TableSlotCell`, shared 16px cell insets) for list grids
 - **nuqs** for search params (bookmarkable filter state)
-- **TanStack Table** for column definitions and rendering
 - **Vitest + Testing Library** for unit/component tests
 - **Mock data** until backend contracts are finalized
 

@@ -1,6 +1,10 @@
+"use client";
+
+import {
+  buttonVariants,
+} from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
 import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 interface ConfirmationViewProps {
   campaignName: string;
@@ -9,7 +13,7 @@ interface ConfirmationViewProps {
 export function ConfirmationView({ campaignName }: ConfirmationViewProps) {
   return (
     <div
-      className="mx-auto max-w-lg rounded-lg border border-border bg-card p-8 text-center shadow-sm"
+      className="surface-stroke-sharp mx-auto max-w-lg rounded-[var(--radius-sm)] bg-card p-8 text-center"
       role="status"
     >
       <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--status-active-bg)]">
@@ -26,12 +30,12 @@ export function ConfirmationView({ campaignName }: ConfirmationViewProps) {
         now live. Monitor status and message delivery from the campaign list.
       </p>
       <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
-        <Button asChild>
-          <Link href="/campaigns">View campaigns</Link>
-        </Button>
-        <Button asChild variant="outline">
-          <Link href="/campaigns/new">Create another</Link>
-        </Button>
+        <Link href="/campaigns" className={buttonVariants({ variant: "default" })}>
+          View campaigns
+        </Link>
+        <Link href="/campaigns/new" className={buttonVariants({ variant: "outline" })}>
+          Create another
+        </Link>
       </div>
     </div>
   );

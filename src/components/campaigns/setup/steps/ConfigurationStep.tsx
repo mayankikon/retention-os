@@ -1,15 +1,16 @@
 "use client";
 
-import { AudienceFilters } from "@/components/campaigns/setup/AudienceFilters";
-import { FormField } from "@/components/campaigns/setup/FormField";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
+  Checkbox,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
+
+import { AudienceFilters } from "@/components/campaigns/setup/AudienceFilters";
+import { FormField } from "@/components/campaigns/setup/FormField";
 import {
   getTimeZoneLabel,
   TIME_ZONE_SCHEDULE_REFERENCE,
@@ -87,8 +88,8 @@ export function ConfigurationStep({
               <div
                 key={option.value}
                 className={cn(
-                  "rounded-md border border-border p-3",
-                  isSelected && "border-brand-primary bg-muted/50",
+                  "rounded-[var(--radius-sm)] border border-border bg-card p-3",
+                  isSelected && "border-primary bg-primary/5",
                 )}
               >
                 <label className="flex cursor-pointer items-start gap-3">
@@ -117,10 +118,12 @@ export function ConfigurationStep({
                       required
                     >
                       <Select
-                        value={draft.timeServiceTriggerPreset}
-                        onValueChange={(value) =>
-                          onChange({ timeServiceTriggerPreset: value })
-                        }
+                        value={draft.timeServiceTriggerPreset || null}
+                        onValueChange={(value) => {
+                          if (value == null) return;
+                          onChange({ timeServiceTriggerPreset: value });
+                        }}
+                        items={TIME_SERVICE_TRIGGER_OPTIONS}
                       >
                         <SelectTrigger
                           id="timeServiceTriggerPreset"
@@ -145,10 +148,12 @@ export function ConfigurationStep({
                       required
                     >
                       <Select
-                        value={draft.mileageServiceTriggerPreset}
-                        onValueChange={(value) =>
-                          onChange({ mileageServiceTriggerPreset: value })
-                        }
+                        value={draft.mileageServiceTriggerPreset || null}
+                        onValueChange={(value) => {
+                          if (value == null) return;
+                          onChange({ mileageServiceTriggerPreset: value });
+                        }}
+                        items={MILEAGE_SERVICE_TRIGGER_OPTIONS}
                       >
                         <SelectTrigger
                           id="mileageServiceTriggerPreset"
@@ -190,10 +195,15 @@ export function ConfigurationStep({
                         required
                       >
                         <Select
-                          value={draft.oemMake || undefined}
-                          onValueChange={(value) =>
-                            onChange({ oemMake: value, oemModel: "" })
-                          }
+                          value={draft.oemMake || null}
+                          onValueChange={(value) => {
+                            if (value == null) return;
+                            onChange({ oemMake: value, oemModel: "" });
+                          }}
+                          items={getOemMakes().map((make) => ({
+                            value: make,
+                            label: make,
+                          }))}
                         >
                           <SelectTrigger id="oemMake">
                             <SelectValue placeholder="Select make" />
@@ -215,9 +225,16 @@ export function ConfigurationStep({
                         required
                       >
                         <Select
-                          value={draft.oemModel || undefined}
-                          onValueChange={(value) => onChange({ oemModel: value })}
+                          value={draft.oemModel || null}
+                          onValueChange={(value) => {
+                            if (value == null) return;
+                            onChange({ oemModel: value });
+                          }}
                           disabled={!draft.oemMake}
+                          items={oemModels.map((model) => ({
+                            value: model,
+                            label: model,
+                          }))}
                         >
                           <SelectTrigger id="oemModel">
                             <SelectValue
@@ -285,7 +302,7 @@ export function ConfigurationStep({
             >
               <Checkbox
                 checked={draft.scheduleDays.includes(day)}
-                onChange={(e) => toggleDay(day, e.target.checked)}
+                onCheckedChange={(checked) => toggleDay(day, checked)}
               />
               {CONFIGURATION_DAY_LABELS[day]}
             </label>

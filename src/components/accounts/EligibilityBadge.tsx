@@ -1,17 +1,23 @@
-import { cn } from "@/lib/utils";
+"use client";
+
+import {
+  Badge,
+  BadgeDot,
+  type BadgeTone,
+} from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives/badge";
 import type { AccountEligibility } from "@/types/account";
 
-const ELIGIBILITY_STYLES: Record<
+const ELIGIBILITY_TONES: Record<
   AccountEligibility,
-  { label: string; className: string }
+  { label: string; tone: BadgeTone }
 > = {
   eligible: {
     label: "Eligible",
-    className: "bg-[var(--status-active-bg)] text-[var(--status-active-fg)]",
+    tone: "green",
   },
   not_eligible: {
     label: "Not eligible",
-    className: "bg-muted text-muted-foreground",
+    tone: "gray",
   },
 };
 
@@ -20,16 +26,16 @@ interface EligibilityBadgeProps {
 }
 
 export function EligibilityBadge({ eligibility }: EligibilityBadgeProps) {
-  const config = ELIGIBILITY_STYLES[eligibility];
+  const config = ELIGIBILITY_TONES[eligibility];
 
   return (
-    <span
-      className={cn(
-        "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold",
-        config.className,
-      )}
+    <Badge
+      tone={config.tone}
+      variant="soft"
+      leadingVisual={<BadgeDot tone={config.tone} />}
+      className="shadow-none"
     >
       {config.label}
-    </span>
+    </Badge>
   );
 }

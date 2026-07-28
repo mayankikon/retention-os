@@ -1,16 +1,20 @@
 "use client";
 
+import {
+  Button,
+  Checkbox,
+  Input,
+  Label,
+  Textarea,
+  buttonVariants,
+} from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
+
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormField } from "@/components/campaigns/setup/FormField";
 import { OptionalImageUpload } from "@/components/campaigns/setup/OptionalImageUpload";
 import { TemplateWizardStepper } from "@/components/templates/TemplateWizardStepper";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { useCurrentUser } from "@/contexts/session-context";
 import {
   createEmptyTemplateDraft,
@@ -103,7 +107,7 @@ export function TemplateWizard({ mode, initialTemplate }: TemplateWizardProps) {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="app-shell-scrollbar-dashed app-shell-content-px app-shell-content-pt app-shell-content-pb min-h-0 flex-1 space-y-8 overflow-y-auto">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">
           {mode === "create" ? "Create template" : "Edit template"}
@@ -133,17 +137,13 @@ export function TemplateWizard({ mode, initialTemplate }: TemplateWizardProps) {
         </div>
 
         <div className="mt-auto flex flex-col-reverse gap-3 border-t border-border px-6 py-6 sm:flex-row sm:justify-between">
-          <Button variant="ghost" asChild>
-            <Link
-              href={
+          <Link href={
                 mode === "edit" && initialTemplate
                   ? `/templates/${initialTemplate.id}`
                   : "/templates"
-              }
-            >
-              Cancel
-            </Link>
-          </Button>
+              } className={buttonVariants({ variant: "ghost" })}>
+          Cancel
+        </Link>
           <div className="flex flex-wrap gap-2">
             {!isFirstStep ? (
               <Button type="button" variant="outline" onClick={handleBack}>
@@ -212,7 +212,7 @@ function DetailsStep({
           value={draft.message}
           onChange={(e) => onChange({ message: e.target.value })}
           rows={3}
-          hasError={Boolean(errors.message)}
+          aria-invalid={Boolean(errors.message)}
           placeholder="Describe the campaign messaging this template supports."
         />
       </FormField>
@@ -242,7 +242,7 @@ function ContentStep({
           value={draft.primaryPromoText}
           onChange={(e) => onChange({ primaryPromoText: e.target.value })}
           rows={5}
-          hasError={Boolean(errors.primaryPromoText)}
+          aria-invalid={Boolean(errors.primaryPromoText)}
         />
       </FormField>
       <FormField label="Dealer URL" htmlFor="dealerUrl" hint="Optional.">
@@ -325,8 +325,8 @@ function RemindersStep({
             <label className="flex items-center gap-3">
               <Checkbox
                 checked={isEnabled}
-                onChange={(e) =>
-                  onChange({ [field.enabledKey]: e.target.checked })
+                onCheckedChange={(checked) =>
+                  onChange({ [field.enabledKey]: checked })
                 }
               />
               <Label className="cursor-pointer font-medium">{field.label}</Label>
@@ -346,7 +346,7 @@ function RemindersStep({
                       onChange({ [field.textKey]: e.target.value })
                     }
                     rows={3}
-                    hasError={Boolean(errors[field.textKey])}
+                    aria-invalid={Boolean(errors[field.textKey])}
                   />
                 </FormField>
                 <OptionalImageUpload

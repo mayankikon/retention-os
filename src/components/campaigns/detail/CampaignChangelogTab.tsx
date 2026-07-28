@@ -1,4 +1,9 @@
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+"use client";
+
+import {
+  Avatar,
+  AvatarFallback,
+} from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
 import { formatRelativeTime, formatTimestamp } from "@/lib/dates";
 import type { CampaignChangelogEntry } from "@/types/campaign-detail";
 

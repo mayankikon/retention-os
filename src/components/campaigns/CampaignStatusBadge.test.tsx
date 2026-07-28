@@ -23,14 +23,15 @@ describe("CampaignStatusBadge", () => {
 });
 
 describe("getStatusBadgeConfig", () => {
-  it("returns scheduled config with expected classes", () => {
+  it("returns scheduled config with expected tone", () => {
     const config = getStatusBadgeConfig("scheduled");
     expect(config.label).toBe(STATUS_LABELS.scheduled);
-    expect(config.className).toContain("status-scheduled");
+    expect(config.tone).toBe("teal");
   });
 
   it("returns fallback for invalid status", () => {
     const config = getStatusBadgeConfig("invalid");
     expect(config.label).toBe("Unknown");
+    expect(config.tone).toBe("gray");
   });
 });

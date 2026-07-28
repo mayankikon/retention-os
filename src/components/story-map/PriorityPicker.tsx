@@ -1,13 +1,14 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
+
 import {
   PRIORITY_SWATCH_CLASSES,
   PRIORITY_TIER_LABELS,

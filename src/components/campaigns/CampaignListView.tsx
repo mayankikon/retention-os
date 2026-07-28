@@ -3,12 +3,14 @@
 import { useEffect, useState } from "react";
 import { Check, X } from "lucide-react";
 import { parseAsInteger, parseAsString, useQueryStates } from "nuqs";
+import { DesignSystemTableShellNoTabs } from "@ikontechnologies-arlington/nxtg-design-shiftpackage";
 import { CampaignFilters } from "@/components/campaigns/CampaignFilters";
 import { CampaignListHeader } from "@/components/campaigns/CampaignListHeader";
 import { CampaignTable } from "@/components/campaigns/CampaignTable";
 import { EmptyState } from "@/components/campaigns/EmptyState";
 import { PaginationBar } from "@/components/campaigns/PaginationBar";
 import { FILTER_ALL } from "@/data/lookups";
+import { DATA_TABLE_SHELL_BORDER_CLASS } from "@/lib/data-table-chrome";
 import {
   resolveEmptyStateVariant,
   selectCampaigns,
@@ -84,10 +86,10 @@ export function CampaignListView() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
       {flash ? (
         <div
-          className="flex items-start justify-between gap-3 rounded-lg border border-border bg-emerald-50 px-4 py-3 text-sm text-emerald-900"
+          className="app-shell-content-px mt-[var(--spacing-16,16px)] flex shrink-0 items-start justify-between gap-3 rounded-lg border border-border bg-emerald-50 px-4 py-3 text-sm text-emerald-900"
           role="status"
         >
           <div className="flex items-start gap-2">
@@ -105,27 +107,35 @@ export function CampaignListView() {
         </div>
       ) : null}
 
-      <CampaignListHeader
-        totalCount={campaigns.length}
-        filteredCount={result.total}
-      />
+      <CampaignListHeader />
 
-      <CampaignFilters />
+      <div className="app-shell-content-px app-shell-content-pb flex min-h-0 min-w-0 flex-1 flex-col gap-6 overflow-hidden pt-6">
+        <div className="shrink-0">
+          <CampaignFilters />
+        </div>
 
-      {emptyVariant ? (
-        <EmptyState variant={emptyVariant} onReset={handleResetFilters} />
-      ) : (
-        <>
-          <CampaignTable campaigns={result.rows} />
-          {result.totalPages > 1 ? (
-            <PaginationBar
-              currentPage={result.page}
-              totalPages={result.totalPages}
-              onPageChange={handlePageChange}
-            />
-          ) : null}
-        </>
-      )}
+        {emptyVariant ? (
+          <EmptyState variant={emptyVariant} onReset={handleResetFilters} />
+        ) : (
+          <DesignSystemTableShellNoTabs
+            className="flex min-h-0 min-w-0 flex-1 flex-col"
+            cardBorderClassName={DATA_TABLE_SHELL_BORDER_CLASS}
+            pagination={
+              result.totalPages > 1 ? (
+                <PaginationBar
+                  currentPage={result.page}
+                  totalPages={result.totalPages}
+                  totalItems={result.total}
+                  pageSize={result.pageSize}
+                  onPageChange={handlePageChange}
+                />
+              ) : null
+            }
+          >
+            <CampaignTable campaigns={result.rows} />
+          </DesignSystemTableShellNoTabs>
+        )}
+      </div>
     </div>
   );
 }

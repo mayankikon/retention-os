@@ -1,89 +1,186 @@
 "use client";
 
-import Link from "next/link";
-import { FilePlus2 } from "lucide-react";
-import { TemplateStatusBadge } from "@/components/templates/TemplateStatusBadge";
-import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
+  TableHeaderCell,
   TableRow,
-} from "@/components/ui/table";
+  TableSlotCell,
+  Button,
+} from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
+import { DesignSystemTableShellNoTabs } from "@ikontechnologies-arlington/nxtg-design-shiftpackage";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { FilePlus2 } from "lucide-react";
+import { TitleBar } from "@/components/layout/TitleBar";
+import { TemplateStatusBadge } from "@/components/templates/TemplateStatusBadge";
 import { useTemplates } from "@/hooks/use-templates";
+import {
+  DATA_TABLE_BODY_CELL_HEIGHT_PX,
+  DATA_TABLE_CELL_INNER_HOVER_CLASS,
+  DATA_TABLE_CELL_INSET_CLASS,
+  DATA_TABLE_CLASS,
+  DATA_TABLE_HEADER_CLASS,
+  DATA_TABLE_HEADER_LABEL_CLASS,
+  DATA_TABLE_HEADER_ROW_CLASS,
+  DATA_TABLE_ROW_GROUP_CLASS,
+  DATA_TABLE_ROW_HOVER_BACKGROUND_CLASS,
+  DATA_TABLE_SHELL_BORDER_CLASS,
+  DATA_TABLE_SLOT_LABEL_CLASS,
+  getDataTableBodyCellFrameClass,
+  getDataTableHeaderCellStyle,
+  getDataTableHeaderThStyle,
+  getDataTableInnerCellStyle,
+} from "@/lib/data-table-chrome";
 import { formatTimestamp } from "@/lib/dates";
 import { getTemplateUsageCount } from "@/lib/template-usage";
+import { cn } from "@/lib/utils";
+
+const TEMPLATE_HEADERS = [
+  { key: "heading", label: "Heading", widthClassName: "min-w-[180px] w-[240px]" },
+  { key: "status", label: "Status", widthClassName: "min-w-[120px] w-[140px]" },
+  { key: "usage", label: "Campaigns using", widthClassName: "min-w-[120px] w-[140px]" },
+  { key: "updated", label: "Updated", widthClassName: "min-w-[140px] w-[160px]" },
+  { key: "updatedBy", label: "Updated by", widthClassName: "min-w-[140px] w-[160px]" },
+] as const;
 
 export function TemplateListView() {
   const templates = useTemplates();
+  const router = useRouter();
+  const headerThStyle = getDataTableHeaderThStyle();
+  const headerCellStyle = getDataTableHeaderCellStyle();
+  const innerStyle = getDataTableInnerCellStyle();
 
   return (
-    <div className="space-y-6">
-      <header className="flex flex-col gap-4 border-b border-border pb-6 sm:flex-row sm:items-end sm:justify-between">
-        <div className="space-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-            Templates
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Create and manage message templates used in campaign setup.{" "}
-            {templates.length} templates
-          </p>
-        </div>
-        <Button asChild>
-          <Link href="/templates/new">
-            <FilePlus2 className="h-4 w-4" aria-hidden />
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+      <TitleBar
+        title="Templates"
+        right={
+          <Button
+            size="header"
+            leadingIcon={<FilePlus2 aria-hidden />}
+            onClick={() => router.push("/templates/new")}
+          >
             Create template
-          </Link>
-        </Button>
-      </header>
+          </Button>
+        }
+      />
 
-      <div className="w-full overflow-x-auto rounded-lg border border-border bg-card shadow-sm">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Heading</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Campaigns using</TableHead>
-              <TableHead>Updated</TableHead>
-              <TableHead>Updated by</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {templates.map((template) => {
-              const usageCount = getTemplateUsageCount(template.id);
+      <div className="app-shell-content-px app-shell-content-pb flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden pt-6">
+        <DesignSystemTableShellNoTabs
+          className="flex min-h-0 min-w-0 flex-1 flex-col"
+          cardBorderClassName={DATA_TABLE_SHELL_BORDER_CLASS}
+          pagination={<span className="sr-only">All templates</span>}
+        >
+          <Table className={DATA_TABLE_CLASS}>
+            <TableHeader className={DATA_TABLE_HEADER_CLASS}>
+              <TableRow size="compact" className={DATA_TABLE_HEADER_ROW_CLASS}>
+                {TEMPLATE_HEADERS.map((header) => (
+                  <TableHead
+                    key={header.key}
+                    className={cn(
+                      header.widthClassName,
+                      "h-auto align-middle",
+                      DATA_TABLE_CELL_INSET_CLASS,
+                    )}
+                    style={headerThStyle}
+                  >
+                    <TableHeaderCell
+                      variant="label"
+                      label={header.label}
+                      className={DATA_TABLE_HEADER_LABEL_CLASS}
+                      style={headerCellStyle}
+                    />
+                  </TableHead>
+                ))}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {templates.map((template, rowIndex) => {
+                const isLastRow = rowIndex === templates.length - 1;
+                const cellFrame = getDataTableBodyCellFrameClass(isLastRow);
 
-              return (
-                <TableRow key={template.id}>
-                  <TableCell>
-                    <Link
-                      href={`/templates/${template.id}`}
-                      className="font-medium text-brand-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
-                    >
-                      {template.heading}
-                    </Link>
-                    <p className="mt-0.5 text-xs text-muted-foreground line-clamp-1">
-                      {template.message}
-                    </p>
-                  </TableCell>
-                  <TableCell>
-                    <TemplateStatusBadge status={template.status} />
-                  </TableCell>
-                  <TableCell className="tabular-nums text-foreground">
-                    {usageCount}
-                  </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {formatTimestamp(template.updatedAt)}
-                  </TableCell>
-                  <TableCell className="text-sm text-foreground">
-                    {template.updatedBy.name}
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
+                return (
+                  <TableRow
+                    key={template.id}
+                    size="default"
+                    className={cn(
+                      DATA_TABLE_ROW_GROUP_CLASS,
+                      "!border-0 !bg-transparent",
+                      DATA_TABLE_ROW_HOVER_BACKGROUND_CLASS,
+                    )}
+                    style={{ minHeight: DATA_TABLE_BODY_CELL_HEIGHT_PX }}
+                  >
+                    <TableCell className={cellFrame}>
+                      <div
+                        className={cn(
+                          "flex items-center",
+                          DATA_TABLE_CELL_INNER_HOVER_CLASS,
+                        )}
+                        style={innerStyle}
+                      >
+                        <Link
+                          href={`/templates/${template.id}`}
+                          className="min-w-0 truncate rounded-sm text-sm font-medium leading-5 text-primary hover:underline"
+                        >
+                          {template.heading}
+                        </Link>
+                      </div>
+                    </TableCell>
+
+                    <TableCell className={cellFrame}>
+                      <div
+                        className={cn(
+                          "flex items-center",
+                          DATA_TABLE_CELL_INNER_HOVER_CLASS,
+                        )}
+                        style={innerStyle}
+                      >
+                        <TemplateStatusBadge status={template.status} />
+                      </div>
+                    </TableCell>
+
+                    <TableCell className={cellFrame}>
+                      <TableSlotCell
+                        label={String(getTemplateUsageCount(template.id))}
+                        className={cn(
+                          DATA_TABLE_SLOT_LABEL_CLASS,
+                          DATA_TABLE_CELL_INNER_HOVER_CLASS,
+                        )}
+                        style={innerStyle}
+                      />
+                    </TableCell>
+
+                    <TableCell className={cellFrame}>
+                      <TableSlotCell
+                        label={formatTimestamp(template.updatedAt)}
+                        className={cn(
+                          DATA_TABLE_SLOT_LABEL_CLASS,
+                          DATA_TABLE_CELL_INNER_HOVER_CLASS,
+                        )}
+                        style={innerStyle}
+                      />
+                    </TableCell>
+
+                    <TableCell className={cellFrame}>
+                      <TableSlotCell
+                        label={template.updatedBy.name}
+                        className={cn(
+                          DATA_TABLE_SLOT_LABEL_CLASS,
+                          DATA_TABLE_CELL_INNER_HOVER_CLASS,
+                        )}
+                        style={innerStyle}
+                      />
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </DesignSystemTableShellNoTabs>
       </div>
     </div>
   );

@@ -1,14 +1,15 @@
 "use client";
 
-import { FormField } from "@/components/campaigns/setup/FormField";
-import { Input } from "@/components/ui/input";
 import {
+  Input,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
+
+import { FormField } from "@/components/campaigns/setup/FormField";
 import {
   CAMPAIGN_NAME_TEMPLATE_HINT,
   TIME_ZONE_OPTIONS,
@@ -35,8 +36,12 @@ export function GeneralStep({ draft, errors, onChange }: GeneralStepProps) {
         required
       >
         <Select
-          value={selectedDealership || undefined}
-          onValueChange={(value) => onChange({ subfleets: [value] })}
+          value={selectedDealership || null}
+          onValueChange={(value) => {
+            if (value == null) return;
+            onChange({ subfleets: [value] });
+          }}
+          items={dealershipOptions}
         >
           <SelectTrigger id="dealership" aria-invalid={Boolean(errors.dealership)}>
             <SelectValue placeholder="Select dealership" />
@@ -63,7 +68,7 @@ export function GeneralStep({ draft, errors, onChange }: GeneralStepProps) {
           value={draft.campaignName}
           onChange={(e) => onChange({ campaignName: e.target.value })}
           placeholder="Enter campaign name"
-          hasError={Boolean(errors.campaignName)}
+          aria-invalid={Boolean(errors.campaignName)}
         />
       </FormField>
 
@@ -76,9 +81,11 @@ export function GeneralStep({ draft, errors, onChange }: GeneralStepProps) {
       >
         <Select
           value={draft.timeZone}
-          onValueChange={(value) =>
-            onChange({ timeZone: value as CampaignSetupDraft["timeZone"] })
-          }
+          onValueChange={(value) => {
+            if (value == null) return;
+            onChange({ timeZone: value as CampaignSetupDraft["timeZone"] });
+          }}
+          items={TIME_ZONE_OPTIONS}
         >
           <SelectTrigger id="timeZone">
             <SelectValue placeholder="Select time zone" />

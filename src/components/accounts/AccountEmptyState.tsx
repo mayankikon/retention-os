@@ -1,5 +1,9 @@
+"use client";
+
+import {
+  Button,
+} from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
 import { FileSearch, FilterX, Inbox } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import type { AccountEmptyStateVariant } from "@/lib/account-filters";
 
 const EMPTY_STATE_CONFIG: Record<

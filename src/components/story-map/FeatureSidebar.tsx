@@ -1,10 +1,13 @@
 "use client";
 
+import {
+  Button,
+  Input,
+} from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
+
 import { useState } from "react";
 import { GripVertical, Trash2 } from "lucide-react";
 import { FlowTagSelect } from "@/components/story-map/FlowTagSelect";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { getDependenciesForFeature } from "@/lib/story-map/dependencies";
 import { PRIORITY_SWATCH_CLASSES } from "@/lib/story-map/constants";
 import { cn } from "@/lib/utils";

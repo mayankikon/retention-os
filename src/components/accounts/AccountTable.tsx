@@ -1,131 +1,163 @@
 "use client";
 
 import {
-  createColumnHelper,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Switch } from "@/components/ui/switch";
-import {
+  Switch,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
+  TableHeaderCell,
   TableRow,
-} from "@/components/ui/table";
+  TableSlotCell,
+} from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
 import { EligibilityBadge } from "@/components/accounts/EligibilityBadge";
 import { useUpdateSmartMarketing } from "@/hooks/use-accounts";
+import {
+  DATA_TABLE_BODY_CELL_HEIGHT_PX,
+  DATA_TABLE_CELL_INNER_HOVER_CLASS,
+  DATA_TABLE_CELL_INSET_CLASS,
+  DATA_TABLE_CLASS,
+  DATA_TABLE_HEADER_CLASS,
+  DATA_TABLE_HEADER_LABEL_CLASS,
+  DATA_TABLE_HEADER_ROW_CLASS,
+  DATA_TABLE_ROW_GROUP_CLASS,
+  DATA_TABLE_ROW_HOVER_BACKGROUND_CLASS,
+  DATA_TABLE_SLOT_LABEL_CLASS,
+  getDataTableBodyCellFrameClass,
+  getDataTableHeaderCellStyle,
+  getDataTableHeaderThStyle,
+  getDataTableInnerCellStyle,
+} from "@/lib/data-table-chrome";
 import type { Account } from "@/types/account";
+import { cn } from "@/lib/utils";
 
-const columnHelper = createColumnHelper<Account>();
+const ACCOUNT_HEADERS = [
+  { key: "dealerName", label: "Dealer Name", widthClassName: "min-w-[180px] w-[220px]" },
+  { key: "groupName", label: "Group Name", widthClassName: "min-w-[140px] w-[160px]" },
+  { key: "accountManager", label: "Account Manager", widthClassName: "min-w-[160px] w-[180px]" },
+  { key: "eligibility", label: "Eligibility", widthClassName: "min-w-[120px] w-[140px]" },
+  { key: "smartMarketing", label: "Smart Marketing", widthClassName: "min-w-[140px] w-[160px]" },
+] as const;
 
 interface AccountTableProps {
   accounts: Account[];
 }
 
+/** Shift file-cabinet table — wrap with `DesignSystemTableShellNoTabs` at the list level. */
 export function AccountTable({ accounts }: AccountTableProps) {
   const updateSmartMarketing = useUpdateSmartMarketing();
-
-  const columns = [
-    columnHelper.accessor("dealerName", {
-      header: "Dealer Name",
-      cell: (info) => (
-        <span className="font-medium text-foreground">{info.getValue()}</span>
-      ),
-    }),
-    columnHelper.accessor("groupName", {
-      header: "Group Name",
-      cell: (info) => (
-        <span className="text-foreground">{info.getValue()}</span>
-      ),
-    }),
-    columnHelper.accessor("accountManager", {
-      header: "Account Manager",
-      cell: (info) => {
-        const manager = info.getValue();
-
-        return (
-          <div className="flex items-center gap-2">
-            <Avatar className="h-7 w-7">
-              <AvatarFallback className="text-[10px]">
-                {manager.initials}
-              </AvatarFallback>
-            </Avatar>
-            <span className="text-sm text-foreground">{manager.name}</span>
-          </div>
-        );
-      },
-    }),
-    columnHelper.accessor("eligibility", {
-      header: "Eligibility",
-      cell: (info) => <EligibilityBadge eligibility={info.getValue()} />,
-    }),
-    columnHelper.accessor("isSmartMarketingEnabled", {
-      header: "Smart Marketing",
-      cell: (info) => {
-        const account = info.row.original;
-        const isEnabled = info.getValue();
-        const isToggleDisabled = account.eligibility === "not_eligible";
-
-        return (
-          <div className="flex items-center gap-2">
-            <Switch
-              checked={isEnabled}
-              disabled={isToggleDisabled}
-              onCheckedChange={(checked) =>
-                updateSmartMarketing(account.id, checked)
-              }
-              aria-label={`Smart marketing for ${account.dealerName}`}
-            />
-            <span className="text-sm text-muted-foreground">
-              {isEnabled ? "On" : "Off"}
-            </span>
-          </div>
-        );
-      },
-    }),
-  ];
-
-  const table = useReactTable({
-    data: accounts,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-  });
+  const headerThStyle = getDataTableHeaderThStyle();
+  const headerCellStyle = getDataTableHeaderCellStyle();
+  const innerStyle = getDataTableInnerCellStyle();
 
   return (
-    <div className="w-full overflow-x-auto rounded-lg border border-border bg-card shadow-sm">
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <TableHead key={header.id}>
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )}
-                </TableHead>
-              ))}
-            </TableRow>
+    <Table className={DATA_TABLE_CLASS}>
+      <TableHeader className={DATA_TABLE_HEADER_CLASS}>
+        <TableRow size="compact" className={DATA_TABLE_HEADER_ROW_CLASS}>
+          {ACCOUNT_HEADERS.map((header) => (
+            <TableHead
+              key={header.key}
+              className={cn(
+                header.widthClassName,
+                "h-auto align-middle",
+                DATA_TABLE_CELL_INSET_CLASS,
+              )}
+              style={headerThStyle}
+            >
+              <TableHeaderCell
+                variant="label"
+                label={header.label}
+                className={DATA_TABLE_HEADER_LABEL_CLASS}
+                style={headerCellStyle}
+              />
+            </TableHead>
           ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows.map((row) => (
-            <TableRow key={row.id}>
-              {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </TableCell>
-              ))}
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {accounts.map((account, rowIndex) => {
+          const isLastRow = rowIndex === accounts.length - 1;
+          const cellFrame = getDataTableBodyCellFrameClass(isLastRow);
+          const isToggleDisabled = account.eligibility === "not_eligible";
+
+          return (
+            <TableRow
+              key={account.id}
+              size="default"
+              className={cn(
+                DATA_TABLE_ROW_GROUP_CLASS,
+                "!border-0 !bg-transparent",
+                DATA_TABLE_ROW_HOVER_BACKGROUND_CLASS,
+              )}
+              style={{ minHeight: DATA_TABLE_BODY_CELL_HEIGHT_PX }}
+            >
+              <TableCell className={cellFrame}>
+                <div
+                  className={cn("flex items-center", DATA_TABLE_CELL_INNER_HOVER_CLASS)}
+                  style={innerStyle}
+                >
+                  <span className="truncate text-sm font-medium leading-5 text-foreground">
+                    {account.dealerName}
+                  </span>
+                </div>
+              </TableCell>
+
+              <TableCell className={cellFrame}>
+                <TableSlotCell
+                  label={account.groupName}
+                  className={cn(
+                    DATA_TABLE_SLOT_LABEL_CLASS,
+                    DATA_TABLE_CELL_INNER_HOVER_CLASS,
+                  )}
+                  style={innerStyle}
+                />
+              </TableCell>
+
+              <TableCell className={cellFrame}>
+                <TableSlotCell
+                  variant="avatar"
+                  label={account.accountManager.name}
+                  avatarFallback={account.accountManager.initials}
+                  className={cn(
+                    DATA_TABLE_SLOT_LABEL_CLASS,
+                    DATA_TABLE_CELL_INNER_HOVER_CLASS,
+                  )}
+                  style={innerStyle}
+                />
+              </TableCell>
+
+              <TableCell className={cellFrame}>
+                <div
+                  className={cn("flex items-center", DATA_TABLE_CELL_INNER_HOVER_CLASS)}
+                  style={innerStyle}
+                >
+                  <EligibilityBadge eligibility={account.eligibility} />
+                </div>
+              </TableCell>
+
+              <TableCell className={cellFrame}>
+                <div
+                  className={cn("flex items-center gap-2", DATA_TABLE_CELL_INNER_HOVER_CLASS)}
+                  style={innerStyle}
+                >
+                  <Switch
+                    checked={account.isSmartMarketingEnabled}
+                    disabled={isToggleDisabled}
+                    onCheckedChange={(checked) =>
+                      updateSmartMarketing(account.id, checked)
+                    }
+                    aria-label={`Smart marketing for ${account.dealerName}`}
+                  />
+                  <span className="text-sm text-muted-foreground">
+                    {account.isSmartMarketingEnabled ? "On" : "Off"}
+                  </span>
+                </div>
+              </TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+          );
+        })}
+      </TableBody>
+    </Table>
   );
 }

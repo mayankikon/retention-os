@@ -1,11 +1,16 @@
-import { Badge } from "@/components/ui/badge";
-import type { TemplateStatus } from "@/types/template";
-import { cn } from "@/lib/utils";
+"use client";
 
-const STATUS_STYLES: Record<TemplateStatus, string> = {
-  draft: "bg-muted text-muted-foreground",
-  published: "bg-emerald-100 text-emerald-800",
-  archived: "bg-amber-100 text-amber-900",
+import {
+  Badge,
+  BadgeDot,
+  type BadgeTone,
+} from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives/badge";
+import type { TemplateStatus } from "@/types/template";
+
+const STATUS_TONES: Record<TemplateStatus, BadgeTone> = {
+  draft: "gray",
+  published: "emerald",
+  archived: "amber",
 };
 
 const STATUS_LABELS: Record<TemplateStatus, string> = {
@@ -19,12 +24,14 @@ interface TemplateStatusBadgeProps {
 }
 
 export function TemplateStatusBadge({ status }: TemplateStatusBadgeProps) {
+  const tone = STATUS_TONES[status];
+
   return (
     <Badge
-      className={cn(
-        "border-transparent font-medium capitalize",
-        STATUS_STYLES[status],
-      )}
+      tone={tone}
+      variant="soft"
+      leadingVisual={<BadgeDot tone={tone} />}
+      className="shadow-none"
     >
       {STATUS_LABELS[status]}
     </Badge>

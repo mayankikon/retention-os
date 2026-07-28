@@ -1,5 +1,9 @@
 "use client";
 
+import {
+  Button,
+} from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
+
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
@@ -9,7 +13,6 @@ import { GeneralStep } from "@/components/campaigns/setup/steps/GeneralStep";
 import { MessagingStep } from "@/components/campaigns/setup/steps/MessagingStep";
 import { RemindersStep } from "@/components/campaigns/setup/steps/RemindersStep";
 import { ReviewStep } from "@/components/campaigns/setup/steps/ReviewStep";
-import { Button } from "@/components/ui/button";
 import { createDefaultSetupDraft } from "@/data/campaign-setup.defaults";
 import { useCampaignSetupLeaveGuard } from "@/contexts/campaign-setup-leave-guard";
 import { useProductVersion } from "@/contexts/product-version-context";

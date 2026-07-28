@@ -1,6 +1,7 @@
 "use client";
 
 import { parseAsInteger, parseAsString, useQueryStates } from "nuqs";
+import { DesignSystemTableShellNoTabs } from "@ikontechnologies-arlington/nxtg-design-shiftpackage";
 import { AccountEmptyState } from "@/components/accounts/AccountEmptyState";
 import { AccountFilters } from "@/components/accounts/AccountFilters";
 import { AccountListHeader } from "@/components/accounts/AccountListHeader";
@@ -13,6 +14,7 @@ import {
   resolveAccountEmptyStateVariant,
   selectAccounts,
 } from "@/lib/account-filters";
+import { DATA_TABLE_SHELL_BORDER_CLASS } from "@/lib/data-table-chrome";
 
 const listParsers = {
   q: parseAsString.withDefault(""),
@@ -71,28 +73,36 @@ export function AccountListView() {
   };
 
   return (
-    <div className="space-y-6">
-      <AccountListHeader
-        totalCount={accounts.length}
-        filteredCount={result.total}
-      />
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+      <AccountListHeader />
 
-      <AccountFilters />
+      <div className="app-shell-content-px app-shell-content-pb flex min-h-0 min-w-0 flex-1 flex-col gap-6 overflow-hidden pt-6">
+        <div className="shrink-0">
+          <AccountFilters />
+        </div>
 
-      {emptyVariant ? (
-        <AccountEmptyState variant={emptyVariant} onReset={handleResetFilters} />
-      ) : (
-        <>
-          <AccountTable accounts={result.rows} />
-          {result.totalPages > 1 ? (
-            <PaginationBar
-              currentPage={result.page}
-              totalPages={result.totalPages}
-              onPageChange={handlePageChange}
-            />
-          ) : null}
-        </>
-      )}
+        {emptyVariant ? (
+          <AccountEmptyState variant={emptyVariant} onReset={handleResetFilters} />
+        ) : (
+          <DesignSystemTableShellNoTabs
+            className="flex min-h-0 min-w-0 flex-1 flex-col"
+            cardBorderClassName={DATA_TABLE_SHELL_BORDER_CLASS}
+            pagination={
+              result.totalPages > 1 ? (
+                <PaginationBar
+                  currentPage={result.page}
+                  totalPages={result.totalPages}
+                  totalItems={result.total}
+                  pageSize={result.pageSize}
+                  onPageChange={handlePageChange}
+                />
+              ) : null
+            }
+          >
+            <AccountTable accounts={result.rows} />
+          </DesignSystemTableShellNoTabs>
+        )}
+      </div>
     </div>
   );
 }

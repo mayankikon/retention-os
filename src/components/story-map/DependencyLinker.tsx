@@ -1,20 +1,19 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
+
 import { getDependenciesForFeature } from "@/lib/story-map/dependencies";
 import type { StoryMapDependency, StoryMapFeature } from "@/types/story-map";
 
@@ -137,7 +136,16 @@ function DependencyAddForm({
         <label className="text-xs font-medium text-muted-foreground">
           Depends on (blocker)
         </label>
-        <Select onValueChange={onAdd}>
+        <Select
+          onValueChange={(value) => {
+            if (value == null) return;
+            onAdd(String(value));
+          }}
+          items={scheduledOthers.map((item) => ({
+            value: item.id,
+            label: item.title,
+          }))}
+        >
           <SelectTrigger aria-label="Blocker feature">
             <SelectValue placeholder="Select feature area" />
           </SelectTrigger>

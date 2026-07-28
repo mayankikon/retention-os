@@ -1,13 +1,16 @@
 "use client";
 
+import {
+  Button,
+  Checkbox,
+  Input,
+  Label,
+} from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
+
 import { useState } from "react";
 import { AlertCircle, CalendarClock, Send, ShieldCheck, Users } from "lucide-react";
 import { FormField } from "@/components/campaigns/setup/FormField";
 import { SuppressionListUpload } from "@/components/campaigns/setup/SuppressionListUpload";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useProductVersion } from "@/contexts/product-version-context";
 import {
   estimateAudienceReach,
@@ -61,7 +64,7 @@ export function ReviewStep({
 
   return (
     <div className="space-y-6">
-      <section className="rounded-lg border border-border bg-card p-5 shadow-sm">
+      <section className="surface-stroke-sharp rounded-[var(--radius-sm)] bg-card p-5">
         <div className="flex items-start gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-brand-primary/10 text-brand-primary">
             <Users className="h-5 w-5" aria-hidden />
@@ -150,8 +153,8 @@ export function ReviewStep({
           <Checkbox
             id="tcpaComplianceConfirmed"
             checked={draft.tcpaComplianceConfirmed}
-            onChange={(event) =>
-              onChange({ tcpaComplianceConfirmed: event.target.checked })
+            onCheckedChange={(checked) =>
+              onChange({ tcpaComplianceConfirmed: checked })
             }
             className="mt-0.5"
             aria-invalid={Boolean(errors.tcpaComplianceConfirmed)}
@@ -189,7 +192,7 @@ export function ReviewStep({
             value={draft.testPhoneNumber}
             onChange={(e) => onChange({ testPhoneNumber: e.target.value })}
             placeholder="+1 (555) 000-0000"
-            hasError={Boolean(errors.testPhoneNumber)}
+            aria-invalid={Boolean(errors.testPhoneNumber)}
           />
           <Button
             type="button"

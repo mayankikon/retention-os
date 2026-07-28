@@ -1,7 +1,10 @@
 "use client";
 
+import {
+  Input,
+} from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
+
 import { FormField } from "@/components/campaigns/setup/FormField";
-import { Input } from "@/components/ui/input";
 import {
   getSuppressionListAcceptAttribute,
   parseSuppressionListFile,

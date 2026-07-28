@@ -1,19 +1,18 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
+import { useMemo } from "react";
 import { usePathname } from "next/navigation";
-import { Building2, LayoutList, LayoutTemplate } from "lucide-react";
-import { AppTitleBar } from "@/components/layout/AppTitleBar";
+import { Building2, LayoutList, LayoutTemplate, Megaphone } from "lucide-react";
+import {
+  AppGroovedMainColumn,
+  Sidebar,
+  type SidebarNavSectionConfig,
+  type SidebarProductConfig,
+} from "@ikontechnologies-arlington/nxtg-design-shiftpackage";
 import { VersionSwitcher } from "@/components/layout/VersionSwitcher";
 import { useOptionalCampaignSetupLeaveGuard } from "@/contexts/campaign-setup-leave-guard";
+import { useCurrentUser } from "@/contexts/session-context";
 import { cn } from "@/lib/utils";
-
-const LOGO_WIDTH_PX = Math.round(113 * 1.3 * 0.85);
-const LOGO_HEIGHT_PX = Math.round(42 * 1.3 * 0.85);
-
-/** Shared horizontal inset so logo and nav active states share the same left edge. */
-const SIDEBAR_INSET_X = "px-5";
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -39,6 +38,10 @@ const NAV_ITEMS = [
   },
 ] as const;
 
+const PRODUCTS: SidebarProductConfig[] = [
+  { id: "smart-marketing", label: "Smart Marketing", icon: Megaphone },
+];
+
 function isNavItemActive(href: string, pathname: string): boolean {
   if (href === "/campaigns") {
     return (
@@ -59,82 +62,78 @@ export function AppShell({
   contentClassName,
 }: AppShellProps) {
   const pathname = usePathname();
+  const user = useCurrentUser();
   const leaveGuard = useOptionalCampaignSetupLeaveGuard();
+  const isSetupActive = Boolean(leaveGuard?.isSetupActive);
 
-  const handleGuardedNavClick = (
-    event: React.MouseEvent<HTMLAnchorElement>,
-    href: string,
-  ) => {
-    if (!leaveGuard?.isSetupActive) return;
-    event.preventDefault();
-    leaveGuard.requestNavigation(href);
+  const mainSections = useMemo<SidebarNavSectionConfig[]>(
+    () => [
+      {
+        items: NAV_ITEMS.map((item) => ({
+          label: item.label,
+          icon: item.icon,
+          isActive: isNavItemActive(item.href, pathname),
+          // Omit href while setup leave-guard is active so Sidebar renders
+          // buttons we can intercept (Links cannot be preventDefault'd via API).
+          href: isSetupActive ? undefined : item.href,
+        })),
+      },
+    ],
+    [pathname, isSetupActive],
+  );
+
+  const handleNavItemClick = (label: string) => {
+    const item = NAV_ITEMS.find((navItem) => navItem.label === label);
+    if (!item) return;
+    if (leaveGuard?.isSetupActive) {
+      leaveGuard.requestNavigation(item.href);
+    }
   };
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <aside className="flex w-60 shrink-0 flex-col border-r border-border bg-card">
-        <div className={cn(SIDEBAR_INSET_X, "pt-5 pb-4")}>
-          <Link
-            href="/campaigns"
-            onClick={(event) => handleGuardedNavClick(event, "/campaigns")}
-            className="inline-flex max-w-full items-center justify-start rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-          >
-            <Image
-              src="/logo.svg"
-              alt="Ikon"
-              width={LOGO_WIDTH_PX}
-              height={LOGO_HEIGHT_PX}
-              priority
-              className="block w-auto max-w-full"
-              style={{ height: `${LOGO_HEIGHT_PX}px` }}
-            />
-          </Link>
-        </div>
+    <div className="flex h-svh min-h-0 overflow-hidden bg-shell font-sans dark:bg-background">
+      <Sidebar
+        homeHref="/campaigns"
+        // Omit `logo` so Shift renders the Toolbox wordmark + condensed mark
+        // (same size/weight morph as productdemo when the rail collapses).
+        showTopProductSwitcher={false}
+        showFooterProductToggle={false}
+        showRightDivider={false}
+        collapsible
+        products={PRODUCTS}
+        activeProductId="smart-marketing"
+        mainSections={mainSections}
+        onNavItemClick={handleNavItemClick}
+        user={{
+          primaryText: user.name,
+          secondaryText: user.role,
+          initials: user.initials,
+        }}
+        userFooterPanel={<VersionSwitcher />}
+      />
 
-        <nav
-          className={cn("flex flex-1 flex-col gap-1 pb-4", SIDEBAR_INSET_X)}
-          aria-label="Main"
-        >
-          {NAV_ITEMS.map((item) => {
-            const isActive = isNavItemActive(item.href, pathname);
-            const Icon = item.icon;
-
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={(event) => handleGuardedNavClick(event, item.href)}
-                className={cn(
-                  "flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                  isActive
-                    ? "bg-muted text-foreground"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                )}
-                aria-current={isActive ? "page" : undefined}
-              >
-                <Icon className="h-4 w-4 shrink-0" aria-hidden />
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
-
-        <VersionSwitcher />
-      </aside>
-
-      <div className="flex min-w-0 flex-1 flex-col">
-        <AppTitleBar />
+      <AppGroovedMainColumn panelClassName="min-h-0">
+        {/*
+          Match new-toolbox workspace shell: main column is overflow-hidden;
+          each page owns scroll (list pages pin the table; wizards/detail scroll).
+          No max-width — content fills the grooved panel edge-to-edge.
+        */}
         <main
           className={cn(
-            "min-w-0 flex-1 px-6 py-8 lg:px-10",
-            className ?? "overflow-auto",
+            "relative flex min-h-0 flex-1 flex-col overflow-hidden",
+            className,
           )}
         >
-          <div className={cn("mx-auto w-full max-w-7xl", contentClassName)}>
+          <div
+            className={cn(
+              "relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden",
+              contentClassName,
+            )}
+          >
             {children}
           </div>
         </main>
-      </div>
+      </AppGroovedMainColumn>
     </div>
   );
 }

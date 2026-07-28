@@ -3,7 +3,7 @@
 ```
 src/
 ├── app/
-│   ├── layout.tsx              # Root layout, NuqsAdapter, global styles
+│   ├── layout.tsx              # Root layout, design-system + NuqsAdapter, global styles
 │   ├── page.tsx                # Redirect → /campaigns
 │   ├── campaigns/
 │   │   ├── page.tsx            # List view (server shell + client list)
@@ -29,10 +29,13 @@ src/
 │   │   ├── detail/             # Campaign detail tabs (Details, Change log)
 │   │   └── setup/              # Wizard steps, shell, confirmation
 │   ├── story-map/              # Roadmap sidebar, timeline, bars
-│   ├── layout/AppShell.tsx
-│   ├── layout/AppTitleBar.tsx
-│   ├── layout/VersionSwitcher.tsx  # Sidebar product version dropdown
-│   └── ui/                     # Shadcn primitives
+│   ├── layout/AppShell.tsx       # Shift Sidebar + AppGroovedMainColumn (full-bleed main; pages own scroll)
+│   ├── layout/AppDialogShell.tsx # Productdemo inventory-style dialog chrome
+│   ├── layout/TitleBar.tsx       # Shift 2.0 page title bar (app-level; not in package)
+│   ├── layout/VersionSwitcher.tsx  # Sidebar footer product version dropdown
+│   ├── layout/LoadingSkeleton.tsx  # Server-safe loading placeholder
+│   ├── providers/design-system-providers.tsx  # Shift AppTheme + chrome providers
+│   └── (feature components — UI primitives from Shift package)
 ├── contexts/
 │   ├── product-version-context.tsx
 │   └── session-context.tsx
@@ -55,8 +58,9 @@ src/
 │   ├── format.ts
 │   ├── pagination.ts
 │   ├── campaign-search-params.ts
+│   ├── app-dialog-shell.ts     # Shared dialog chrome classes (productdemo parity)
 │   └── story-map/              # Timeline math, constants, localStorage
-├── styles/globals.css            # Ikon-swappable design tokens
+├── styles/globals.css            # App tokens + Shift package CSS imports
 └── types/
     ├── account.ts
     ├── product-version.ts

@@ -1,8 +1,11 @@
 "use client";
 
+import {
+  Button,
+} from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
+
 import { useState } from "react";
 import { GripVertical, Plus, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import {
   LANE_GUTTER_WIDTH_PX,
   LANE_HEIGHT_PX,

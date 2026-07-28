@@ -1,16 +1,19 @@
 "use client";
 
+import {
+  Button,
+  Input,
+} from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
+
 import { CampaignStatusBadge } from "@/components/campaigns/CampaignStatusBadge";
 import { PaginationBar } from "@/components/campaigns/PaginationBar";
 import { AppShell } from "@/components/layout/AppShell";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { CAMPAIGN_STATUSES } from "@/types/campaign";
 
 export default function CampaignRedlinesPage() {
   return (
     <AppShell>
-      <div className="space-y-10">
+      <div className="app-shell-scrollbar-dashed app-shell-content-px app-shell-content-pt app-shell-content-pb min-h-0 flex-1 space-y-10 overflow-y-auto">
         <header>
           <h1 className="text-2xl font-semibold">Campaign List — Redlines</h1>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -45,13 +48,12 @@ export default function CampaignRedlinesPage() {
           <Input placeholder="Search by campaign" className="max-w-xs" />
           <Input
             placeholder="Error state"
-            hasError
+            aria-invalid
             className="max-w-xs"
             defaultValue="Invalid"
           />
           <Input
             placeholder="Success state"
-            hasSuccess
             className="max-w-xs"
             defaultValue="Valid"
           />
@@ -72,7 +74,7 @@ export default function CampaignRedlinesPage() {
             onPageChange={() => undefined}
           />
           <p className="text-xs text-muted-foreground">
-            Prev/Next disabled at bounds. Current page uses primary variant.
+            Shift inline `Paginator` via `PaginationBar`. Prev/Next disabled at bounds.
           </p>
         </RedlineSection>
 

@@ -1,13 +1,14 @@
 "use client";
 
-import { MESSAGE_VARIABLES } from "@/data/message-variables";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
+
+import { MESSAGE_VARIABLES } from "@/data/message-variables";
 
 interface AddMessageVariableDialogProps {
   open: boolean;

@@ -1,17 +1,18 @@
 "use client";
 
-import { useRef } from "react";
-import { Plus, X } from "lucide-react";
-import { FormField } from "@/components/campaigns/setup/FormField";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
+  Button,
+  Input,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
+
+import { useRef } from "react";
+import { Plus, X } from "lucide-react";
+import { FormField } from "@/components/campaigns/setup/FormField";
 import {
   AUDIENCE_ATTRIBUTE_META,
   getAudienceAttributeMeta,
@@ -108,16 +109,21 @@ export function AudienceFilters({
           <div
             key={rule.id}
             className={cn(
-              "rounded-md border border-border p-3",
+              "rounded-[var(--radius-sm)] border border-border bg-card p-3",
               error && "border-destructive bg-destructive/5",
             )}
           >
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
               <Select
                 value={rule.attribute}
-                onValueChange={(value) =>
-                  changeAttribute(rule.id, value as AudienceAttribute)
-                }
+                onValueChange={(value) => {
+                  if (value == null) return;
+                  changeAttribute(rule.id, value as AudienceAttribute);
+                }}
+                items={AUDIENCE_ATTRIBUTE_META.map((option) => ({
+                  value: option.attribute,
+                  label: option.label,
+                }))}
               >
                 <SelectTrigger aria-label="Filter Field" className="sm:flex-1">
                   <SelectValue />
@@ -258,9 +264,13 @@ function RuleValueEditor({ rule, selectedMake, onChange }: RuleValueEditorProps)
 
     return (
       <Select
-        value={rule.value || undefined}
-        onValueChange={(value) => onChange(rule.id, { value })}
+        value={rule.value || null}
+        onValueChange={(value) => {
+          if (value == null) return;
+          onChange(rule.id, { value });
+        }}
         disabled={!selectedMake}
+        items={modelOptions}
       >
         <SelectTrigger aria-label="Filter Value">
           <SelectValue
@@ -283,8 +293,12 @@ function RuleValueEditor({ rule, selectedMake, onChange }: RuleValueEditorProps)
   if (meta.editor === "select") {
     return (
       <Select
-        value={rule.value || undefined}
-        onValueChange={(value) => onChange(rule.id, { value })}
+        value={rule.value || null}
+        onValueChange={(value) => {
+          if (value == null) return;
+          onChange(rule.id, { value });
+        }}
+        items={meta.options ?? []}
       >
         <SelectTrigger aria-label="Filter Value">
           <SelectValue placeholder="Select…" />

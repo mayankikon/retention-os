@@ -1,16 +1,22 @@
 "use client";
 
-import { Search, X } from "lucide-react";
-import { parseAsInteger, parseAsString, useQueryStates } from "nuqs";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
+  Input,
+  InputActionButton,
+  InputContainer,
+  InputIcon,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
+import { Search, X } from "lucide-react";
+import { parseAsInteger, parseAsString, useQueryStates } from "nuqs";
+import {
+  ActiveFilterChip,
+  ActiveFilterChipsBar,
+} from "@/components/filters/ActiveFilterChip";
 import { FILTER_ALL } from "@/data/lookups";
 import {
   eligibilityFilterOptions,
@@ -55,64 +61,66 @@ export function AccountFilters({ className }: AccountFiltersProps) {
 
   return (
     <section
-      className={cn("space-y-3", className)}
+      className={cn("space-y-2.5", className)}
       aria-label="Account filters"
     >
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:flex-1 lg:max-w-xl">
-          <FilterSelect
-            label="Eligibility"
-            value={filters.eligibility}
-            options={eligibilityFilterOptions}
-            onValueChange={(value) => updateFilter("eligibility", value)}
-          />
-          <FilterSelect
-            label="Smart Marketing"
-            value={filters.smartMarketing}
-            options={smartMarketingFilterOptions}
-            onValueChange={(value) => updateFilter("smartMarketing", value)}
-          />
-        </div>
+      <div className="flex shrink-0 flex-wrap items-center gap-2.5">
+        <FilterSelect
+          label="Eligibility"
+          value={filters.eligibility}
+          options={eligibilityFilterOptions}
+          onValueChange={(value) => updateFilter("eligibility", value)}
+          className="w-full min-w-[10.5rem] sm:w-[10.5rem]"
+        />
+        <FilterSelect
+          label="Smart Marketing"
+          value={filters.smartMarketing}
+          options={smartMarketingFilterOptions}
+          onValueChange={(value) => updateFilter("smartMarketing", value)}
+          className="w-full min-w-[10.5rem] sm:w-[10.5rem]"
+        />
 
-        <div className="relative w-full lg:max-w-xs">
-          <Search
-            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
-            aria-hidden
-          />
+        <InputContainer
+          size="lg"
+          className="control-hover-stroke w-full max-w-sm sm:ml-auto"
+        >
+          <InputIcon position="lead">
+            <Search className="size-4" aria-hidden />
+          </InputIcon>
           <Input
+            standalone={false}
+            size="lg"
             type="search"
             placeholder="Search accounts"
             value={filters.q}
             onChange={(event) => {
               void setFilters({ q: event.target.value, page: 1 });
             }}
-            className="pl-9 pr-9"
             aria-label="Search accounts"
           />
           {filters.q ? (
-            <button
+            <InputActionButton
+              position="tail"
               type="button"
               onClick={() => updateFilter("q", "")}
-              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-sm p-1 text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               aria-label="Clear search"
             >
-              <X className="h-4 w-4" />
-            </button>
+              <X className="size-4" />
+            </InputActionButton>
           ) : null}
-        </div>
+        </InputContainer>
       </div>
 
       {hasActiveFilters ? (
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs text-muted-foreground">Active filters:</span>
+        <ActiveFilterChipsBar onClearAll={handleClearAll}>
           {filters.q ? (
-            <FilterChip
+            <ActiveFilterChip
               label={`Search: "${filters.q}"`}
               onRemove={() => updateFilter("q", "")}
             />
           ) : null}
           {filters.eligibility !== FILTER_ALL ? (
-            <FilterChip
+            <ActiveFilterChip
               label={`Eligibility: ${
                 eligibilityFilterOptions.find(
                   (option) => option.value === filters.eligibility,
@@ -122,7 +130,7 @@ export function AccountFilters({ className }: AccountFiltersProps) {
             />
           ) : null}
           {filters.smartMarketing !== FILTER_ALL ? (
-            <FilterChip
+            <ActiveFilterChip
               label={`Smart Marketing: ${
                 smartMarketingFilterOptions.find(
                   (option) => option.value === filters.smartMarketing,
@@ -131,10 +139,7 @@ export function AccountFilters({ className }: AccountFiltersProps) {
               onRemove={() => updateFilter("smartMarketing", FILTER_ALL)}
             />
           ) : null}
-          <Button variant="ghost" size="sm" onClick={handleClearAll}>
-            Clear all
-          </Button>
-        </div>
+        </ActiveFilterChipsBar>
       ) : null}
     </section>
   );
@@ -145,6 +150,7 @@ interface FilterSelectProps {
   value: string;
   options: { value: string; label: string }[];
   onValueChange: (value: string) => void;
+  className?: string;
 }
 
 function FilterSelect({
@@ -152,10 +158,22 @@ function FilterSelect({
   value,
   options,
   onValueChange,
+  className,
 }: FilterSelectProps) {
   return (
-    <Select value={value} onValueChange={onValueChange}>
-      <SelectTrigger aria-label={label}>
+    <Select
+      value={value}
+      onValueChange={(next) => {
+        if (next == null) return;
+        onValueChange(next);
+      }}
+      items={options}
+    >
+      <SelectTrigger
+        size="lg"
+        aria-label={label}
+        className={cn("control-hover-stroke", className)}
+      >
         <SelectValue placeholder={label} />
       </SelectTrigger>
       <SelectContent>
@@ -166,26 +184,5 @@ function FilterSelect({
         ))}
       </SelectContent>
     </Select>
-  );
-}
-
-interface FilterChipProps {
-  label: string;
-  onRemove: () => void;
-}
-
-function FilterChip({ label, onRemove }: FilterChipProps) {
-  return (
-    <span className="inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2.5 py-0.5 text-xs">
-      {label}
-      <button
-        type="button"
-        onClick={onRemove}
-        className="rounded-full p-0.5 hover:bg-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        aria-label={`Remove ${label}`}
-      >
-        <X className="h-3 w-3" />
-      </button>
-    </span>
   );
 }

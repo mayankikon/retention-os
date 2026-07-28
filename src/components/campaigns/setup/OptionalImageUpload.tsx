@@ -1,9 +1,12 @@
 "use client";
 
+import {
+  Button,
+} from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
+
 import { useRef } from "react";
 import { ImagePlus, Upload } from "lucide-react";
 import { FormField } from "@/components/campaigns/setup/FormField";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface OptionalImageUploadProps {

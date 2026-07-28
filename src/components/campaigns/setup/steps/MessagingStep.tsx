@@ -1,14 +1,17 @@
 "use client";
 
+import {
+  Button,
+  Checkbox,
+  Input,
+  Textarea,
+} from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
+
 import { useMemo, useRef, useState } from "react";
 import { Braces } from "lucide-react";
 import { AddMessageVariableDialog } from "@/components/campaigns/setup/AddMessageVariableDialog";
 import { FormField } from "@/components/campaigns/setup/FormField";
 import { OptionalImageUpload } from "@/components/campaigns/setup/OptionalImageUpload";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
   buildMessageTemplatePatch,
   type CampaignMessageTemplate,
@@ -119,17 +122,14 @@ export function MessagingStep({ draft, errors, onChange }: MessagingStepProps) {
               <label
                 key={option.value}
                 className={cn(
-                  "flex cursor-pointer items-start gap-3 rounded-md border border-border p-3",
-                  isEnabled && "border-brand-primary bg-muted/50",
+                  "flex cursor-pointer items-start gap-3 rounded-[var(--radius-sm)] border border-border bg-card p-3",
+                  isEnabled && "border-primary bg-primary/5",
                 )}
               >
                 <Checkbox
                   checked={isEnabled}
-                  onChange={(event) =>
-                    handleDeliveryChannelToggle(
-                      option.value,
-                      event.target.checked,
-                    )
+                  onCheckedChange={(checked) =>
+                    handleDeliveryChannelToggle(option.value, checked)
                   }
                   className="mt-0.5"
                   aria-label={option.label}
@@ -168,9 +168,9 @@ export function MessagingStep({ draft, errors, onChange }: MessagingStepProps) {
               type="button"
               onClick={() => handleSelectTemplate(template.id)}
               className={cn(
-                "rounded-md border border-border p-3 text-left transition-colors hover:bg-muted/50",
+                "rounded-[var(--radius-sm)] border border-border bg-card p-3 text-left transition-colors hover:bg-muted/50",
                 draft.messageTemplateId === template.id &&
-                  "border-brand-primary bg-muted/50",
+                  "border-primary bg-primary/5",
               )}
             >
               <span className="block text-sm font-medium">{template.label}</span>
@@ -202,7 +202,7 @@ export function MessagingStep({ draft, errors, onChange }: MessagingStepProps) {
               })
             }
             rows={5}
-            hasError={Boolean(errors.primaryPromoText)}
+            aria-invalid={Boolean(errors.primaryPromoText)}
           />
           <Button
             type="button"

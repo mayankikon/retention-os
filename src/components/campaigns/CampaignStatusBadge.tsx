@@ -1,43 +1,20 @@
+"use client";
+
+import {
+  Badge,
+  BadgeDot,
+  type BadgeTone,
+} from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives/badge";
 import { STATUS_LABELS } from "@/data/lookups";
-import { cn } from "@/lib/utils";
 import type { CampaignStatus } from "@/types/campaign";
 
-const STATUS_STYLES: Record<
-  CampaignStatus,
-  { label: string; className: string }
-> = {
-  scheduled: {
-    label: STATUS_LABELS.scheduled,
-    className:
-      "bg-[var(--status-scheduled-bg)] text-[var(--status-scheduled-fg)]",
-  },
-  active: {
-    label: STATUS_LABELS.active,
-    className: "bg-[var(--status-active-bg)] text-[var(--status-active-fg)]",
-  },
-  paused: {
-    label: STATUS_LABELS.paused,
-    className: "bg-[var(--status-paused-bg)] text-[var(--status-paused-fg)]",
-  },
-  stopped: {
-    label: STATUS_LABELS.stopped,
-    className:
-      "bg-[var(--status-stopped-bg)] text-[var(--status-stopped-fg)]",
-  },
-  completed: {
-    label: STATUS_LABELS.completed,
-    className:
-      "bg-[var(--status-completed-bg)] text-[var(--status-completed-fg)]",
-  },
-  draft: {
-    label: STATUS_LABELS.draft,
-    className: "bg-[var(--status-draft-bg)] text-[var(--status-draft-fg)]",
-  },
-};
-
-const FALLBACK_STYLE = {
-  label: "Unknown",
-  className: "bg-muted text-muted-foreground",
+const STATUS_TONES: Record<CampaignStatus, BadgeTone> = {
+  scheduled: "teal",
+  active: "green",
+  paused: "amber",
+  stopped: "red",
+  completed: "cyan",
+  draft: "gray",
 };
 
 interface CampaignStatusBadgeProps {
@@ -45,25 +22,32 @@ interface CampaignStatusBadgeProps {
 }
 
 export function CampaignStatusBadge({ status }: CampaignStatusBadgeProps) {
-  const config =
-    status in STATUS_STYLES
-      ? STATUS_STYLES[status as CampaignStatus]
-      : FALLBACK_STYLE;
+  const isKnown = status in STATUS_TONES;
+  const tone = isKnown
+    ? STATUS_TONES[status as CampaignStatus]
+    : ("gray" as BadgeTone);
+  const label = isKnown
+    ? STATUS_LABELS[status as CampaignStatus]
+    : "Unknown";
 
   return (
-    <span
-      className={cn(
-        "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold",
-        config.className,
-      )}
+    <Badge
+      tone={tone}
+      variant="soft"
+      leadingVisual={<BadgeDot tone={tone} />}
+      className="shadow-none"
     >
-      {config.label}
-    </span>
+      {label}
+    </Badge>
   );
 }
 
 export function getStatusBadgeConfig(status: CampaignStatus | string) {
-  return status in STATUS_STYLES
-    ? STATUS_STYLES[status as CampaignStatus]
-    : FALLBACK_STYLE;
+  const isKnown = status in STATUS_TONES;
+  return {
+    label: isKnown ? STATUS_LABELS[status as CampaignStatus] : "Unknown",
+    tone: isKnown
+      ? STATUS_TONES[status as CampaignStatus]
+      : ("gray" as BadgeTone),
+  };
 }

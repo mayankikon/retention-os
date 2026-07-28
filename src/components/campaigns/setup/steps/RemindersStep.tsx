@@ -1,10 +1,13 @@
 "use client";
 
+import {
+  Checkbox,
+  Label,
+  Textarea,
+} from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
+
 import { FormField } from "@/components/campaigns/setup/FormField";
 import { OptionalImageUpload } from "@/components/campaigns/setup/OptionalImageUpload";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { useProductVersion } from "@/contexts/product-version-context";
 import { getReminderImagePreviewUrl } from "@/lib/reminder-setup";
 import type { CampaignSetupDraft } from "@/types/campaign-setup";
@@ -145,16 +148,16 @@ function ReminderTemplateField({
   return (
     <div
       className={cn(
-        "space-y-4 rounded-md border border-border p-4",
-        isEnabled && "border-brand-primary/40 bg-muted/20",
+        "space-y-4 rounded-[var(--radius-sm)] border border-border bg-card p-4",
+        isEnabled && "border-primary bg-primary/5",
       )}
     >
       <label className="flex items-center gap-3">
         <Checkbox
           id={`${field.textareaId}Enabled`}
           checked={isEnabled}
-          onChange={(event) =>
-            onChange({ [field.enabledKey]: event.target.checked })
+          onCheckedChange={(checked) =>
+            onChange({ [field.enabledKey]: checked })
           }
         />
         <Label
@@ -185,7 +188,7 @@ function ReminderTemplateField({
                 })
               }
               rows={field.rows}
-              hasError={Boolean(textError)}
+              aria-invalid={Boolean(textError)}
             />
           </FormField>
 
@@ -208,9 +211,9 @@ function ReminderTemplateField({
               <Checkbox
                 id={`${field.imageHtmlFor}UsePrimary`}
                 checked={draft[field.usePrimaryImageKey]}
-                onChange={(event) =>
+                onCheckedChange={(checked) =>
                   onChange({
-                    [field.usePrimaryImageKey]: event.target.checked,
+                    [field.usePrimaryImageKey]: checked,
                   })
                 }
                 className="mt-0.5"

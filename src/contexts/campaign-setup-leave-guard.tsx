@@ -1,5 +1,7 @@
 "use client";
 
+import { Button } from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
+
 import {
   createContext,
   useCallback,
@@ -10,14 +12,8 @@ import {
   useState,
 } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { AppDialogShell } from "@/components/layout/AppDialogShell";
+import { APP_DIALOG_INSTRUCTION_CLASS } from "@/lib/app-dialog-shell";
 
 interface CampaignSetupLeaveHandlers {
   onSaveDraft: () => void;
@@ -121,33 +117,49 @@ export function CampaignSetupLeaveGuardProvider({
     <CampaignSetupLeaveGuardContext.Provider value={value}>
       {children}
 
-      <Dialog
+      <AppDialogShell
         open={pendingHref !== null}
         onOpenChange={(open) => {
           if (!open) handleStay();
         }}
-      >
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Campaign in progress</DialogTitle>
-            <DialogDescription>
-              You have a campaign building in progress. Do you want to save this
-              as a draft or abandon it?
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-            <Button type="button" variant="outline" onClick={handleStay}>
-              Keep editing
+        title="Campaign In Progress"
+        size="compact"
+        footer={
+          <>
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
+              onClick={handleStay}
+              className="cursor-pointer"
+            >
+              Keep Editing
             </Button>
-            <Button type="button" variant="outline" onClick={handleAbandon}>
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
+              onClick={handleAbandon}
+              className="cursor-pointer"
+            >
               Abandon
             </Button>
-            <Button type="button" onClick={handleSaveDraft}>
-              Save draft
+            <Button
+              type="button"
+              size="lg"
+              onClick={handleSaveDraft}
+              className="cursor-pointer"
+            >
+              Save Draft
             </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+          </>
+        }
+      >
+        <p className={APP_DIALOG_INSTRUCTION_CLASS}>
+          You have a campaign building in progress. Do you want to save this as
+          a draft or abandon it?
+        </p>
+      </AppDialogShell>
     </CampaignSetupLeaveGuardContext.Provider>
   );
 }
