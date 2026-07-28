@@ -44,7 +44,7 @@ const TEMPLATE_HEADERS = [
   { key: "status", label: "Status", widthClassName: "min-w-[120px] w-[140px]" },
   { key: "usage", label: "Campaigns using", widthClassName: "min-w-[120px] w-[140px]" },
   { key: "updated", label: "Updated", widthClassName: "min-w-[140px] w-[160px]" },
-  { key: "updatedBy", label: "Updated by", widthClassName: "min-w-[140px] w-[160px]" },
+  { key: "updatedBy", label: "Updated by", widthClassName: "min-w-[160px] w-[180px]" },
 ] as const;
 
 export function TemplateListView() {
@@ -167,7 +167,9 @@ export function TemplateListView() {
 
                     <TableCell className={cellFrame}>
                       <TableSlotCell
+                        variant="avatar"
                         label={template.updatedBy.name}
+                        avatarFallback={template.updatedBy.initials}
                         className={cn(
                           DATA_TABLE_SLOT_LABEL_CLASS,
                           DATA_TABLE_CELL_INNER_HOVER_CLASS,

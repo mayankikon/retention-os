@@ -1,3 +1,4 @@
+import { MOCK_CURRENT_USER } from "@/data/current-user.mock";
 import type { MessageTemplate, TemplateActor } from "@/types/template";
 import {
   CHECK_ENGINE_TEMPLATE_ID,
@@ -5,10 +6,11 @@ import {
   SERVICE_REMINDER_TEMPLATE_ID,
 } from "@/types/template";
 
-const SYSTEM_ACTOR: TemplateActor = {
-  id: "u-system",
-  name: "Ikon System",
-  initials: "IS",
+/** Seed templates attribute to the mock signed-in user (person, not a system/company). */
+const SEED_ACTOR: TemplateActor = {
+  id: MOCK_CURRENT_USER.id,
+  name: MOCK_CURRENT_USER.name,
+  initials: MOCK_CURRENT_USER.initials,
 };
 
 const SEED_CREATED_AT = "2026-06-01T15:00:00.000Z";
@@ -44,23 +46,23 @@ function buildSeedTemplate(
     reminder3ImagePreviewUrl: null,
     status: "published",
     isSystem: true,
-    createdBy: SYSTEM_ACTOR,
+    createdBy: SEED_ACTOR,
     createdAt: SEED_CREATED_AT,
-    updatedBy: SYSTEM_ACTOR,
+    updatedBy: SEED_ACTOR,
     updatedAt: SEED_CREATED_AT,
     auditEvents: [
       {
         id: `${id}-audit-created`,
         action: "created",
         summary: "System template seeded",
-        actor: SYSTEM_ACTOR,
+        actor: SEED_ACTOR,
         at: SEED_CREATED_AT,
       },
       {
         id: `${id}-audit-published`,
         action: "published",
         summary: "Published for campaign use",
-        actor: SYSTEM_ACTOR,
+        actor: SEED_ACTOR,
         at: SEED_CREATED_AT,
       },
     ],

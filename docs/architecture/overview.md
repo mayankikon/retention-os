@@ -49,7 +49,7 @@ Web UI for Ikon's Smart Marketing Campaign Manager. Phase 1 delivers the **Campa
 - Create/edit via multi-step wizard; Draft / Published / Archived statuses
 - Detail shows content, campaigns using the template, and audit history
 - Published templates populate campaign Messaging (plus Custom); POC setup still Oil Change–only
-- Persistence: `localStorage` (`retention-os-message-templates`) seeded with system templates
+- Persistence: `localStorage` (`retention-os-message-templates-v2`) seeded with system templates
 
 ## External boundaries
 

@@ -17,7 +17,7 @@ export function VersionSwitcher() {
   const { versionId, setVersionId } = useProductVersion();
 
   return (
-    <div className="border-t border-border px-4 py-3">
+    <>
       <label
         htmlFor="product-version"
         className="mb-2 block text-xs font-medium uppercase tracking-wide text-muted-foreground"
@@ -48,13 +48,12 @@ export function VersionSwitcher() {
               key={option.id}
               value={option.id}
               disabled={!canSelectProductVersion(option.id)}
-              className="focus:bg-transparent focus:text-foreground data-highlighted:bg-transparent"
             >
               {option.label}
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
-    </div>
+    </>
   );
 }

@@ -7,7 +7,8 @@ import type {
   TemplateStatus,
 } from "@/types/template";
 
-const STORAGE_KEY = "retention-os-message-templates";
+/** Bumped when seed actor attribution changed (person vs system label). */
+const STORAGE_KEY = "retention-os-message-templates-v2";
 export const TEMPLATES_UPDATED_EVENT = "templates-updated";
 
 function isBrowser(): boolean {
