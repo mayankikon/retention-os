@@ -18,7 +18,7 @@ Retention OS currently uses local Shadcn/Radix primitives and hand-rolled tokens
 ## Consequences
 
 - Shift primitives can be adopted incrementally without restyling the whole app first
-- Future installs need GitHub Packages auth (`GITHUB_TOKEN` + `.npmrc`) and may require `--legacy-peer-deps` until `lucide-react` peer ranges catch up
+- Future installs need GitHub Packages auth (`GITHUB_TOKEN` + `.npmrc`). Netlify/CI must set a `GITHUB_TOKEN` env var (PAT with `read:packages` for the `ikontechnologies-arlington` org). Repo `.npmrc` sets `legacy-peer-deps=true` until Shift’s `lucide-react` peer range catches up to v1
 - Local `@/components/ui/*` removed; all design primitives import from the Shift package
 - App chrome uses Shift `Sidebar` + `AppGroovedMainColumn` (see smart-marketing-web pattern)
 - Components that import Shift must be Client Components (`"use client"`) because the package barrel evaluates Base UI context at module load
