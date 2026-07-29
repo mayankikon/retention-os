@@ -76,6 +76,38 @@ export const VEHICLE_MODELS_BY_MAKE: Record<string, string[]> = {
   GMC: ["Sierra", "Terrain"],
 };
 
+/** Trims keyed by `Make|Model` for audience and OEM pickers. */
+export const VEHICLE_TRIMS_BY_MAKE_MODEL: Record<string, string[]> = {
+  "Toyota|RAV4": ["LE", "XLE", "XLE Premium", "Limited", "Prime SE", "Prime XSE"],
+  "Toyota|Camry": ["LE", "SE", "XLE", "XSE", "TRD"],
+  "Toyota|Corolla": ["LE", "SE", "XLE", "XSE", "Hybrid LE"],
+  "Toyota|Highlander": ["LE", "XLE", "Limited", "Platinum", "Hybrid LE"],
+  "Toyota|Tacoma": ["SR", "SR5", "TRD Sport", "TRD Off-Road", "Limited"],
+  "Honda|Civic": ["LX", "Sport", "EX", "Touring", "Si"],
+  "Honda|Accord": ["LX", "Sport", "EX-L", "Touring", "Hybrid Sport"],
+  "Honda|CR-V": ["LX", "EX", "EX-L", "Sport", "Touring"],
+  "Honda|Pilot": ["Sport", "EX-L", "TrailSport", "Touring", "Elite"],
+  "Ford|F-150": ["XL", "XLT", "Lariat", "King Ranch", "Platinum", "Raptor"],
+  "Ford|Explorer": ["Active", "ST-Line", "XLT", "Limited", "ST", "Platinum"],
+  "Ford|Escape": ["Active", "ST-Line", "Platinum", "PHEV"],
+  "Chevrolet|Silverado": ["WT", "Custom", "LT", "RST", "LTZ", "High Country"],
+  "Chevrolet|Equinox": ["LS", "LT", "RS", "Activ", "Premier"],
+  "Chevrolet|Malibu": ["LS", "LT", "RS", "Premier"],
+  "Nissan|Altima": ["S", "SV", "SR", "SL"],
+  "Nissan|Rogue": ["S", "SV", "SR", "SL", "Platinum"],
+  "Nissan|Sentra": ["S", "SV", "SR", "SR Premium"],
+  "Jeep|Wrangler": ["Sport", "Willys", "Sahara", "Rubicon"],
+  "Jeep|Grand Cherokee": ["Laredo", "Altitude", "Limited", "Overland", "Summit"],
+  "Ram|1500": ["Tradesman", "Big Horn", "Laramie", "Rebel", "Limited"],
+  "Ram|2500": ["Tradesman", "Big Horn", "Laramie", "Limited"],
+  "GMC|Sierra": ["Pro", "SLE", "Elevation", "SLT", "AT4", "Denali"],
+  "GMC|Terrain": ["Elevation", "SLE", "AT4", "Denali"],
+};
+
+function makeModelKey(make: string, model: string): string {
+  return `${make}|${model}`;
+}
+
 export function getModelsForMake(make: string): string[] {
   return VEHICLE_MODELS_BY_MAKE[make] ?? [];
 }
@@ -86,6 +118,36 @@ export function isModelValidForMake(make: string, model: string): boolean {
 
 export function getModelOptionsForMake(make: string): AudienceOption[] {
   return getModelsForMake(make).map((model) => ({ value: model, label: model }));
+}
+
+export function getTrimsForMakeModel(make: string, model: string): string[] {
+  if (!make || !model) {
+    return [];
+  }
+
+  return VEHICLE_TRIMS_BY_MAKE_MODEL[makeModelKey(make, model)] ?? [];
+}
+
+export function isTrimValidForMakeModel(
+  make: string,
+  model: string,
+  trim: string,
+): boolean {
+  if (!trim) {
+    return true;
+  }
+
+  return getTrimsForMakeModel(make, model).includes(trim);
+}
+
+export function getTrimOptionsForMakeModel(
+  make: string,
+  model: string,
+): AudienceOption[] {
+  return getTrimsForMakeModel(make, model).map((trim) => ({
+    value: trim,
+    label: trim,
+  }));
 }
 
 export function serializeDateRange(startDate: string, endDate: string): string {
@@ -161,6 +223,11 @@ export const AUDIENCE_ATTRIBUTE_META: AudienceAttributeMeta[] = [
     editor: "select",
   },
   {
+    attribute: "vehicleTrim",
+    label: "Trim",
+    editor: "select",
+  },
+  {
     attribute: "customerZip",
     label: "Zip Code",
     editor: "text",
@@ -208,7 +275,7 @@ export function getAudienceValueLabel(
 ): string {
   const meta = getAudienceAttributeMeta(attribute);
   if (meta.editor === "select") {
-    if (attribute === "vehicleModel") {
+    if (attribute === "vehicleModel" || attribute === "vehicleTrim") {
       return value;
     }
     return meta.options?.find((option) => option.value === value)?.label ?? value;

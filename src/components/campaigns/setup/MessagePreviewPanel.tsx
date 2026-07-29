@@ -64,11 +64,11 @@ export function MessagePreviewPanel({
   return (
     <aside
       className="w-full min-w-0 lg:sticky lg:top-8"
-      aria-label="Customer message preview"
+      aria-label="Customer Message Preview"
     >
       <div className="mb-3">
         <h2 className="text-sm font-semibold tracking-tight text-foreground">
-          Message preview
+          Message Preview
         </h2>
         <p className="mt-0.5 text-xs text-muted-foreground">
           {channelDescription}

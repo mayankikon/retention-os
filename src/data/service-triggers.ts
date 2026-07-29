@@ -1,4 +1,8 @@
 import type { ServiceTriggerMode, ServiceTriggerType } from "@/types/campaign-setup";
+import {
+  getTrimsForMakeModel,
+  isTrimValidForMakeModel,
+} from "@/data/audience-attributes";
 
 export interface ServiceTriggerPresetOption {
   value: string;
@@ -41,20 +45,16 @@ export const SERVICE_TRIGGER_MODE_OPTIONS: ServiceTriggerModeOption[] = [
 ];
 
 export const TIME_SERVICE_TRIGGER_OPTIONS: ServiceTriggerPresetOption[] = [
-  { value: "90_days", label: "90 days" },
-  { value: "180_days", label: "180 days" },
-  {
-    value: "180_days_5000_mile",
-    label: "180 days / 5,000 miles (SOP default)",
-  },
-  { value: "1_year", label: "1 year" },
+  { value: "90_days", label: "90 Days" },
+  { value: "180_days", label: "180 Days" },
+  { value: "1_year", label: "1 Year" },
 ];
 
 export const MILEAGE_SERVICE_TRIGGER_OPTIONS: ServiceTriggerPresetOption[] = [
-  { value: "2000_miles", label: "2,000 miles" },
-  { value: "5000_miles", label: "5,000 miles" },
-  { value: "10000_miles", label: "10,000 miles" },
-  { value: "60000_miles", label: "60,000 miles" },
+  { value: "2000_miles", label: "2,000 Miles" },
+  { value: "5000_miles", label: "5,000 Miles" },
+  { value: "10000_miles", label: "10,000 Miles" },
+  { value: "60000_miles", label: "60,000 Miles" },
 ];
 
 export const OEM_SERVICE_SCHEDULES: OemServiceSchedule[] = [
@@ -165,9 +165,21 @@ export const OEM_SERVICE_SCHEDULES: OemServiceSchedule[] = [
   },
 ];
 
+export function getOemTrimsForMakeModel(make: string, model: string): string[] {
+  return getTrimsForMakeModel(make, model);
+}
+
+export function isOemTrimValidForMakeModel(
+  make: string,
+  model: string,
+  trim: string,
+): boolean {
+  return isTrimValidForMakeModel(make, model, trim);
+}
+
 export const DEFAULT_TIME_SERVICE_TRIGGER =
   TIME_SERVICE_TRIGGER_OPTIONS.find(
-    (option) => option.value === "180_days_5000_mile",
+    (option) => option.value === "180_days",
   )?.value ?? TIME_SERVICE_TRIGGER_OPTIONS[0].value;
 
 export const DEFAULT_MILEAGE_SERVICE_TRIGGER =

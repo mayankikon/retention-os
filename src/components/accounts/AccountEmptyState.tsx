@@ -17,24 +17,24 @@ const EMPTY_STATE_CONFIG: Record<
 > = {
   noData: {
     icon: Inbox,
-    title: "No accounts yet",
+    title: "No Accounts Yet",
     description:
       "Dealership accounts will appear here once they are onboarded.",
-    actionLabel: "Clear filters",
+    actionLabel: "Clear Filters",
   },
   noSearchResults: {
     icon: FileSearch,
-    title: "No accounts match your search",
+    title: "No Accounts Match Your Search",
     description:
       "Try adjusting your search term or clearing filters to see more results.",
-    actionLabel: "Clear search",
+    actionLabel: "Clear Search",
   },
   filteredZero: {
     icon: FilterX,
-    title: "No accounts match these filters",
+    title: "No Accounts Match These Filters",
     description:
       "Broaden your eligibility or smart marketing filters to find matching accounts.",
-    actionLabel: "Clear all filters",
+    actionLabel: "Clear All Filters",
   },
 };
 

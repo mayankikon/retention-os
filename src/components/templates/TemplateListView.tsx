@@ -42,9 +42,9 @@ import { cn } from "@/lib/utils";
 const TEMPLATE_HEADERS = [
   { key: "heading", label: "Heading", widthClassName: "min-w-[180px] w-[240px]" },
   { key: "status", label: "Status", widthClassName: "min-w-[120px] w-[140px]" },
-  { key: "usage", label: "Campaigns using", widthClassName: "min-w-[120px] w-[140px]" },
+  { key: "usage", label: "Campaigns Using", widthClassName: "min-w-[120px] w-[140px]" },
   { key: "updated", label: "Updated", widthClassName: "min-w-[140px] w-[160px]" },
-  { key: "updatedBy", label: "Updated by", widthClassName: "min-w-[160px] w-[180px]" },
+  { key: "updatedBy", label: "Updated By", widthClassName: "min-w-[160px] w-[180px]" },
 ] as const;
 
 export function TemplateListView() {
@@ -64,7 +64,7 @@ export function TemplateListView() {
             leadingIcon={<FilePlus2 aria-hidden />}
             onClick={() => router.push("/templates/new")}
           >
-            Create template
+            Create Template
           </Button>
         }
       />

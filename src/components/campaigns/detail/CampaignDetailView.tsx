@@ -21,7 +21,7 @@ interface CampaignDetailViewProps {
 
 const DETAIL_TABS: { id: CampaignDetailTab; label: string }[] = [
   { id: "details", label: "Details" },
-  { id: "changelog", label: "Change log" },
+  { id: "changelog", label: "Change Log" },
 ];
 
 export function CampaignDetailView({ campaignId }: CampaignDetailViewProps) {
@@ -46,13 +46,13 @@ export function CampaignDetailView({ campaignId }: CampaignDetailViewProps) {
   if (!campaign) {
     return (
       <div className="surface-stroke-sharp rounded-[var(--radius-sm)] bg-card p-6">
-        <h1 className="text-xl font-semibold">Campaign not found</h1>
+        <h1 className="text-xl font-semibold">Campaign Not Found</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           We could not find a campaign with ID{" "}
           <span className="font-medium text-foreground">{campaignId}</span>.
         </p>
         <Link href="/campaigns" className={cn(buttonVariants({ variant: "outline" }), "mt-4")}>
-          Back to campaigns
+          Back to Campaigns
         </Link>
       </div>
     );

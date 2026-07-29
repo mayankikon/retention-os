@@ -171,7 +171,7 @@ function ReminderTemplateField({
       {isEnabled ? (
         <>
           <FormField
-            label={`${field.label} text`}
+            label={`${field.label} Text`}
             htmlFor={field.textareaId}
             error={textError}
             required
@@ -193,7 +193,7 @@ function ReminderTemplateField({
           </FormField>
 
           <OptionalImageUpload
-            label={`${field.label} image`}
+            label={`${field.label} Image`}
             htmlFor={field.imageHtmlFor}
             hint="Optional. Upload a custom image for this reminder."
             fileName={hasCustomImage ? draft[field.fileNameKey] : null}

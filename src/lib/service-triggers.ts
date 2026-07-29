@@ -5,11 +5,12 @@ import {
 } from "@/data/service-triggers";
 import {
   getSelectedMakeFromRules,
+  getSelectedModelFromRules,
   isRuleComplete,
   summarizeAudienceFilters,
   validatePurchaseDateRangeRule,
 } from "@/lib/audience-filters";
-import { isModelValidForMake } from "@/data/audience-attributes";
+import { isModelValidForMake, isTrimValidForMakeModel } from "@/data/audience-attributes";
 import type {
   CampaignSetupDraft,
   ServiceTriggerMode,
@@ -22,7 +23,7 @@ export function getDefaultPresetForTriggerType(
   switch (triggerType) {
     case "time":
       return TIME_SERVICE_TRIGGER_OPTIONS.find(
-        (option) => option.value === "180_days_5000_mile",
+        (option) => option.value === "180_days",
       )!.value;
     case "mileage":
       return MILEAGE_SERVICE_TRIGGER_OPTIONS[0].value;
@@ -55,6 +56,13 @@ export function setServiceTriggerMode(
       serviceTriggerTypes: ["oem"],
       oemMake: draft.oemMake,
       oemModel: draft.oemModel,
+      oemTrim: draft.oemTrim,
+      audienceFilters: draft.audienceFilters.filter(
+        (rule) =>
+          rule.attribute !== "vehicleMake" &&
+          rule.attribute !== "vehicleModel" &&
+          rule.attribute !== "vehicleTrim",
+      ),
     };
   }
 
@@ -68,6 +76,7 @@ export function setServiceTriggerMode(
       getDefaultPresetForTriggerType("mileage"),
     oemMake: "",
     oemModel: "",
+    oemTrim: "",
   };
 }
 
@@ -84,23 +93,23 @@ export function getServiceTriggerSummaries(draft: CampaignSetupDraft): string[] 
     );
 
     summaries.push(
-      `Time Interval: ${timeOption?.label ?? "Not selected"}`,
-      `Mileage Interval: ${mileageOption?.label ?? "Not selected"}`,
+      `Time Interval: ${timeOption?.label ?? "Not Selected"}`,
+      `Mileage Interval: ${mileageOption?.label ?? "Not Selected"}`,
     );
   } else if (!draft.oemMake || !draft.oemModel) {
-    summaries.push("OEM-Recommended Service Schedule: Not selected");
+    summaries.push("OEM-Recommended Service Schedule: Not Selected");
   } else {
     const schedule = getOemServiceSchedule(draft.oemMake, draft.oemModel);
     summaries.push(
       schedule
-        ? `OEM-Recommended Service Schedule: ${schedule.make} ${schedule.model} — ${schedule.intervalMiles.toLocaleString("en-US")} mi / ${formatIntervalDays(schedule.intervalDays)}`
-        : `OEM-Recommended Service Schedule: ${draft.oemMake} ${draft.oemModel}`,
+        ? `OEM-Recommended Service Schedule: ${schedule.make} ${schedule.model}${draft.oemTrim ? ` ${draft.oemTrim}` : ""} — ${schedule.intervalMiles.toLocaleString("en-US")} mi / ${formatIntervalDays(schedule.intervalDays)}`
+        : `OEM-Recommended Service Schedule: ${draft.oemMake} ${draft.oemModel}${draft.oemTrim ? ` ${draft.oemTrim}` : ""}`,
     );
   }
 
   const audienceLines = summarizeAudienceFilters(draft.audienceFilters);
   if (audienceLines.length === 0) {
-    summaries.push("Audience Query: No filters added");
+    summaries.push("Audience Query: No Filters Added");
   } else {
     summaries.push(
       ...audienceLines.map((line) => `Audience Query · ${line}`),
@@ -113,7 +122,7 @@ export function getServiceTriggerSummaries(draft: CampaignSetupDraft): string[] 
 export function getServiceTriggerSummary(draft: CampaignSetupDraft): string {
   const summaries = getServiceTriggerSummaries(draft);
   if (summaries.length === 0) {
-    return "No service trigger selected";
+    return "No Service Trigger Selected";
   }
 
   return summaries.join("; ");
@@ -152,6 +161,18 @@ export function validateAudienceFilterFields(
           "Add a Make filter before selecting a Model.";
       } else if (!isModelValidForMake(make, rule.value.trim())) {
         errors[`audience.${rule.id}`] = `Model is not available for ${make}.`;
+      }
+    }
+
+    if (rule.attribute === "vehicleTrim") {
+      const make = getSelectedMakeFromRules(draft.audienceFilters);
+      const model = getSelectedModelFromRules(draft.audienceFilters);
+      if (!make || !model) {
+        errors[`audience.${rule.id}`] =
+          "Add Make and Model filters before selecting a Trim.";
+      } else if (!isTrimValidForMakeModel(make, model, rule.value.trim())) {
+        errors[`audience.${rule.id}`] =
+          `Trim is not available for ${make} ${model}.`;
       }
     }
   }
@@ -204,8 +225,8 @@ export function validateServiceTriggerFields(
 function formatIntervalDays(days: number): string {
   if (days % 365 === 0 && days >= 365) {
     const years = days / 365;
-    return years === 1 ? "12 months" : `${years} years`;
+    return years === 1 ? "12 Months" : `${years} Years`;
   }
 
-  return `${days} days`;
+  return `${days} Days`;
 }

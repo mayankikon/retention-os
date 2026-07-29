@@ -17,13 +17,16 @@ import {
   AUDIENCE_ATTRIBUTE_META,
   getAudienceAttributeMeta,
   getModelOptionsForMake,
+  getTrimOptionsForMakeModel,
   parseDateRange,
   serializeDateRange,
 } from "@/data/audience-attributes";
 import {
   estimateAudienceReach,
   getSelectedMakeFromRules,
+  getSelectedModelFromRules,
   syncModelRulesAfterMakeChange,
+  syncTrimRulesAfterModelChange,
 } from "@/lib/audience-filters";
 import { cn } from "@/lib/utils";
 import type {
@@ -37,6 +40,8 @@ interface AudienceFiltersProps {
   errors: Record<string, string>;
   onChange: (patch: Partial<CampaignSetupDraft>) => void;
   embedded?: boolean;
+  /** When set, only these attributes appear in the filter field dropdown. */
+  allowedAttributes?: readonly AudienceAttribute[];
 }
 
 export function AudienceFilters({
@@ -44,11 +49,20 @@ export function AudienceFilters({
   errors,
   onChange,
   embedded = false,
+  allowedAttributes,
 }: AudienceFiltersProps) {
   const nextId = useRef(0);
   const rules = draft.audienceFilters;
   const reach = estimateAudienceReach(rules);
   const selectedMake = getSelectedMakeFromRules(rules);
+  const selectedModel = getSelectedModelFromRules(rules);
+  const attributeOptions = allowedAttributes
+    ? AUDIENCE_ATTRIBUTE_META.filter((meta) =>
+        allowedAttributes.includes(meta.attribute),
+      )
+    : AUDIENCE_ATTRIBUTE_META;
+  const defaultAttribute =
+    attributeOptions[0]?.attribute ?? AUDIENCE_ATTRIBUTE_META[0].attribute;
 
   const setRules = (next: AudienceFilterRule[]) => {
     onChange({ audienceFilters: next });
@@ -60,7 +74,7 @@ export function AudienceFilters({
       ...rules,
       {
         id: `rule-${nextId.current}-${rules.length}`,
-        attribute: AUDIENCE_ATTRIBUTE_META[0].attribute,
+        attribute: defaultAttribute,
         value: "",
       },
     ]);
@@ -78,6 +92,15 @@ export function AudienceFilters({
       typeof patch.value === "string"
     ) {
       nextRules = syncModelRulesAfterMakeChange(nextRules, patch.value);
+    }
+
+    if (
+      updatedRule?.attribute === "vehicleModel" &&
+      patch.value &&
+      typeof patch.value === "string"
+    ) {
+      const make = getSelectedMakeFromRules(nextRules);
+      nextRules = syncTrimRulesAfterModelChange(nextRules, make, patch.value);
     }
 
     setRules(nextRules);
@@ -120,7 +143,7 @@ export function AudienceFilters({
                   if (value == null) return;
                   changeAttribute(rule.id, value as AudienceAttribute);
                 }}
-                items={AUDIENCE_ATTRIBUTE_META.map((option) => ({
+                items={attributeOptions.map((option) => ({
                   value: option.attribute,
                   label: option.label,
                 }))}
@@ -129,7 +152,7 @@ export function AudienceFilters({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {AUDIENCE_ATTRIBUTE_META.map((option) => (
+                  {attributeOptions.map((option) => (
                     <SelectItem key={option.attribute} value={option.attribute}>
                       {option.label}
                     </SelectItem>
@@ -146,6 +169,7 @@ export function AudienceFilters({
                 <RuleValueEditor
                   rule={rule}
                   selectedMake={selectedMake}
+                  selectedModel={selectedModel}
                   onChange={updateRule}
                 />
               </div>
@@ -177,11 +201,11 @@ export function AudienceFilters({
           Add Filter
         </Button>
         <p className="text-sm text-muted-foreground">
-          {rules.length > 0 ? "AND · " : ""}matches{" "}
+          {rules.length > 0 ? "AND · " : ""}Matches{" "}
           <span className="font-medium text-foreground">
             ~{reach.toLocaleString("en-US")}
           </span>{" "}
-          vehicles
+          Vehicles
         </p>
       </div>
     </div>
@@ -204,10 +228,16 @@ export function AudienceFilters({
 interface RuleValueEditorProps {
   rule: AudienceFilterRule;
   selectedMake?: string;
+  selectedModel?: string;
   onChange: (id: string, patch: Partial<AudienceFilterRule>) => void;
 }
 
-function RuleValueEditor({ rule, selectedMake, onChange }: RuleValueEditorProps) {
+function RuleValueEditor({
+  rule,
+  selectedMake,
+  selectedModel,
+  onChange,
+}: RuleValueEditorProps) {
   const meta = getAudienceAttributeMeta(rule.attribute);
 
   if (rule.attribute === "vehiclePurchaseDate") {
@@ -228,12 +258,12 @@ function RuleValueEditor({ rule, selectedMake, onChange }: RuleValueEditorProps)
             htmlFor={`${rule.id}-purchase-start`}
             className="text-xs font-medium text-muted-foreground"
           >
-            Start date
+            Start Date
           </label>
           <Input
             id={`${rule.id}-purchase-start`}
             type="date"
-            aria-label="Purchase start date"
+            aria-label="Purchase Start Date"
             value={startDate}
             max={endDate || undefined}
             onChange={(event) => handleDateChange("start", event.target.value)}
@@ -244,12 +274,12 @@ function RuleValueEditor({ rule, selectedMake, onChange }: RuleValueEditorProps)
             htmlFor={`${rule.id}-purchase-end`}
             className="text-xs font-medium text-muted-foreground"
           >
-            End date
+            End Date
           </label>
           <Input
             id={`${rule.id}-purchase-end`}
             type="date"
-            aria-label="Purchase end date"
+            aria-label="Purchase End Date"
             value={endDate}
             min={startDate || undefined}
             onChange={(event) => handleDateChange("end", event.target.value)}
@@ -275,12 +305,48 @@ function RuleValueEditor({ rule, selectedMake, onChange }: RuleValueEditorProps)
         <SelectTrigger aria-label="Filter Value">
           <SelectValue
             placeholder={
-              selectedMake ? "Select model…" : "Add a Make filter first"
+              selectedMake ? "Select Model…" : "Add a Make Filter First"
             }
           />
         </SelectTrigger>
         <SelectContent>
           {modelOptions.map((option) => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    );
+  }
+
+  if (rule.attribute === "vehicleTrim") {
+    const trimOptions =
+      selectedMake && selectedModel
+        ? getTrimOptionsForMakeModel(selectedMake, selectedModel)
+        : [];
+
+    return (
+      <Select
+        value={rule.value || null}
+        onValueChange={(value) => {
+          if (value == null) return;
+          onChange(rule.id, { value });
+        }}
+        disabled={!selectedMake || !selectedModel}
+        items={trimOptions}
+      >
+        <SelectTrigger aria-label="Filter Value">
+          <SelectValue
+            placeholder={
+              selectedMake && selectedModel
+                ? "Select Trim…"
+                : "Add Make and Model Filters First"
+            }
+          />
+        </SelectTrigger>
+        <SelectContent>
+          {trimOptions.map((option) => (
             <SelectItem key={option.value} value={option.value}>
               {option.label}
             </SelectItem>

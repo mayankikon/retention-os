@@ -71,7 +71,7 @@ export function ReviewStep({
           </div>
           <div className="min-w-0 flex-1">
             <h3 className="text-sm font-semibold text-foreground">
-              Audience summary
+              Audience Summary
             </h3>
             <p className="mt-1 text-sm text-muted-foreground">
               Estimated customers for this campaign after your trigger and
@@ -81,7 +81,7 @@ export function ReviewStep({
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               <div className="rounded-md border border-border bg-muted/20 px-4 py-3">
                 <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  Customers targeted
+                  Customers Targeted
                 </p>
                 <p className="mt-1 text-2xl font-semibold tabular-nums text-foreground">
                   ~{customersTargeted.toLocaleString("en-US")}
@@ -89,7 +89,7 @@ export function ReviewStep({
               </div>
               <div className="rounded-md border border-border bg-muted/20 px-4 py-3">
                 <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  Roughly reachable
+                  Roughly Reachable
                 </p>
                 <p className="mt-1 text-2xl font-semibold tabular-nums text-foreground">
                   ~{customersReached.toLocaleString("en-US")}
@@ -116,7 +116,7 @@ export function ReviewStep({
       {!isPocVersion ? (
         <section className="space-y-4 rounded-md border border-border p-4">
           <div>
-            <h3 className="text-sm font-semibold">Audience suppression</h3>
+            <h3 className="text-sm font-semibold">Audience Suppression</h3>
             <p className="mt-1 text-sm text-muted-foreground">
               Exclude opted-out customers and numbers on your do-not-contact list
               before launch.
@@ -141,7 +141,7 @@ export function ReviewStep({
         <div className="flex items-start gap-2">
           <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-brand-primary" />
           <div>
-            <h3 className="text-sm font-semibold">TCPA compliance</h3>
+            <h3 className="text-sm font-semibold">TCPA Compliance</h3>
             <p className="mt-1 text-sm text-muted-foreground">
               Federal TCPA rules require consent for marketing texts and timely
               honoring of opt-out requests (including STOP replies).
@@ -180,7 +180,7 @@ export function ReviewStep({
       </section>
 
       <FormField
-        label="Test mobile number"
+        label="Test Mobile Number"
         htmlFor="testPhone"
         hint="Send Campaign Test — sample SMS to your device."
         error={errors.testPhoneNumber}
@@ -205,7 +205,7 @@ export function ReviewStep({
               ? "Sending…"
               : testStatus === "sent" || isTestSent
                 ? "Sent"
-                : "Send test"}
+                : "Send Test"}
           </Button>
         </div>
       </FormField>
@@ -230,14 +230,14 @@ export function ReviewStep({
             <div className="flex items-start gap-2">
               <CalendarClock className="mt-0.5 h-4 w-4 shrink-0 text-brand-primary" />
               <div>
-                <h3 className="text-sm font-semibold">Schedule activation</h3>
+                <h3 className="text-sm font-semibold">Schedule Activation</h3>
                 <p className="mt-1 text-sm text-muted-foreground">
                   Choose the date this campaign should become active.
                 </p>
               </div>
             </div>
             <FormField
-              label="Activation date"
+              label="Activation Date"
               htmlFor="activateOnDate"
               required
               error={errors.scheduledActivateAt}
@@ -256,7 +256,7 @@ export function ReviewStep({
                 disabled={!canLaunch || !activateOnDate}
                 onClick={() => onSchedule(activateOnDate)}
               >
-                {isActivating ? "Scheduling…" : "Confirm schedule"}
+                {isActivating ? "Scheduling…" : "Confirm Schedule"}
               </Button>
               <Button
                 type="button"
@@ -272,7 +272,7 @@ export function ReviewStep({
                 onClick={onSaveDraft}
                 disabled={isActivating}
               >
-                Save draft
+                Save Draft
               </Button>
             </div>
           </div>
@@ -283,7 +283,7 @@ export function ReviewStep({
               onClick={onActivateNow}
               disabled={!canLaunch}
             >
-              {isActivating ? "Activating…" : "Activate now"}
+              {isActivating ? "Activating…" : "Activate Now"}
             </Button>
             <Button
               type="button"
@@ -300,7 +300,7 @@ export function ReviewStep({
               onClick={onSaveDraft}
               disabled={isActivating}
             >
-              Save draft
+              Save Draft
             </Button>
           </div>
         )}

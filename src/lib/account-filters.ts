@@ -12,7 +12,7 @@ export const SMART_MARKETING_FILTER_OFF = "off";
 export const eligibilityFilterOptions = [
   { value: FILTER_ALL, label: "All Eligibility" },
   { value: "eligible", label: "Eligible" },
-  { value: "not_eligible", label: "Not eligible" },
+  { value: "not_eligible", label: "Not Eligible" },
 ];
 
 export const smartMarketingFilterOptions = [

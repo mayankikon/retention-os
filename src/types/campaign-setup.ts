@@ -49,6 +49,7 @@ export const AUDIENCE_ATTRIBUTES = [
   "vehicleYear",
   "vehicleMake",
   "vehicleModel",
+  "vehicleTrim",
   "customerZip",
   "customerCity",
   "vehiclePurchaseDate",
@@ -56,6 +57,17 @@ export const AUDIENCE_ATTRIBUTES = [
 ] as const;
 
 export type AudienceAttribute = (typeof AUDIENCE_ATTRIBUTES)[number];
+
+/** Audience attributes available under OEM mode (make/model already chosen above). */
+export const OEM_AUDIENCE_ATTRIBUTES = [
+  "vehicleYear",
+  "customerZip",
+  "customerCity",
+  "vehiclePurchaseDate",
+  "odometer",
+] as const satisfies readonly AudienceAttribute[];
+
+export type OemAudienceAttribute = (typeof OEM_AUDIENCE_ATTRIBUTES)[number];
 
 export interface AudienceFilterRule {
   id: string;
@@ -93,6 +105,7 @@ export interface CampaignSetupDraft {
   mileageServiceTriggerPreset: string;
   oemMake: string;
   oemModel: string;
+  oemTrim: string;
   subfleets: string[];
   scheduleDays: ScheduleDay[];
   timeZone: SetupTimeZone;

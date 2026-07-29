@@ -110,7 +110,7 @@ export function TemplateWizard({ mode, initialTemplate }: TemplateWizardProps) {
     <div className="app-shell-scrollbar-dashed app-shell-content-px app-shell-content-pt app-shell-content-pb min-h-0 flex-1 space-y-8 overflow-y-auto">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-          {mode === "create" ? "Create template" : "Edit template"}
+          {mode === "create" ? "Create Template" : "Edit Template"}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Define reusable messaging for campaign setup.
@@ -161,10 +161,10 @@ export function TemplateWizard({ mode, initialTemplate }: TemplateWizardProps) {
                   variant="outline"
                   onClick={() => persist("draft")}
                 >
-                  Save draft
+                  Save Draft
                 </Button>
                 <Button type="button" onClick={() => persist("published")}>
-                  {mode === "edit" ? "Save & publish" : "Publish"}
+                  {mode === "edit" ? "Save & Publish" : "Publish"}
                 </Button>
               </>
             )}
@@ -232,7 +232,7 @@ function ContentStep({
   return (
     <div className="space-y-6">
       <FormField
-        label="Primary promo text"
+        label="Primary Promo Text"
         htmlFor="primaryPromoText"
         required
         error={errors.primaryPromoText}
@@ -255,7 +255,7 @@ function ContentStep({
         />
       </FormField>
       <OptionalImageUpload
-        label="Campaign image"
+        label="Campaign Image"
         htmlFor="templateImage"
         hint="Optional image associated with this template."
         fileName={draft.campaignImageFileName}
@@ -388,7 +388,7 @@ function ReviewStep({ draft }: { draft: TemplateDraft }) {
       </div>
       <div>
         <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          Primary promo text
+          Primary Promo Text
         </p>
         <p className="mt-1 whitespace-pre-wrap text-foreground">
           {draft.primaryPromoText || "—"}

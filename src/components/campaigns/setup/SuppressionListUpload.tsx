@@ -38,7 +38,7 @@ export function SuppressionListUpload({
 
   return (
     <FormField
-      label="Suppression list"
+      label="Suppression List"
       htmlFor="suppressionList"
       hint="Optional. Upload a CSV or TXT file with one phone number per line. Opted-out and do-not-contact numbers will be excluded from this campaign."
       error={error}

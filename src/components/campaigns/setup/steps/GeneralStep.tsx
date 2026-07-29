@@ -57,7 +57,7 @@ export function GeneralStep({ draft, errors, onChange }: GeneralStepProps) {
       </FormField>
 
       <FormField
-        label="Campaign name"
+        label="Campaign Name"
         htmlFor="campaignName"
         hint={CAMPAIGN_NAME_TEMPLATE_HINT}
         error={errors.campaignName}
@@ -73,7 +73,7 @@ export function GeneralStep({ draft, errors, onChange }: GeneralStepProps) {
       </FormField>
 
       <FormField
-        label="Dealership time zone"
+        label="Dealership Time Zone"
         htmlFor="timeZone"
         hint="Used to schedule SMS delivery per the SOP time zone table."
         error={errors.timeZone}

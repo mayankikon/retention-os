@@ -23,7 +23,7 @@ export function ConfirmationView({ campaignName }: ConfirmationViewProps) {
         />
       </div>
       <h1 className="text-2xl font-semibold text-foreground">
-        Campaign activated
+        Campaign Activated
       </h1>
       <p className="mt-3 text-sm text-muted-foreground">
         <span className="font-medium text-foreground">{campaignName}</span> is
@@ -31,10 +31,10 @@ export function ConfirmationView({ campaignName }: ConfirmationViewProps) {
       </p>
       <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
         <Link href="/campaigns" className={buttonVariants({ variant: "default" })}>
-          View campaigns
+          View Campaigns
         </Link>
         <Link href="/campaigns/new" className={buttonVariants({ variant: "outline" })}>
-          Create another
+          Create Another
         </Link>
       </div>
     </div>

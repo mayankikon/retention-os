@@ -33,7 +33,7 @@ export const SETUP_STEP_META: SetupStepMeta[] = [
   },
   {
     id: "review",
-    label: "Review & activate",
+    label: "Review & Activate",
     description: "Test, verify, and launch",
   },
 ];
@@ -124,6 +124,7 @@ export function createDefaultSetupDraft(): CampaignSetupDraft {
     mileageServiceTriggerPreset: DEFAULT_MILEAGE_SERVICE_TRIGGER,
     oemMake: "",
     oemModel: "",
+    oemTrim: "",
     subfleets: [],
     scheduleDays: [...SCHEDULE_DAYS],
     timeZone: "CST",

@@ -45,7 +45,7 @@ export function TemplateDetailView({ templateId }: TemplateDetailViewProps) {
       <div className="space-y-4">
         <h1 className="text-2xl font-semibold">Template not found</h1>
         <Link href="/templates" className={buttonVariants({ variant: "outline" })}>
-          Back to templates
+          Back to Templates
         </Link>
       </div>
     );
@@ -142,10 +142,10 @@ export function TemplateDetailView({ templateId }: TemplateDetailViewProps) {
       <section className="space-y-3">
         <h2 className="text-lg font-semibold text-foreground">Content</h2>
         <div className="rounded-lg border border-border bg-card p-5 shadow-sm space-y-4 text-sm">
-          <ContentBlock label="Primary promo text" value={template.primaryPromoText} />
+          <ContentBlock label="Primary Promo Text" value={template.primaryPromoText} />
           <ContentBlock label="Dealer URL" value={template.dealerUrl || "—"} />
           <ContentBlock
-            label="Campaign image"
+            label="Campaign Image"
             value={template.campaignImageFileName || "None"}
           />
           <ContentBlock

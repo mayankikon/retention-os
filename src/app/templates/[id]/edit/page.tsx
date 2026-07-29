@@ -24,9 +24,9 @@ export default function EditTemplatePage({ params }: EditTemplatePageProps) {
         <TemplateWizard mode="edit" initialTemplate={template} />
       ) : (
         <div className="space-y-4">
-          <h1 className="text-2xl font-semibold">Template not found</h1>
+          <h1 className="text-2xl font-semibold">Template Not Found</h1>
           <Link href="/templates" className={buttonVariants({ variant: "outline" })}>
-          Back to templates
+          Back to Templates
         </Link>
         </div>
       )}

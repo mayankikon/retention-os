@@ -105,7 +105,7 @@ export function MessagingStep({ draft, errors, onChange }: MessagingStepProps) {
       </p>
 
       <FormField
-        label="Delivery channels"
+        label="Delivery Channels"
         error={errors.deliveryChannels}
         hint={
           isPocVersion
@@ -147,7 +147,7 @@ export function MessagingStep({ draft, errors, onChange }: MessagingStepProps) {
       </FormField>
 
       <FormField
-        label="Message template"
+        label="Message Template"
         hint={
           isPocVersion
             ? "POC includes the Oil Change Campaign template only."
@@ -183,7 +183,7 @@ export function MessagingStep({ draft, errors, onChange }: MessagingStepProps) {
       </FormField>
 
       <FormField
-        label="Primary promo text"
+        label="Primary Promo Text"
         htmlFor="primaryPromoText"
         error={errors.primaryPromoText}
         required
@@ -237,7 +237,7 @@ export function MessagingStep({ draft, errors, onChange }: MessagingStepProps) {
       </FormField>
 
       <OptionalImageUpload
-        label="Campaign image"
+        label="Campaign Image"
         htmlFor="campaignImage"
         hint="Optional. Upload a 2×3 logo or high-quality storefront image — shown as an MMS attachment in the preview."
         error={errors.campaignImage}

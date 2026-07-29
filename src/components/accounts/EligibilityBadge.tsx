@@ -16,7 +16,7 @@ const ELIGIBILITY_TONES: Record<
     tone: "green",
   },
   not_eligible: {
-    label: "Not eligible",
+    label: "Not Eligible",
     tone: "gray",
   },
 };

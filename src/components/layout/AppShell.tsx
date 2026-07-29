@@ -103,6 +103,9 @@ export function AppShell({
         products={PRODUCTS}
         activeProductId="smart-marketing"
         mainSections={mainSections}
+        // Hide Shift's default Settings block (General / Alerts / Marketing /
+        // Configurations) until those destinations exist in this app.
+        settingsSections={[]}
         onNavItemClick={handleNavItemClick}
         user={{
           primaryText: user.name,

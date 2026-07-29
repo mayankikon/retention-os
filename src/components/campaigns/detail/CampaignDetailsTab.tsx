@@ -82,9 +82,9 @@ export function CampaignDetailsTab({
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <MetricCard
-            label="Sent to"
+            label="Sent To"
             value={formatMessageCount(analytics.recipientsSent)}
-            subtext="Customers reached"
+            subtext="Customers Reached"
             icon={Send}
           />
           <MetricCard
@@ -92,8 +92,8 @@ export function CampaignDetailsTab({
             value={formatMessageCount(analytics.openedCount)}
             subtext={
               hasActivity
-                ? `${formatOpenRate(analytics.openedCount, analytics.recipientsSent)} open rate`
-                : "No sends yet"
+                ? `${formatOpenRate(analytics.openedCount, analytics.recipientsSent)} Open Rate`
+                : "No Sends Yet"
             }
             icon={Users}
           />
@@ -102,18 +102,18 @@ export function CampaignDetailsTab({
             value={formatMessageCount(analytics.deliveredCount)}
             subtext={
               hasActivity
-                ? `${formatDeliveryRate(analytics.deliveredCount, analytics.recipientsSent)} delivery rate`
-                : "No deliveries yet"
+                ? `${formatDeliveryRate(analytics.deliveredCount, analytics.recipientsSent)} Delivery Rate`
+                : "No Deliveries Yet"
             }
             icon={CheckCircle2}
           />
           <MetricCard
-            label="Click-through rate"
+            label="Click-Through Rate"
             value={formatClickThroughRate(campaign.clickThroughRate)}
             subtext={
               hasActivity
-                ? "Of customers sent"
-                : "No clicks yet"
+                ? "Of Customers Sent"
+                : "No Clicks Yet"
             }
             icon={Percent}
           />
@@ -122,7 +122,7 @@ export function CampaignDetailsTab({
 
       <section className="space-y-4">
         <div>
-          <h2 className="text-sm font-semibold">Campaign info</h2>
+          <h2 className="text-sm font-semibold">Campaign Info</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Configuration and scheduling metadata.
           </p>
@@ -131,25 +131,25 @@ export function CampaignDetailsTab({
         <dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <DetailField label="Dealer" value={campaign.dealer} />
           <DetailField
-            label="Time zone"
+            label="Time Zone"
             value={getTimeZoneLabel(campaign.timeZone)}
           />
           <DetailField label="Group" value={campaign.group} />
           <DetailField
-            label="Messages sent"
+            label="Messages Sent"
             value={formatMessageCount(campaign.messages)}
           />
-          <DetailField label="Created by" value={campaign.createdBy.name} />
+          <DetailField label="Created By" value={campaign.createdBy.name} />
           <DetailField
             label="Created"
             value={formatTimestamp(campaign.createdAt)}
           />
           <DetailField
-            label="Last updated"
+            label="Last Updated"
             value={formatTimestamp(campaign.lastUpdatedAt)}
           />
           <DetailField
-            label="Next data refresh"
+            label="Next Data Refresh"
             value={formatTimestamp(campaign.nextUpdateAt)}
           />
         </dl>

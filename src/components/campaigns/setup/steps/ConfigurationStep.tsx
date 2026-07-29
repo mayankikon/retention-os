@@ -19,6 +19,7 @@ import {
   getOemMakes,
   getOemModelsForMake,
   getOemServiceSchedule,
+  getOemTrimsForMakeModel,
   MILEAGE_SERVICE_TRIGGER_OPTIONS,
   SERVICE_TRIGGER_MODE_OPTIONS,
   TIME_SERVICE_TRIGGER_OPTIONS,
@@ -33,7 +34,7 @@ import type {
   ScheduleDay,
   ServiceTriggerMode,
 } from "@/types/campaign-setup";
-import { SCHEDULE_DAYS } from "@/types/campaign-setup";
+import { OEM_AUDIENCE_ATTRIBUTES, SCHEDULE_DAYS } from "@/types/campaign-setup";
 import { cn } from "@/lib/utils";
 
 interface ConfigurationStepProps {
@@ -49,6 +50,10 @@ export function ConfigurationStep({
 }: ConfigurationStepProps) {
   const serviceTriggerMode = getServiceTriggerMode(draft);
   const oemModels = draft.oemMake ? getOemModelsForMake(draft.oemMake) : [];
+  const oemTrims =
+    draft.oemMake && draft.oemModel
+      ? getOemTrimsForMakeModel(draft.oemMake, draft.oemModel)
+      : [];
   const oemSchedule =
     draft.oemMake && draft.oemModel
       ? getOemServiceSchedule(draft.oemMake, draft.oemModel)
@@ -74,7 +79,7 @@ export function ConfigurationStep({
   return (
     <div className="space-y-6">
       <FormField
-        label="Service triggers"
+        label="Service Triggers"
         error={serviceTriggerError}
         hint="Choose time and mileage intervals or an OEM schedule, then optionally narrow the audience."
         required
@@ -173,7 +178,7 @@ export function ConfigurationStep({
 
                     <div className="border-t border-border pt-4">
                       <p className="mb-3 text-sm font-medium text-foreground">
-                        Audience query
+                        Audience Query
                       </p>
                       <AudienceFilters
                         draft={draft}
@@ -187,7 +192,7 @@ export function ConfigurationStep({
 
                 {isSelected && option.value === "oem" ? (
                   <div className="mt-3 space-y-4 pl-7">
-                    <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="grid gap-4 sm:grid-cols-3">
                       <FormField
                         label="Make"
                         htmlFor="oemMake"
@@ -198,7 +203,11 @@ export function ConfigurationStep({
                           value={draft.oemMake || null}
                           onValueChange={(value) => {
                             if (value == null) return;
-                            onChange({ oemMake: value, oemModel: "" });
+                            onChange({
+                              oemMake: value,
+                              oemModel: "",
+                              oemTrim: "",
+                            });
                           }}
                           items={getOemMakes().map((make) => ({
                             value: make,
@@ -206,7 +215,7 @@ export function ConfigurationStep({
                           }))}
                         >
                           <SelectTrigger id="oemMake">
-                            <SelectValue placeholder="Select make" />
+                            <SelectValue placeholder="Select Make" />
                           </SelectTrigger>
                           <SelectContent>
                             {getOemMakes().map((make) => (
@@ -228,7 +237,7 @@ export function ConfigurationStep({
                           value={draft.oemModel || null}
                           onValueChange={(value) => {
                             if (value == null) return;
-                            onChange({ oemModel: value });
+                            onChange({ oemModel: value, oemTrim: "" });
                           }}
                           disabled={!draft.oemMake}
                           items={oemModels.map((model) => ({
@@ -240,8 +249,8 @@ export function ConfigurationStep({
                             <SelectValue
                               placeholder={
                                 draft.oemMake
-                                  ? "Select model"
-                                  : "Choose make first"
+                                  ? "Select Model"
+                                  : "Choose Make First"
                               }
                             />
                           </SelectTrigger>
@@ -254,13 +263,50 @@ export function ConfigurationStep({
                           </SelectContent>
                         </Select>
                       </FormField>
+
+                      <FormField label="Trim" htmlFor="oemTrim">
+                        <Select
+                          value={draft.oemTrim || null}
+                          onValueChange={(value) => {
+                            if (value == null) return;
+                            onChange({ oemTrim: value });
+                          }}
+                          disabled={!draft.oemMake || !draft.oemModel}
+                          items={oemTrims.map((trim) => ({
+                            value: trim,
+                            label: trim,
+                          }))}
+                        >
+                          <SelectTrigger id="oemTrim">
+                            <SelectValue
+                              placeholder={
+                                draft.oemMake && draft.oemModel
+                                  ? "Select Trim"
+                                  : "Choose Model First"
+                              }
+                            />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {oemTrims.map((trim) => (
+                              <SelectItem key={trim} value={trim}>
+                                {trim}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FormField>
                     </div>
 
                     {oemSchedule ? (
                       <div className="rounded-md border border-border bg-background p-3 text-sm">
                         <p className="font-medium text-foreground">
-                          {oemSchedule.make} {oemSchedule.model} OEM schedule
+                          {oemSchedule.make} {oemSchedule.model} OEM Schedule
                         </p>
+                        {draft.oemTrim ? (
+                          <p className="mt-1 text-sm text-muted-foreground">
+                            Scoped to {draft.oemTrim}
+                          </p>
+                        ) : null}
                         <p className="mt-1 text-muted-foreground">
                           Trigger: every{" "}
                           {oemSchedule.intervalMiles.toLocaleString("en-US")} miles or{" "}
@@ -271,13 +317,22 @@ export function ConfigurationStep({
 
                     <div className="border-t border-border pt-4">
                       <p className="mb-3 text-sm font-medium text-foreground">
-                        Audience query
+                        Audience Query
                       </p>
+                      {draft.oemMake && draft.oemModel ? (
+                        <p className="mb-3 text-xs text-muted-foreground">
+                          Vehicle Scope: {draft.oemMake} {draft.oemModel}
+                          {draft.oemTrim
+                            ? ` · ${draft.oemTrim}`
+                            : " · All Trims"}
+                        </p>
+                      ) : null}
                       <AudienceFilters
                         draft={draft}
                         errors={errors}
                         onChange={onChange}
                         embedded
+                        allowedAttributes={OEM_AUDIENCE_ATTRIBUTES}
                       />
                     </div>
                   </div>
@@ -289,7 +344,7 @@ export function ConfigurationStep({
       </FormField>
 
       <FormField
-        label="Define schedule"
+        label="Define Schedule"
         error={errors.scheduleDays}
         hint="Always Monday–Saturday. Times follow dealership time zone (Campaign Manager uses CST)."
         required

@@ -21,7 +21,7 @@ Standard Operating Procedure for Campaign Setup in Smart Marketing Campaign Mana
 ## Defaults (from SOP)
 
 - Primary promo and Reminder 1/2 copy: `src/data/campaign-setup.defaults.ts`
-- Service triggers: interval (time + mileage), OEM make/model, or audience query with vehicle/location/purchase filters (`src/data/service-triggers.ts`, `src/data/audience-attributes.ts`); default interval mode with time preset 180 days / 5,000 miles and mileage preset 2,000 miles
+- Service triggers: interval (time + mileage) with optional audience Make/Model/Trim; OEM make/model with optional trim (empty trim = all trims); OEM audience query excludes Make/Model/Trim and offers year, zip, city, purchase date, and odometer (`src/data/service-triggers.ts`, `src/data/audience-attributes.ts`); default interval mode with time preset 180 days and mileage preset 2,000 miles
 - Campaign type: Predefined (only supported type in wizard)
 - Schedule days: Monday–Saturday
 

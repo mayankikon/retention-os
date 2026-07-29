@@ -9,6 +9,7 @@ import {
 } from "@/data/audience-attributes";
 import {
   syncModelRulesAfterMakeChange,
+  syncTrimRulesAfterModelChange,
   validatePurchaseDateRangeRule,
 } from "@/lib/audience-filters";
 
@@ -28,16 +29,34 @@ describe("vehicle make and model options", () => {
     expect(isModelValidForMake("Honda", "Civic")).toBe(true);
   });
 
-  it("clears invalid model rules when make changes", () => {
+  it("clears invalid model and trim rules when make changes", () => {
     const next = syncModelRulesAfterMakeChange(
       [
         { id: "a", attribute: "vehicleMake", value: "Toyota" },
         { id: "b", attribute: "vehicleModel", value: "Corolla" },
+        { id: "c", attribute: "vehicleTrim", value: "SE" },
       ],
       "Honda",
     );
 
     expect(next[1]?.value).toBe("");
+    expect(next[2]?.value).toBe("");
+  });
+});
+
+describe("vehicle trim sync", () => {
+  it("clears invalid trim when model changes", () => {
+    const next = syncTrimRulesAfterModelChange(
+      [
+        { id: "a", attribute: "vehicleMake", value: "Toyota" },
+        { id: "b", attribute: "vehicleModel", value: "Camry" },
+        { id: "c", attribute: "vehicleTrim", value: "Prime SE" },
+      ],
+      "Toyota",
+      "Camry",
+    );
+
+    expect(next[2]?.value).toBe("");
   });
 });
 

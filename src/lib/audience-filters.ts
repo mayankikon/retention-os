@@ -4,6 +4,7 @@ import {
   isModelValidForMake,
   isPurchaseDateRangeComplete,
   isPurchaseDateRangeValid,
+  isTrimValidForMakeModel,
   parseDateRange,
   serializeDateRange,
 } from "@/data/audience-attributes";
@@ -37,6 +38,15 @@ export function getSelectedMakeFromRules(
   return makeRule?.value.trim();
 }
 
+export function getSelectedModelFromRules(
+  rules: AudienceFilterRule[],
+): string | undefined {
+  const modelRule = rules.find(
+    (rule) => rule.attribute === "vehicleModel" && isRuleComplete(rule),
+  );
+  return modelRule?.value.trim();
+}
+
 /** Stable, order-independent hash of a string for deterministic value nudges. */
 function hashString(value: string): number {
   let hash = 0;
@@ -53,6 +63,7 @@ function baseShrinkFactor(rule: AudienceFilterRule): number {
       return 0.45;
     case "vehicleYear":
     case "vehicleModel":
+    case "vehicleTrim":
     case "customerCity":
       return 0.5;
     case "vehiclePurchaseDate":
@@ -108,6 +119,26 @@ export function syncModelRulesAfterMakeChange(
       rule.attribute === "vehicleModel" &&
       rule.value &&
       !isModelValidForMake(makeValue, rule.value)
+    ) {
+      return { ...rule, value: "" };
+    }
+    if (rule.attribute === "vehicleTrim" && rule.value) {
+      return { ...rule, value: "" };
+    }
+    return rule;
+  });
+}
+
+export function syncTrimRulesAfterModelChange(
+  rules: AudienceFilterRule[],
+  makeValue: string | undefined,
+  modelValue: string,
+): AudienceFilterRule[] {
+  return rules.map((rule) => {
+    if (
+      rule.attribute === "vehicleTrim" &&
+      rule.value &&
+      (!makeValue || !isTrimValidForMakeModel(makeValue, modelValue, rule.value))
     ) {
       return { ...rule, value: "" };
     }

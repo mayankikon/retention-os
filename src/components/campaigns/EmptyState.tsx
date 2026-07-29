@@ -17,24 +17,24 @@ const EMPTY_STATE_CONFIG: Record<
 > = {
   noData: {
     icon: Inbox,
-    title: "No campaigns yet",
+    title: "No Campaigns Yet",
     description:
       "Create your first campaign to start reaching customers. Campaigns will appear here once they are set up.",
     actionLabel: "Create Campaign",
   },
   noSearchResults: {
     icon: FileSearch,
-    title: "No campaigns match your search",
+    title: "No Campaigns Match Your Search",
     description:
       "Try adjusting your search term or clearing filters to see more results.",
-    actionLabel: "Clear search",
+    actionLabel: "Clear Search",
   },
   filteredZero: {
     icon: FilterX,
-    title: "No campaigns match these filters",
+    title: "No Campaigns Match These Filters",
     description:
       "Broaden your dealership, time zone, or status filters to find matching campaigns.",
-    actionLabel: "Clear all filters",
+    actionLabel: "Clear All Filters",
   },
 };
 

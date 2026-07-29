@@ -13,12 +13,12 @@ describe("service triggers", () => {
     const draft = createDefaultSetupDraft();
     expect(draft.serviceTriggerMode).toBe("interval");
     expect(draft.serviceTriggerTypes).toEqual(["time", "mileage"]);
-    expect(draft.timeServiceTriggerPreset).toBe("180_days_5000_mile");
+    expect(draft.timeServiceTriggerPreset).toBe("180_days");
     expect(getServiceTriggerSummary(draft)).toContain(
-      "Time Interval: 180 days / 5,000 miles (SOP default)",
+      "Time Interval: 180 Days",
     );
     expect(getServiceTriggerSummary(draft)).toContain(
-      "Mileage Interval: 2,000 miles",
+      "Mileage Interval: 2,000 Miles",
     );
   });
 
@@ -32,9 +32,9 @@ describe("service triggers", () => {
     expect(intervalDraft.serviceTriggerMode).toBe("interval");
     expect(intervalDraft.serviceTriggerTypes).toEqual(["time", "mileage"]);
     expect(getServiceTriggerSummaries(intervalDraft)).toEqual([
-      "Time Interval: 180 days / 5,000 miles (SOP default)",
-      "Mileage Interval: 2,000 miles",
-      "Audience Query: No filters added",
+      "Time Interval: 180 Days",
+      "Mileage Interval: 2,000 Miles",
+      "Audience Query: No Filters Added",
     ]);
   });
 
@@ -72,7 +72,7 @@ describe("service triggers", () => {
     };
 
     expect(getServiceTriggerSummary(draft)).toContain(
-      "OEM-Recommended Service Schedule: Toyota RAV4 — 10,000 mi / 12 months",
+      "OEM-Recommended Service Schedule: Toyota RAV4 — 10,000 mi / 12 Months",
     );
     expect(validateServiceTriggerFields(draft)).toEqual({});
   });
@@ -83,6 +83,7 @@ describe("service triggers", () => {
       ...setServiceTriggerMode(createDefaultSetupDraft(), "oem"),
       oemMake: "Toyota",
       oemModel: "RAV4",
+      oemTrim: "XLE",
     };
 
     const intervalDraft = {
@@ -92,7 +93,43 @@ describe("service triggers", () => {
 
     expect(intervalDraft.oemMake).toBe("");
     expect(intervalDraft.oemModel).toBe("");
+    expect(intervalDraft.oemTrim).toBe("");
     expect(intervalDraft.serviceTriggerTypes).toEqual(["time", "mileage"]);
+  });
+
+  it("strips make, model, and trim audience filters when switching to OEM mode", () => {
+    const draft = {
+      ...createDefaultSetupDraft(),
+      audienceFilters: [
+        { id: "a", attribute: "vehicleMake" as const, value: "Toyota" },
+        { id: "b", attribute: "vehicleModel" as const, value: "Corolla" },
+        { id: "c", attribute: "vehicleTrim" as const, value: "SE" },
+        { id: "d", attribute: "customerCity" as const, value: "Dallas" },
+      ],
+    };
+
+    const oemDraft = {
+      ...draft,
+      ...setServiceTriggerMode(draft, "oem"),
+    };
+
+    expect(oemDraft.audienceFilters).toEqual([
+      { id: "d", attribute: "customerCity", value: "Dallas" },
+    ]);
+  });
+
+  it("includes optional OEM trim in the schedule summary", () => {
+    const draft = {
+      ...createDefaultSetupDraft(),
+      ...setServiceTriggerMode(createDefaultSetupDraft(), "oem"),
+      oemMake: "Toyota",
+      oemModel: "RAV4",
+      oemTrim: "XLE",
+    };
+
+    expect(getServiceTriggerSummary(draft)).toContain(
+      "OEM-Recommended Service Schedule: Toyota RAV4 XLE — 10,000 mi / 12 Months",
+    );
   });
 
   it("nests audience query filters under interval or OEM", () => {
@@ -107,8 +144,8 @@ describe("service triggers", () => {
 
     expect(getServiceTriggerMode(draft)).toBe("interval");
     expect(getServiceTriggerSummaries(draft)).toEqual([
-      "Time Interval: 180 days / 5,000 miles (SOP default)",
-      "Mileage Interval: 2,000 miles",
+      "Time Interval: 180 Days",
+      "Mileage Interval: 2,000 Miles",
       "Audience Query · Make: Toyota",
       "Audience Query · Model: Corolla",
     ]);
