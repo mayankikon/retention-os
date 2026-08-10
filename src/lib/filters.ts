@@ -1,4 +1,4 @@
-import { FILTER_ALL } from "@/data/lookups";
+import { FILTER_ALL, getDealerGroup } from "@/data/lookups";
 import {
   DEFAULT_PAGE_SIZE,
   type Campaign,
@@ -17,6 +17,7 @@ export interface SelectCampaignsResult {
 export function hasActiveFilters(filters: CampaignFilters): boolean {
   return Boolean(
     filters.q.trim() ||
+      (filters.group && filters.group !== FILTER_ALL) ||
       (filters.dealer && filters.dealer !== FILTER_ALL) ||
       (filters.timeZone && filters.timeZone !== FILTER_ALL) ||
       (filters.status && filters.status !== FILTER_ALL),
@@ -37,6 +38,14 @@ export function filterCampaigns(
       filters.dealer &&
       filters.dealer !== FILTER_ALL &&
       campaign.dealer !== filters.dealer
+    ) {
+      return false;
+    }
+    if (
+      filters.group &&
+      filters.group !== FILTER_ALL &&
+      (!filters.dealer || filters.dealer === FILTER_ALL) &&
+      getDealerGroup(campaign.dealer) !== filters.group
     ) {
       return false;
     }

@@ -1,6 +1,7 @@
 import type { Campaign, CampaignStatus } from "@/types/campaign";
 import type { CampaignSetupDraft } from "@/types/campaign-setup";
 import type { AppUser } from "@/types/user";
+import { getDealerGroup } from "@/data/lookups";
 
 function resolveDealer(subfleets: string[]): string {
   if (subfleets.length === 0) return "Unassigned";
@@ -9,7 +10,7 @@ function resolveDealer(subfleets: string[]): string {
 }
 
 export interface CreateCampaignFromDraftOptions {
-  status?: Extract<CampaignStatus, "draft" | "scheduled" | "active">;
+  status?: Extract<CampaignStatus, "draft" | "active">;
   scheduledActivateAt?: string | null;
 }
 
@@ -37,11 +38,12 @@ export function createCampaignFromDraft(
       initials: user.initials,
     },
     createdAt: now.toISOString(),
-    group: draft.subfleets[0] ?? "General",
+    group:
+      draft.groupId ||
+      (draft.subfleets[0] ? getDealerGroup(draft.subfleets[0]) : "General"),
     lastUpdatedAt: now.toISOString(),
     nextUpdateAt: nextHour.toISOString(),
     messageTemplateId: draft.messageTemplateId,
-    scheduledActivateAt:
-      status === "scheduled" ? (options.scheduledActivateAt ?? null) : null,
+    scheduledActivateAt: options.scheduledActivateAt ?? null,
   };
 }

@@ -11,6 +11,7 @@ Query parameters (mirror URL state):
 | Param | Type | Description |
 |-------|------|-------------|
 | `q` | string | Search by campaign name |
+| `group` | string | Dealer group filter (`all` = no filter); cascades dealer options |
 | `dealer` | string | Dealership filter (`all` = no filter) |
 | `timeZone` | string | `CST` \| `EST` \| `PST` \| `MST` \| `all` |
 | `status` | string | Campaign status \| `all` |
@@ -34,7 +35,7 @@ Query parameters (mirror URL state):
 }
 ```
 
-**Campaign object** — see `src/types/campaign.ts` (`createdBy` includes `id`, `name`, `initials`; `createdAt` ISO timestamp; `clickThroughRate` percentage 0–100 for list display; statuses: scheduled, active, paused, stopped, completed, draft).
+**Campaign object** — see `src/types/campaign.ts` (`createdBy` includes `id`, `name`, `initials`; `createdAt` ISO timestamp; `clickThroughRate` percentage 0–100 for list display; statuses: draft, active, paused, completed, archived; optional `scheduledActivateAt` for future go-live while status remains draft).
 
 **POST /campaigns** (proposed) — create from setup wizard; `createdBy` and `createdAt` set server-side from session.
 

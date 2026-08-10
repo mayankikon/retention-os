@@ -4,7 +4,7 @@ import {
   Button,
 } from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
 
-import { Pause, Play, Square } from "lucide-react";
+import { Pause, Play } from "lucide-react";
 import { CampaignStatusBadge } from "@/components/campaigns/CampaignStatusBadge";
 import { TitleBar } from "@/components/layout/TitleBar";
 import { updateCampaignStatus } from "@/lib/campaign-store";
@@ -15,12 +15,8 @@ interface CampaignDetailHeaderProps {
 }
 
 export function CampaignDetailHeader({ campaign }: CampaignDetailHeaderProps) {
-  const canPause = campaign.status === "active" || campaign.status === "scheduled";
+  const canPause = campaign.status === "active";
   const canResume = campaign.status === "paused";
-  const canStop =
-    campaign.status === "active" ||
-    campaign.status === "paused" ||
-    campaign.status === "scheduled";
 
   const handleStatusChange = (status: CampaignStatus) => {
     updateCampaignStatus(campaign.id, status);
@@ -55,17 +51,6 @@ export function CampaignDetailHeader({ campaign }: CampaignDetailHeaderProps) {
               onClick={() => handleStatusChange("active")}
             >
               Resume
-            </Button>
-          ) : null}
-          {canStop ? (
-            <Button
-              type="button"
-              variant="secondary"
-              size="header"
-              leadingIcon={<Square aria-hidden />}
-              onClick={() => handleStatusChange("stopped")}
-            >
-              Stop
             </Button>
           ) : null}
         </div>

@@ -24,6 +24,12 @@ describe("getPreviewSenderName", () => {
     expect(getPreviewSenderName(["ABC Motors"], "")).toBe("ABC Motors");
   });
 
+  it("uses the first selected dealership when multiple are selected", () => {
+    expect(
+      getPreviewSenderName(["Ikon Motors North", "Ikon Motors South"], ""),
+    ).toBe("Ikon Motors North");
+  });
+
   it("falls back to campaign name segment", () => {
     expect(
       getPreviewSenderName([], "SM ABC Motors CST Oil Change"),

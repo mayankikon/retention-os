@@ -106,8 +106,22 @@ export interface CampaignSetupDraft {
   oemMake: string;
   oemModel: string;
   oemTrim: string;
+  /** Dealer group selected on General (Next Gen terminology). */
+  groupId: string;
+  /**
+   * Selected dealerships under `groupId`.
+   * Kept as `subfleets` for historical draft field naming in this prototype.
+   */
   subfleets: string[];
+  /**
+   * Per-dealership timezone overrides when lookup data has no known TZ.
+   * Keys are dealership names.
+   */
+  timezoneOverrides: Partial<Record<string, SetupTimeZone>>;
   scheduleDays: ScheduleDay[];
+  /** Optional local send clock time (HH:mm). Null/empty = use SOP table guidance only. */
+  sendTimeLocal: string | null;
+  /** Primary timezone for schedule display (first selected dealership). */
   timeZone: SetupTimeZone;
   testPhoneNumber: string;
   suppressionListFileName: string | null;

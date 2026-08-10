@@ -9,13 +9,16 @@ import {
   buttonVariants,
 } from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Braces } from "lucide-react";
+import { AddMessageVariableDialog } from "@/components/campaigns/setup/AddMessageVariableDialog";
 import { FormField } from "@/components/campaigns/setup/FormField";
 import { OptionalImageUpload } from "@/components/campaigns/setup/OptionalImageUpload";
 import { TemplateWizardStepper } from "@/components/templates/TemplateWizardStepper";
 import { useCurrentUser } from "@/contexts/session-context";
+import { insertTextAtCursor } from "@/lib/insert-text-at-cursor";
 import {
   createEmptyTemplateDraft,
   createTemplate,
@@ -229,6 +232,31 @@ function ContentStep({
   errors: Record<string, string>;
   onChange: (patch: Partial<TemplateDraft>) => void;
 }) {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [isVariableDialogOpen, setIsVariableDialogOpen] = useState(false);
+
+  const handleInsertVariable = (token: string) => {
+    const textarea = textareaRef.current;
+    const selectionStart =
+      textarea?.selectionStart ?? draft.primaryPromoText.length;
+    const selectionEnd = textarea?.selectionEnd ?? selectionStart;
+
+    const { value, cursorPosition } = insertTextAtCursor(
+      draft.primaryPromoText,
+      selectionStart,
+      selectionEnd,
+      token,
+    );
+
+    onChange({ primaryPromoText: value });
+
+    requestAnimationFrame(() => {
+      if (!textarea) return;
+      textarea.focus();
+      textarea.setSelectionRange(cursorPosition, cursorPosition);
+    });
+  };
+
   return (
     <div className="space-y-6">
       <FormField
@@ -237,14 +265,31 @@ function ContentStep({
         required
         error={errors.primaryPromoText}
       >
-        <Textarea
-          id="primaryPromoText"
-          value={draft.primaryPromoText}
-          onChange={(e) => onChange({ primaryPromoText: e.target.value })}
-          rows={5}
-          aria-invalid={Boolean(errors.primaryPromoText)}
-        />
+        <div className="space-y-2">
+          <Textarea
+            ref={textareaRef}
+            id="primaryPromoText"
+            value={draft.primaryPromoText}
+            onChange={(e) => onChange({ primaryPromoText: e.target.value })}
+            rows={5}
+            aria-invalid={Boolean(errors.primaryPromoText)}
+          />
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            onClick={() => setIsVariableDialogOpen(true)}
+          >
+            <Braces className="mr-2 h-4 w-4" />
+            Add variables
+          </Button>
+        </div>
       </FormField>
+      <AddMessageVariableDialog
+        open={isVariableDialogOpen}
+        onOpenChange={setIsVariableDialogOpen}
+        onSelectVariable={handleInsertVariable}
+      />
       <FormField label="Dealer URL" htmlFor="dealerUrl" hint="Optional.">
         <Input
           id="dealerUrl"

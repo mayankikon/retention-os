@@ -11,6 +11,7 @@ import {
 
 import { AudienceFilters } from "@/components/campaigns/setup/AudienceFilters";
 import { FormField } from "@/components/campaigns/setup/FormField";
+import { SendTimeField } from "@/components/campaigns/setup/SendTimeField";
 import {
   getTimeZoneLabel,
   TIME_ZONE_SCHEDULE_REFERENCE,
@@ -25,6 +26,7 @@ import {
   TIME_SERVICE_TRIGGER_OPTIONS,
 } from "@/data/service-triggers";
 import { CONFIGURATION_DAY_LABELS } from "@/lib/format-schedule";
+import { formatSendTimeLabel } from "@/lib/send-time";
 import {
   getServiceTriggerMode,
   setServiceTriggerMode,
@@ -345,8 +347,8 @@ export function ConfigurationStep({
 
       <FormField
         label="Define Schedule"
-        error={errors.scheduleDays}
-        hint="Always Monday–Saturday. Times follow dealership time zone (Campaign Manager uses CST)."
+        error={errors.scheduleDays ?? errors.sendTimeLocal}
+        hint="Always Monday–Saturday. Optional send time uses the primary dealership time zone from General."
         required
       >
         <div className="mb-3 flex flex-wrap gap-2">
@@ -371,9 +373,27 @@ export function ConfigurationStep({
           </span>
           <span className="text-muted-foreground">
             {" "}
-            (selected on the General step)
+            (primary dealership from the General step)
           </span>
         </p>
+
+        <FormField
+          label="Send Time (optional)"
+          htmlFor="sendTimeLocal"
+          hint={
+            draft.sendTimeLocal
+              ? `Sends at ${formatSendTimeLabel(draft.sendTimeLocal)} ${getTimeZoneLabel(draft.timeZone)}. Clear it to follow the SOP lunch windows below.`
+              : "Leave blank to follow the SOP lunch windows below, or pick a local clock time to pin an exact send hour."
+          }
+          error={errors.sendTimeLocal}
+        >
+          <SendTimeField
+            id="sendTimeLocal"
+            value={draft.sendTimeLocal}
+            onChange={(sendTimeLocal) => onChange({ sendTimeLocal })}
+            hasError={Boolean(errors.sendTimeLocal)}
+          />
+        </FormField>
 
         <div className="mt-4 overflow-x-auto rounded-md border border-border">
           <table className="w-full text-xs">

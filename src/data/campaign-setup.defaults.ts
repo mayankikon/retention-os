@@ -14,7 +14,7 @@ export const SETUP_STEP_META: SetupStepMeta[] = [
   {
     id: "general",
     label: "General",
-    description: "Dealership, name, and time zone",
+    description: "Group, dealerships, and campaign name",
   },
   {
     id: "messaging",
@@ -125,8 +125,11 @@ export function createDefaultSetupDraft(): CampaignSetupDraft {
     oemMake: "",
     oemModel: "",
     oemTrim: "",
+    groupId: "",
     subfleets: [],
+    timezoneOverrides: {},
     scheduleDays: [...SCHEDULE_DAYS],
+    sendTimeLocal: null,
     timeZone: "CST",
     testPhoneNumber: "",
     suppressionListFileName: null,

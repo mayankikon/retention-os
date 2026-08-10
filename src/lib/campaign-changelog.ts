@@ -3,11 +3,10 @@ import type { CampaignChangelogEntry } from "@/types/campaign-detail";
 
 const STATUS_LABELS: Record<CampaignStatus, string> = {
   draft: "Draft",
-  scheduled: "Scheduled",
   active: "Active",
   paused: "Paused",
-  stopped: "Stopped",
   completed: "Completed",
+  archived: "Archived",
 };
 
 function hoursAfter(iso: string, hours: number): string {
@@ -52,7 +51,7 @@ export function buildCampaignChangelog(
     },
   ];
 
-  if (campaign.status !== "draft") {
+  if (campaign.status !== "draft" && campaign.status !== "archived") {
     entries.push({
       id: `${campaign.id}-message-configured`,
       timestamp: hoursAfter(campaign.createdAt, 2),
@@ -64,26 +63,8 @@ export function buildCampaignChangelog(
   }
 
   if (
-    campaign.status === "scheduled" ||
     campaign.status === "active" ||
     campaign.status === "paused" ||
-    campaign.status === "stopped" ||
-    campaign.status === "completed"
-  ) {
-    entries.push(
-      buildStatusEntry(
-        campaign,
-        "scheduled",
-        hoursBefore(campaign.lastUpdatedAt, 12),
-        "Campaign scheduled",
-      ),
-    );
-  }
-
-  if (
-    campaign.status === "active" ||
-    campaign.status === "paused" ||
-    campaign.status === "stopped" ||
     campaign.status === "completed"
   ) {
     entries.push({
@@ -107,17 +88,6 @@ export function buildCampaignChangelog(
     });
   }
 
-  if (campaign.status === "stopped") {
-    entries.push({
-      id: `${campaign.id}-stopped`,
-      timestamp: campaign.lastUpdatedAt,
-      actor: campaign.createdBy,
-      action: "stopped",
-      summary: "Campaign stopped",
-      details: "No further messages will be sent for this campaign.",
-    });
-  }
-
   if (campaign.status === "completed") {
     entries.push({
       id: `${campaign.id}-completed`,
@@ -127,6 +97,17 @@ export function buildCampaignChangelog(
       summary: "Campaign completed",
       details: "All scheduled sends have finished.",
     });
+  }
+
+  if (campaign.status === "archived") {
+    entries.push(
+      buildStatusEntry(
+        campaign,
+        "archived",
+        campaign.lastUpdatedAt,
+        "Campaign archived",
+      ),
+    );
   }
 
   if (campaign.lastUpdatedAt !== campaign.createdAt) {

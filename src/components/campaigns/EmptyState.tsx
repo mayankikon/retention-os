@@ -33,7 +33,7 @@ const EMPTY_STATE_CONFIG: Record<
     icon: FilterX,
     title: "No Campaigns Match These Filters",
     description:
-      "Broaden your dealership, time zone, or status filters to find matching campaigns.",
+      "Broaden your time zone or status filters to see more results, or reset the dealership scope above.",
     actionLabel: "Clear All Filters",
   },
 };

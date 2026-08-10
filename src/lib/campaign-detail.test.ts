@@ -5,11 +5,11 @@ import { buildCampaignChangelog } from "@/lib/campaign-changelog";
 import { findCampaignById } from "@/lib/campaign-lookup";
 
 describe("campaign analytics", () => {
-  it("returns zeros for scheduled campaigns with no sends", () => {
-    const scheduled = mockCampaigns.find((c) => c.status === "scheduled");
-    expect(scheduled).toBeDefined();
+  it("returns zeros for draft campaigns with no sends", () => {
+    const draft = mockCampaigns.find((c) => c.status === "draft");
+    expect(draft).toBeDefined();
 
-    const analytics = getCampaignAnalytics(scheduled!);
+    const analytics = getCampaignAnalytics(draft!);
     expect(analytics).toEqual({
       recipientsSent: 0,
       openedCount: 0,

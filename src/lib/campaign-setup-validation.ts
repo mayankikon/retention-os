@@ -1,4 +1,5 @@
 import type { CampaignSetupDraft, SetupStepId } from "@/types/campaign-setup";
+import { getKnownDealerTimeZone } from "@/data/lookups";
 import { validateServiceTriggerFields } from "@/lib/service-triggers";
 import { validateDeliveryChannels } from "@/lib/delivery-channels";
 
@@ -20,12 +21,22 @@ export function validateGeneralStep(
     errors.campaignName = "Campaign name is required.";
   }
 
-  if (draft.subfleets.length === 0 || !hasText(draft.subfleets[0] ?? "")) {
-    errors.dealership = "Select a dealership.";
+  if (!hasText(draft.groupId)) {
+    errors.groupId = "Select a group.";
   }
 
-  if (!draft.timeZone) {
-    errors.timeZone = "Select a dealership time zone.";
+  if (draft.subfleets.length === 0) {
+    errors.dealership = "Select at least one dealership.";
+  }
+
+  for (const dealer of draft.subfleets) {
+    if (
+      !getKnownDealerTimeZone(dealer) &&
+      !draft.timezoneOverrides[dealer]
+    ) {
+      errors[`timezone.${dealer}`] =
+        "Select a timezone for this dealership.";
+    }
   }
 
   return { isValid: Object.keys(errors).length === 0, errors };
@@ -74,7 +85,15 @@ export function validateConfigurationStep(
     errors.scheduleDays = "Schedule must include Monday through Saturday.";
   }
 
+  if (draft.sendTimeLocal && !isValidSendTimeLocal(draft.sendTimeLocal)) {
+    errors.sendTimeLocal = "Enter send time as HH:mm (24-hour).";
+  }
+
   return { isValid: Object.keys(errors).length === 0, errors };
+}
+
+function isValidSendTimeLocal(value: string): boolean {
+  return /^([01]\d|2[0-3]):[0-5]\d$/.test(value.trim());
 }
 
 export function validateAudienceStep(

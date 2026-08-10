@@ -21,11 +21,9 @@ export function getPreviewSenderName(
   subfleets: string[],
   campaignName: string,
 ): string {
-  if (subfleets.length === 1) {
+  // Spec: multi-dealership preview uses the first selected dealership.
+  if (subfleets.length >= 1) {
     return subfleets[0];
-  }
-  if (subfleets.length > 1) {
-    return "Your dealership";
   }
 
   const nameMatch = campaignName.match(/SM\s+(.+?)\s+(?:CST|EST|PST|MST)/i);

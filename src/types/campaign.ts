@@ -1,10 +1,9 @@
 export const CAMPAIGN_STATUSES = [
-  "scheduled",
+  "draft",
   "active",
   "paused",
-  "stopped",
   "completed",
-  "draft",
+  "archived",
 ] as const;
 
 export type CampaignStatus = (typeof CAMPAIGN_STATUSES)[number];
@@ -35,12 +34,16 @@ export interface Campaign {
   nextUpdateAt: string;
   /** Linked message template id when created from a managed template. */
   messageTemplateId?: string | null;
-  /** ISO date when a scheduled campaign should activate. */
+  /**
+   * ISO date when a draft campaign should activate.
+   * Future start is a date field — not a separate status.
+   */
   scheduledActivateAt?: string | null;
 }
 
 export interface CampaignFilters {
   q: string;
+  group: string;
   dealer: string;
   timeZone: string;
   status: string;

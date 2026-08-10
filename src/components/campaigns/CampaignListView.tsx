@@ -7,6 +7,7 @@ import { DesignSystemTableShellNoTabs } from "@ikontechnologies-arlington/nxtg-d
 import { CampaignFilters } from "@/components/campaigns/CampaignFilters";
 import { CampaignListHeader } from "@/components/campaigns/CampaignListHeader";
 import { CampaignTable } from "@/components/campaigns/CampaignTable";
+import { DealershipScopeBar } from "@/components/campaigns/DealershipScopeBar";
 import { EmptyState } from "@/components/campaigns/EmptyState";
 import { PaginationBar } from "@/components/campaigns/PaginationBar";
 import { FILTER_ALL } from "@/data/lookups";
@@ -23,6 +24,7 @@ import { useCampaigns } from "@/hooks/use-campaigns";
 
 const listParsers = {
   q: parseAsString.withDefault(""),
+  group: parseAsString.withDefault(FILTER_ALL),
   dealer: parseAsString.withDefault(FILTER_ALL),
   timeZone: parseAsString.withDefault(FILTER_ALL),
   status: parseAsString.withDefault(FILTER_ALL),
@@ -34,7 +36,7 @@ function flashCopy(message: CampaignFlashMessage): string {
     case "activated":
       return `${message.campaignName} is now active.`;
     case "scheduled":
-      return `${message.campaignName} is scheduled${message.detail ? ` · ${message.detail}` : ""}.`;
+      return `${message.campaignName} will activate on the selected date${message.detail ? ` · ${message.detail}` : ""}.`;
     case "draft":
       return `${message.campaignName} saved as a draft.`;
     default:
@@ -53,6 +55,7 @@ export function CampaignListView() {
 
   const result = selectCampaigns(campaigns, {
     q: filters.q,
+    group: filters.group,
     dealer: filters.dealer,
     timeZone: filters.timeZone,
     status: filters.status,
@@ -64,6 +67,7 @@ export function CampaignListView() {
     result.total,
     {
       q: filters.q,
+      group: filters.group,
       dealer: filters.dealer,
       timeZone: filters.timeZone,
       status: filters.status,
@@ -74,6 +78,7 @@ export function CampaignListView() {
   const handleResetFilters = () => {
     void setFilters({
       q: "",
+      group: FILTER_ALL,
       dealer: FILTER_ALL,
       timeZone: FILTER_ALL,
       status: FILTER_ALL,
@@ -108,6 +113,10 @@ export function CampaignListView() {
       ) : null}
 
       <CampaignListHeader />
+
+      <div className="app-shell-content-px shrink-0">
+        <DealershipScopeBar />
+      </div>
 
       <div className="app-shell-content-px app-shell-content-pb flex min-h-0 min-w-0 flex-1 flex-col gap-6 overflow-hidden pt-6">
         <div className="shrink-0">

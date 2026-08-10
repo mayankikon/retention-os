@@ -15,7 +15,7 @@ const ACTION_LABELS: Record<CampaignChangelogEntry["action"], string> = {
   activated: "Activated",
   paused: "Paused",
   completed: "Completed",
-  stopped: "Stopped",
+  archived: "Archived",
 };
 
 interface CampaignChangelogTabProps {

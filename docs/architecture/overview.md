@@ -19,11 +19,11 @@ Web UI for Ikon's Smart Marketing Campaign Manager. Phase 1 delivers the **Campa
 ### Campaign list (Phase 1)
 
 - Campaign list with columns: Name, Dealership, Time Zone, Status, Messages, Click-Through Rate, **Created By**
-- Filters: Dealership, Time Zone, Status
+- Filters: Time Zone, Status; primary dealership scope bar with Group + Dealer
 - Search by campaign name
 - Pagination (10 per page)
-- Status badges: scheduled, active, paused, stopped, completed, draft
-- Detail actions: Pause / Resume / Stop
+- Status badges: draft, active, paused, completed, archived
+- Detail actions: Pause / Resume (Archive live-control redesign deferred)
 - Data refresh indicator (hourly cadence)
 - Empty states: no data, no search results, filtered zero
 - Success banner after activate / schedule / save draft
@@ -31,9 +31,10 @@ Web UI for Ikon's Smart Marketing Campaign Manager. Phase 1 delivers the **Campa
 ### Campaign setup (Phase 2)
 
 - Five-step wizard at `/campaigns/new` (General → Messaging → Reminders → Configuration → Review)
-- Configuration: Time+Mileage or OEM trigger, each with nested audience query; schedule days
+- General: Group → multi-select Dealerships with per-dealer timezone (fallback when unknown)
+- Configuration: Time+Mileage or OEM trigger, each with nested audience query; schedule days; optional send time + SOP timezone table
 - Review: audience reach card; Activate now / Schedule / Save draft (draft only on this step); leave-guard modal when navigating away mid-setup; Audience suppression hidden on POC V0.5
-- After activate/schedule/draft: success banner on `/campaigns` list
+- After activate/schedule/draft: success banner on `/campaigns` list (scheduled activation keeps status `draft` + `scheduledActivateAt`)
 - SOP-default SMS templates, timezone schedule reference table, test send (mock)
 
 ### Product versions

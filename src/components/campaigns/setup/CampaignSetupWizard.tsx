@@ -14,6 +14,10 @@ import { MessagingStep } from "@/components/campaigns/setup/steps/MessagingStep"
 import { RemindersStep } from "@/components/campaigns/setup/steps/RemindersStep";
 import { ReviewStep } from "@/components/campaigns/setup/steps/ReviewStep";
 import { createDefaultSetupDraft } from "@/data/campaign-setup.defaults";
+import {
+  getDealerGroup,
+  getPrimaryTimeZoneFromDealerships,
+} from "@/data/lookups";
 import { useCampaignSetupLeaveGuard } from "@/contexts/campaign-setup-leave-guard";
 import { useProductVersion } from "@/contexts/product-version-context";
 import { useCurrentUser } from "@/contexts/session-context";
@@ -32,6 +36,22 @@ import { SETUP_STEPS } from "@/types/campaign-setup";
 
 const stepParser = parseAsStringLiteral(SETUP_STEPS).withDefault("general");
 
+function createInitialSetupDraft(dealership: string | null): CampaignSetupDraft {
+  const base = createDefaultSetupDraft();
+  if (!dealership) return base;
+
+  const groupId = getDealerGroup(dealership);
+  const subfleets = [dealership];
+
+  return {
+    ...base,
+    groupId,
+    subfleets,
+    timezoneOverrides: {},
+    timeZone: getPrimaryTimeZoneFromDealerships(subfleets, {}),
+  };
+}
+
 export function CampaignSetupWizard() {
   const router = useRouter();
   const currentUser = useCurrentUser();
@@ -39,13 +59,9 @@ export function CampaignSetupWizard() {
   const { registerSetup, unregisterSetup, clearSetup, requestNavigation } =
     useCampaignSetupLeaveGuard();
   const [step, setStep] = useQueryState("step", stepParser);
-  const [draft, setDraft] = useState<CampaignSetupDraft>(() => {
-    const base = createDefaultSetupDraft();
-    if (currentUser.dealership) {
-      return { ...base, subfleets: [currentUser.dealership] };
-    }
-    return base;
-  });
+  const [draft, setDraft] = useState<CampaignSetupDraft>(() =>
+    createInitialSetupDraft(currentUser.dealership),
+  );
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [completedSteps, setCompletedSteps] = useState<Set<SetupStepId>>(
     () => new Set(),
@@ -178,7 +194,7 @@ export function CampaignSetupWizard() {
       await new Promise((resolve) => setTimeout(resolve, 800));
 
       const campaign = createCampaignFromDraft(draft, currentUser, {
-        status: "scheduled",
+        status: "draft",
         scheduledActivateAt: `${activateOnDate}T12:00:00.000Z`,
       });
       addUserCreatedCampaign(campaign);

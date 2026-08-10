@@ -18,7 +18,6 @@ import {
   ActiveFilterChipsBar,
 } from "@/components/filters/ActiveFilterChip";
 import {
-  dealerFilterOptions,
   FILTER_ALL,
   timeZoneFilterOptions,
   statusFilterOptions,
@@ -27,7 +26,6 @@ import { cn } from "@/lib/utils";
 
 const filterParsers = {
   q: parseAsString.withDefault(""),
-  dealer: parseAsString.withDefault(FILTER_ALL),
   timeZone: parseAsString.withDefault(FILTER_ALL),
   status: parseAsString.withDefault(FILTER_ALL),
   page: parseAsInteger.withDefault(1),
@@ -45,14 +43,12 @@ export function CampaignFilters({ className }: CampaignFiltersProps) {
 
   const hasActiveFilters =
     Boolean(filters.q) ||
-    filters.dealer !== FILTER_ALL ||
     filters.timeZone !== FILTER_ALL ||
     filters.status !== FILTER_ALL;
 
   const handleClearAll = () => {
     void setFilters({
       q: "",
-      dealer: FILTER_ALL,
       timeZone: FILTER_ALL,
       status: FILTER_ALL,
       page: 1,
@@ -66,34 +62,12 @@ export function CampaignFilters({ className }: CampaignFiltersProps) {
   return (
     <section
       className={cn("space-y-2.5", className)}
-      aria-label="Campaign filters"
+      aria-label="Campaign Filters"
     >
       <div className="flex shrink-0 flex-wrap items-center gap-2.5">
-        <FilterSelect
-          label="Dealership"
-          value={filters.dealer}
-          options={dealerFilterOptions}
-          onValueChange={(value) => updateFilter("dealer", value)}
-          className="w-full min-w-[10.5rem] sm:w-[10.5rem]"
-        />
-        <FilterSelect
-          label="Time Zone"
-          value={filters.timeZone}
-          options={timeZoneFilterOptions}
-          onValueChange={(value) => updateFilter("timeZone", value)}
-          className="w-full min-w-[10.5rem] sm:w-[10.5rem]"
-        />
-        <FilterSelect
-          label="Status"
-          value={filters.status}
-          options={statusFilterOptions}
-          onValueChange={(value) => updateFilter("status", value)}
-          className="w-full min-w-[9rem] sm:w-[9rem]"
-        />
-
         <InputContainer
           size="lg"
-          className="control-hover-stroke w-full max-w-sm sm:ml-auto"
+          className="control-hover-stroke w-full max-w-sm"
         >
           <InputIcon position="lead">
             <Search className="size-4" aria-hidden />
@@ -107,19 +81,36 @@ export function CampaignFilters({ className }: CampaignFiltersProps) {
             onChange={(event) => {
               void setFilters({ q: event.target.value, page: 1 });
             }}
-            aria-label="Search by campaign"
+            aria-label="Search by Campaign"
           />
           {filters.q ? (
             <InputActionButton
               position="tail"
               type="button"
               onClick={() => updateFilter("q", "")}
-              aria-label="Clear search"
+              aria-label="Clear Search"
             >
               <X className="size-4" />
             </InputActionButton>
           ) : null}
         </InputContainer>
+
+        <div className="flex w-full flex-wrap items-center gap-2.5 sm:ml-auto sm:w-auto">
+          <FilterSelect
+            label="Time Zone"
+            value={filters.timeZone}
+            options={timeZoneFilterOptions}
+            onValueChange={(value) => updateFilter("timeZone", value)}
+            className="w-full min-w-[10.5rem] sm:w-[10.5rem]"
+          />
+          <FilterSelect
+            label="Status"
+            value={filters.status}
+            options={statusFilterOptions}
+            onValueChange={(value) => updateFilter("status", value)}
+            className="w-full min-w-[9rem] sm:w-[9rem]"
+          />
+        </div>
       </div>
 
       {hasActiveFilters ? (
@@ -128,12 +119,6 @@ export function CampaignFilters({ className }: CampaignFiltersProps) {
             <ActiveFilterChip
               label={`Search: "${filters.q}"`}
               onRemove={() => updateFilter("q", "")}
-            />
-          ) : null}
-          {filters.dealer !== FILTER_ALL ? (
-            <ActiveFilterChip
-              label={`Dealer: ${filters.dealer}`}
-              onRemove={() => updateFilter("dealer", FILTER_ALL)}
             />
           ) : null}
           {filters.timeZone !== FILTER_ALL ? (

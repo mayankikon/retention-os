@@ -9,12 +9,11 @@ import { STATUS_LABELS } from "@/data/lookups";
 import type { CampaignStatus } from "@/types/campaign";
 
 const STATUS_TONES: Record<CampaignStatus, BadgeTone> = {
-  scheduled: "teal",
+  draft: "gray",
   active: "green",
   paused: "amber",
-  stopped: "red",
   completed: "cyan",
-  draft: "gray",
+  archived: "gray",
 };
 
 interface CampaignStatusBadgeProps {

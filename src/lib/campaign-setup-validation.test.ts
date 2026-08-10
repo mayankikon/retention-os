@@ -16,23 +16,37 @@ function validDraft(): CampaignSetupDraft {
     ...createDefaultSetupDraft(),
     campaignName: "SM ABC Motors PST 2/17 JT",
     campaignImageFileName: "logo.png",
+    groupId: "Ikon Motors",
     subfleets: ["Ikon Motors North"],
   };
 }
 
 describe("validateGeneralStep", () => {
-  it("requires campaign name and dealership", () => {
+  it("requires campaign name, group, and dealership", () => {
     const result = validateGeneralStep(createDefaultSetupDraft());
     expect(result.isValid).toBe(false);
     expect(result.errors.campaignName).toBeDefined();
+    expect(result.errors.groupId).toBeDefined();
     expect(result.errors.dealership).toBeDefined();
     expect(result.errors.campaignImage).toBeUndefined();
   });
 
-  it("accepts any non-empty campaign name", () => {
+  it("accepts any non-empty campaign name with group and dealership", () => {
     const draft = { ...validDraft(), campaignName: "My custom campaign" };
     const result = validateGeneralStep(draft);
     expect(result.isValid).toBe(true);
+  });
+
+  it("requires timezone fallback when dealership TZ is unknown", () => {
+    const draft: CampaignSetupDraft = {
+      ...validDraft(),
+      groupId: "Summit Automotive Group",
+      subfleets: ["Summit Chevrolet"],
+      timezoneOverrides: {},
+    };
+    const result = validateGeneralStep(draft);
+    expect(result.isValid).toBe(false);
+    expect(result.errors["timezone.Summit Chevrolet"]).toBeDefined();
   });
 });
 
@@ -82,6 +96,23 @@ describe("validateConfigurationStep", () => {
     const result = validateConfigurationStep(draft);
     expect(result.isValid).toBe(false);
     expect(result.errors.scheduleDays).toBeDefined();
+  });
+
+  it("allows empty optional send time", () => {
+    const draft = { ...validDraft(), sendTimeLocal: null };
+    expect(validateConfigurationStep(draft).isValid).toBe(true);
+  });
+
+  it("rejects invalid optional send time", () => {
+    const draft = { ...validDraft(), sendTimeLocal: "25:99" };
+    const result = validateConfigurationStep(draft);
+    expect(result.isValid).toBe(false);
+    expect(result.errors.sendTimeLocal).toBeDefined();
+  });
+
+  it("accepts valid optional send time", () => {
+    const draft = { ...validDraft(), sendTimeLocal: "12:30" };
+    expect(validateConfigurationStep(draft).isValid).toBe(true);
   });
 
   it("requires OEM make and model when OEM trigger is selected", () => {

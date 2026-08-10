@@ -11,6 +11,7 @@ import type { CampaignFilters } from "@/types/campaign";
 
 const baseFilters: CampaignFilters = {
   q: "",
+  group: FILTER_ALL,
   dealer: FILTER_ALL,
   timeZone: FILTER_ALL,
   status: FILTER_ALL,
@@ -39,6 +40,17 @@ describe("filterCampaigns", () => {
     });
     expect(result.every((c) => c.dealer === "Ikon Motors North")).toBe(true);
     expect(result.length).toBeGreaterThan(0);
+  });
+
+  it("filters by dealer group when no specific dealer is selected", () => {
+    const result = filterCampaigns(mockCampaigns, {
+      ...baseFilters,
+      group: "Ikon Motors",
+    });
+    expect(result.length).toBeGreaterThan(0);
+    expect(
+      result.every((campaign) => campaign.dealer.startsWith("Ikon Motors")),
+    ).toBe(true);
   });
 
   it("filters by time zone and status", () => {

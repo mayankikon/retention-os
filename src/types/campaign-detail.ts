@@ -15,7 +15,7 @@ export const CHANGELOG_ACTIONS = [
   "activated",
   "paused",
   "completed",
-  "stopped",
+  "archived",
 ] as const;
 
 export type ChangelogAction = (typeof CHANGELOG_ACTIONS)[number];
