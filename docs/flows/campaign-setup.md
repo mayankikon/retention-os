@@ -32,7 +32,7 @@ flowchart LR
 | Steps | `setup/steps/*.tsx` |
 | Success | `ConfirmationView.tsx` |
 | Message preview | `MessagePreviewPanel.tsx` — SMS device + email inbox mockups; channel tabs when both enabled; primary promo on General/Messaging/Configuration/Review, reminders only on Reminders step. Sender uses the first selected dealership. |
-| Send time | `setup/SendTimeField.tsx` — hour / minute / AM-PM design-system selects (no native `input[type=time]`); conversions in `src/lib/send-time.ts`. `timeLabel` prefixes the select accessible names so the same control can serve send time and campaign start time on one step |
+| Send time | `setup/SendTimeField.tsx` — hour / AM-PM design-system selects (no native `input[type=time]`; minutes fixed at `:00`); conversions in `src/lib/send-time.ts`. `timeLabel` prefixes the select accessible names so the same control can serve send time and campaign start time on one step |
 | Campaign duration | Native `input[type=date]` pair on the Configuration step; window resolution and rules in `src/lib/campaign-window.ts` |
 | Schedule timezone table | Rows come from `src/lib/schedule-time-zones.ts`. With no pinned send time it renders the authored SOP lunch windows (expressed against CST). Once a send time is pinned, every dealership sends at that same local clock time and each row converts back to the primary dealership's zone, flagging `(prev day)` / `(next day)` rolls. |
 
@@ -41,7 +41,7 @@ flowchart LR
 `src/lib/campaign-setup-validation.ts` — per-step rules aligned with SOP required fields.
 
 - General requires group + ≥1 dealership; missing dealer TZ needs a row-level fallback.
-- Configuration accepts empty optional `sendTimeLocal`; when set it must be `HH:mm` (24-hour). The picker only emits valid values and offers 5-minute steps, keeping an off-step minute selectable if a draft already holds one.
+- Configuration accepts empty optional `sendTimeLocal`; when set it must be `HH:mm` (24-hour). The picker offers whole hours only (minutes always `:00`).
 - Configuration requires `campaignEndDate`. `campaignStartDate` and `campaignStartTimeLocal` are optional; the end date must land on or after the start date, or on or after today when no start date is set (`validateCampaignWindow`).
 
 ## State

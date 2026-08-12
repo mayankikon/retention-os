@@ -44,6 +44,15 @@ Parsed by `nuqs` in `CampaignListView`, `DealershipScopeBar`, and `CampaignFilte
 
 Documented on `/campaigns/redlines` and implemented via Tailwind classes on table rows, buttons, inputs, badges, and pagination.
 
+## Dealership column (multi-select)
+
+Campaigns created for multiple dealerships in a group store the full list on `dealers` and keep the first selection as `dealer` (primary).
+
+- List cell: primary name + muted `+N` for the remaining count (three dealers → `Ikon Motors North` `+2`).
+- Hover title lists every dealership.
+- Detail view shows the full comma-separated list.
+- Dealer filter matches any dealership in `dealers`, not only the primary.
+
 ## Archived campaigns
 
 - Default `status=All` excludes `archived` rows from the table and pagination totals.

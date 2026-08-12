@@ -1,4 +1,5 @@
 import { FILTER_ALL, getDealerGroup } from "@/data/lookups";
+import { getCampaignDealers } from "@/lib/campaign-dealers";
 import {
   DEFAULT_PAGE_SIZE,
   type Campaign,
@@ -34,10 +35,12 @@ export function filterCampaigns(
     if (query && !campaign.name.toLowerCase().includes(query)) {
       return false;
     }
+    const campaignDealers = getCampaignDealers(campaign);
+
     if (
       filters.dealer &&
       filters.dealer !== FILTER_ALL &&
-      campaign.dealer !== filters.dealer
+      !campaignDealers.includes(filters.dealer)
     ) {
       return false;
     }
@@ -45,7 +48,7 @@ export function filterCampaigns(
       filters.group &&
       filters.group !== FILTER_ALL &&
       (!filters.dealer || filters.dealer === FILTER_ALL) &&
-      getDealerGroup(campaign.dealer) !== filters.group
+      !campaignDealers.some((dealer) => getDealerGroup(dealer) === filters.group)
     ) {
       return false;
     }

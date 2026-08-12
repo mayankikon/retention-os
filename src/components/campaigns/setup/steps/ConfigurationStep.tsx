@@ -368,7 +368,7 @@ export function ConfigurationStep({
         <div className="space-y-4 rounded-[var(--radius-sm)] border border-border bg-card p-3">
           <div className="grid gap-4 sm:grid-cols-2">
             <FormField
-              label="Start Date (optional)"
+              label="Start Date"
               htmlFor="campaignStartDate"
               hint="Leave blank to start the moment you create the campaign."
               error={errors.campaignStartDate}

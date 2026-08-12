@@ -14,6 +14,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CampaignStatusBadge } from "@/components/campaigns/CampaignStatusBadge";
 import { getTimeZoneLabel } from "@/data/campaign-setup.defaults";
+import { getDealershipColumnDisplay } from "@/lib/campaign-dealers";
 import {
   DATA_TABLE_BODY_CELL_HEIGHT_PX,
   DATA_TABLE_CELL_INNER_HOVER_CLASS,
@@ -83,6 +84,7 @@ export function CampaignTable({ campaigns }: CampaignTableProps) {
         {campaigns.map((campaign, rowIndex) => {
           const isLastRow = rowIndex === campaigns.length - 1;
           const cellFrame = getDataTableBodyCellFrameClass(isLastRow);
+          const dealership = getDealershipColumnDisplay(campaign);
 
           return (
             <TableRow
@@ -120,14 +122,25 @@ export function CampaignTable({ campaigns }: CampaignTableProps) {
               </TableCell>
 
               <TableCell className={cellFrame}>
-                <TableSlotCell
-                  label={campaign.dealer}
+                <div
                   className={cn(
-                    DATA_TABLE_SLOT_LABEL_CLASS,
+                    "flex min-w-0 items-center gap-1.5",
                     DATA_TABLE_CELL_INNER_HOVER_CLASS,
                   )}
                   style={innerStyle}
-                />
+                  title={dealership.allDealers.join(", ")}
+                >
+                  <span
+                    className={cn(DATA_TABLE_SLOT_LABEL_CLASS, "min-w-0 truncate")}
+                  >
+                    {dealership.primaryLabel}
+                  </span>
+                  {dealership.additionalCount > 0 ? (
+                    <span className="shrink-0 text-sm tabular-nums text-muted-foreground">
+                      +{dealership.additionalCount}
+                    </span>
+                  ) : null}
+                </div>
               </TableCell>
 
               <TableCell className={cellFrame}>

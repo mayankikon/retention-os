@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { CheckCircle2, Percent, Send, Users } from "lucide-react";
 import { getTimeZoneLabel } from "@/data/campaign-setup.defaults";
+import { formatDealershipList, getCampaignDealers } from "@/lib/campaign-dealers";
 import { formatTimestamp } from "@/lib/dates";
 import {
   formatClickThroughRate,
@@ -129,7 +130,10 @@ export function CampaignDetailsTab({
         </div>
 
         <dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <DetailField label="Dealer" value={campaign.dealer} />
+          <DetailField
+            label="Dealerships"
+            value={formatDealershipList(getCampaignDealers(campaign))}
+          />
           <DetailField
             label="Time Zone"
             value={getTimeZoneLabel(campaign.timeZone)}

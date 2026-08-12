@@ -21,7 +21,16 @@ export interface CampaignCreator {
 export interface Campaign {
   id: string;
   name: string;
+  /**
+   * Primary dealership (first selected). Kept for filters, group rollup, and
+   * legacy rows that predate multi-dealership campaigns.
+   */
   dealer: string;
+  /**
+   * All dealerships this campaign covers within the group.
+   * When omitted, the campaign covers only `dealer`.
+   */
+  dealers?: string[];
   timeZone: CampaignTimeZone;
   status: CampaignStatus;
   messages: number;

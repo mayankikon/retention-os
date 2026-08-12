@@ -12,7 +12,6 @@ import {
 import { useEffect, useState } from "react";
 import {
   getSendTimeHourOptions,
-  getSendTimeMinuteOptions,
   parseSendTimeLocal,
   SEND_TIME_MERIDIEMS,
   toSendTimeLocal,
@@ -32,15 +31,16 @@ interface SendTimeFieldProps {
 
 interface SendTimeSelection {
   hour: string;
-  minute: string;
   meridiem: string;
 }
 
 const EMPTY_SELECTION: SendTimeSelection = {
   hour: "",
-  minute: "",
   meridiem: "",
 };
+
+/** Picker only offers whole hours; stored `HH:mm` always uses `:00`. */
+const WHOLE_HOUR_MINUTE = 0;
 
 const HOUR_OPTIONS = getSendTimeHourOptions();
 
@@ -55,7 +55,6 @@ function toSelection(value: string | null): SendTimeSelection {
 
   return {
     hour: String(parts.hour12),
-    minute: String(parts.minute),
     meridiem: parts.meridiem,
   };
 }
@@ -76,16 +75,11 @@ export function SendTimeField({
     setSelection(toSelection(value));
   }, [value]);
 
-  const minuteOptions = getSendTimeMinuteOptions(
-    selection.minute ? Number.parseInt(selection.minute, 10) : undefined,
-  );
-
   const applySelection = (patch: Partial<SendTimeSelection>) => {
-    // Choosing an hour first fills the rest so a single pick is already valid.
+    // Choosing an hour first fills AM/PM so a single pick is already valid.
     const next: SendTimeSelection = {
       ...selection,
       ...patch,
-      minute: patch.minute ?? (selection.minute || "0"),
       meridiem: patch.meridiem ?? (selection.meridiem || "PM"),
     };
 
@@ -99,7 +93,7 @@ export function SendTimeField({
     onChange(
       toSendTimeLocal({
         hour12: Number.parseInt(next.hour, 10),
-        minute: Number.parseInt(next.minute, 10),
+        minute: WHOLE_HOUR_MINUTE,
         meridiem: next.meridiem as SendTimeMeridiem,
       }),
     );
@@ -130,34 +124,6 @@ export function SendTimeField({
         </SelectTrigger>
         <SelectContent>
           {HOUR_OPTIONS.map((option) => (
-            <SelectItem key={option.value} value={option.value}>
-              {option.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      <span aria-hidden className="text-sm text-muted-foreground">
-        :
-      </span>
-
-      <Select
-        value={selection.minute || null}
-        onValueChange={(next) => {
-          if (next == null) return;
-          applySelection({ minute: next });
-        }}
-        items={minuteOptions}
-      >
-        <SelectTrigger
-          aria-label={`${timeLabel} minutes`}
-          aria-invalid={hasError}
-          className="w-[5.5rem]"
-        >
-          <SelectValue placeholder="Min" />
-        </SelectTrigger>
-        <SelectContent>
-          {minuteOptions.map((option) => (
             <SelectItem key={option.value} value={option.value}>
               {option.label}
             </SelectItem>

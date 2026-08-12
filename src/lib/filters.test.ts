@@ -54,8 +54,22 @@ describe("filterCampaigns", () => {
       ...baseFilters,
       dealer: "Ikon Motors North",
     });
-    expect(result.every((c) => c.dealer === "Ikon Motors North")).toBe(true);
+    expect(
+      result.every(
+        (campaign) =>
+          campaign.dealer === "Ikon Motors North" ||
+          campaign.dealers?.includes("Ikon Motors North"),
+      ),
+    ).toBe(true);
     expect(result.length).toBeGreaterThan(0);
+  });
+
+  it("matches a multi-dealership campaign when filtering by a secondary dealer", () => {
+    const result = filterCampaigns(mockCampaigns, {
+      ...baseFilters,
+      dealer: "Ikon Motors East",
+    });
+    expect(result.some((campaign) => campaign.id === "cmp-001")).toBe(true);
   });
 
   it("filters by dealer group when no specific dealer is selected", () => {

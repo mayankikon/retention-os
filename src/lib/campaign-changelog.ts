@@ -1,5 +1,9 @@
 import type { Campaign, CampaignStatus } from "@/types/campaign";
 import type { CampaignChangelogEntry } from "@/types/campaign-detail";
+import {
+  formatDealershipList,
+  getCampaignDealers,
+} from "@/lib/campaign-dealers";
 
 const STATUS_LABELS: Record<CampaignStatus, string> = {
   draft: "Draft",
@@ -47,7 +51,7 @@ export function buildCampaignChangelog(
       actor: campaign.createdBy,
       action: "created",
       summary: "Campaign created",
-      details: `"${campaign.name}" was created for ${campaign.dealer}.`,
+      details: `"${campaign.name}" was created for ${formatDealershipList(getCampaignDealers(campaign))}.`,
     },
   ];
 

@@ -70,6 +70,28 @@ describe("createCampaignFromDraft", () => {
     expect(startsAt.getMinutes()).toBe(15);
   });
 
+  it("stores every selected dealership and keeps the first as primary", () => {
+    const draft = {
+      ...createDefaultSetupDraft(),
+      campaignName: "Multi-dealer campaign",
+      subfleets: [
+        "Ikon Motors North",
+        "Ikon Motors South",
+        "Ikon Motors East",
+      ],
+      campaignEndDate: "2026-09-30",
+    };
+
+    const campaign = createCampaignFromDraft(draft, MOCK_CURRENT_USER);
+
+    expect(campaign.dealer).toBe("Ikon Motors North");
+    expect(campaign.dealers).toEqual([
+      "Ikon Motors North",
+      "Ikon Motors South",
+      "Ikon Motors East",
+    ]);
+  });
+
   it("initializes click-through rate to zero and defaults to active", () => {
     const draft = {
       ...createDefaultSetupDraft(),

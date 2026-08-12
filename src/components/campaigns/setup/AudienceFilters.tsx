@@ -122,7 +122,7 @@ export function AudienceFilters({
 
       {rules.length === 0 ? (
         <div className="rounded-md border border-dashed border-border p-4 text-sm text-muted-foreground">
-          No filters yet — add criteria to define your audience.
+          No filters yet
         </div>
       ) : null}
 

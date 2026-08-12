@@ -4,10 +4,18 @@ import type { AppUser } from "@/types/user";
 import { getDealerGroup } from "@/data/lookups";
 import { resolveCampaignWindow } from "@/lib/campaign-window";
 
-function resolveDealer(subfleets: string[]): string {
-  if (subfleets.length === 0) return "Unassigned";
-  if (subfleets.length === 1) return subfleets[0];
-  return subfleets.join(", ");
+function resolveDealers(subfleets: string[]): {
+  dealer: string;
+  dealers: string[];
+} {
+  if (subfleets.length === 0) {
+    return { dealer: "Unassigned", dealers: [] };
+  }
+
+  return {
+    dealer: subfleets[0],
+    dealers: [...subfleets],
+  };
 }
 
 export interface CreateCampaignFromDraftOptions {
@@ -26,10 +34,13 @@ export function createCampaignFromDraft(
   const status = options.status ?? "active";
   const { startsAt, endsAt } = resolveCampaignWindow(draft, now);
 
+  const { dealer, dealers } = resolveDealers(draft.subfleets);
+
   return {
     id: `cmp-${now.getTime()}`,
     name: draft.campaignName.trim() || "Untitled campaign",
-    dealer: resolveDealer(draft.subfleets),
+    dealer,
+    dealers,
     timeZone: draft.timeZone,
     status,
     messages: 0,
