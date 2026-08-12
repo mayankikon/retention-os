@@ -2,6 +2,7 @@ import type { Campaign, CampaignStatus } from "@/types/campaign";
 import type { CampaignSetupDraft } from "@/types/campaign-setup";
 import type { AppUser } from "@/types/user";
 import { getDealerGroup } from "@/data/lookups";
+import { resolveCampaignWindow } from "@/lib/campaign-window";
 
 function resolveDealer(subfleets: string[]): string {
   if (subfleets.length === 0) return "Unassigned";
@@ -23,6 +24,7 @@ export function createCampaignFromDraft(
   const nextHour = new Date(now);
   nextHour.setHours(nextHour.getHours() + 1);
   const status = options.status ?? "active";
+  const { startsAt, endsAt } = resolveCampaignWindow(draft, now);
 
   return {
     id: `cmp-${now.getTime()}`,
@@ -45,5 +47,7 @@ export function createCampaignFromDraft(
     nextUpdateAt: nextHour.toISOString(),
     messageTemplateId: draft.messageTemplateId,
     scheduledActivateAt: options.scheduledActivateAt ?? null,
+    startsAt,
+    endsAt,
   };
 }

@@ -4,22 +4,48 @@ import {
   Button,
 } from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
 
-import { Pause, Play } from "lucide-react";
+import { Archive, Pause, Play } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { CampaignStatusBadge } from "@/components/campaigns/CampaignStatusBadge";
 import { TitleBar } from "@/components/layout/TitleBar";
-import { updateCampaignStatus } from "@/lib/campaign-store";
+import {
+  setCampaignFlashMessage,
+  updateCampaignStatus,
+} from "@/lib/campaign-store";
 import type { Campaign, CampaignStatus } from "@/types/campaign";
 
 interface CampaignDetailHeaderProps {
   campaign: Campaign;
 }
 
+const ARCHIVEABLE_STATUSES: ReadonlySet<CampaignStatus> = new Set([
+  "active",
+  "paused",
+  "completed",
+]);
+
 export function CampaignDetailHeader({ campaign }: CampaignDetailHeaderProps) {
+  const router = useRouter();
   const canPause = campaign.status === "active";
   const canResume = campaign.status === "paused";
+  const canArchive = ARCHIVEABLE_STATUSES.has(campaign.status);
 
   const handleStatusChange = (status: CampaignStatus) => {
     updateCampaignStatus(campaign.id, status);
+  };
+
+  const handleArchive = () => {
+    const confirmed = window.confirm(
+      `Archive “${campaign.name}”? This stops sending and cannot be undone.`,
+    );
+    if (!confirmed) return;
+
+    updateCampaignStatus(campaign.id, "archived");
+    setCampaignFlashMessage({
+      kind: "archived",
+      campaignName: campaign.name,
+    });
+    router.push("/campaigns");
   };
 
   return (
@@ -51,6 +77,17 @@ export function CampaignDetailHeader({ campaign }: CampaignDetailHeaderProps) {
               onClick={() => handleStatusChange("active")}
             >
               Resume
+            </Button>
+          ) : null}
+          {canArchive ? (
+            <Button
+              type="button"
+              variant="secondary"
+              size="header"
+              leadingIcon={<Archive aria-hidden />}
+              onClick={handleArchive}
+            >
+              Archive
             </Button>
           ) : null}
         </div>

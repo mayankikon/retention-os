@@ -39,6 +39,10 @@ export interface Campaign {
    * Future start is a date field — not a separate status.
    */
   scheduledActivateAt?: string | null;
+  /** ISO instant the campaign run window opens. Defaults to `createdAt`. */
+  startsAt?: string | null;
+  /** ISO instant the campaign run window closes (end of the selected end day). */
+  endsAt?: string | null;
 }
 
 export interface CampaignFilters {

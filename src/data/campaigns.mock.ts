@@ -411,6 +411,19 @@ const campaignRows: Omit<Campaign, "clickThroughRate">[] = [
     lastUpdatedAt: hoursFromNow(-120),
     nextUpdateAt: hoursFromNow(1),
   },
+  {
+    id: "cmp-031",
+    name: "Legacy Tire Promo (Archived)",
+    dealer: "Ikon Motors North",
+    timeZone: "CST",
+    status: "archived",
+    messages: 420,
+    createdBy: { id: "u2", name: "Maya Chen", initials: "MC" },
+    createdAt: hoursFromNow(-900),
+    group: "Retention",
+    lastUpdatedAt: hoursFromNow(-200),
+    nextUpdateAt: hoursFromNow(1),
+  },
 ];
 
 export const mockCampaigns: Campaign[] = campaignRows.map((row) => ({

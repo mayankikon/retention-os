@@ -39,6 +39,8 @@ function flashCopy(message: CampaignFlashMessage): string {
       return `${message.campaignName} will activate on the selected date${message.detail ? ` · ${message.detail}` : ""}.`;
     case "draft":
       return `${message.campaignName} saved as a draft.`;
+    case "archived":
+      return `${message.campaignName} was archived.`;
     default:
       return message.campaignName;
   }

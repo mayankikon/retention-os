@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { createDefaultSetupDraft } from "@/data/campaign-setup.defaults";
 import { MOCK_CURRENT_USER } from "@/data/current-user.mock";
+import { toDateInputValue } from "@/lib/campaign-window";
 import { createCampaignFromDraft } from "@/lib/create-campaign-from-draft";
 
 describe("createCampaignFromDraft", () => {
@@ -35,6 +36,38 @@ describe("createCampaignFromDraft", () => {
 
     const campaign = createCampaignFromDraft(draft, MOCK_CURRENT_USER);
     expect(campaign.timeZone).toBe("PST");
+  });
+
+  it("starts the run window at creation time when no start date is chosen", () => {
+    const draft = {
+      ...createDefaultSetupDraft(),
+      campaignName: "Immediate campaign",
+      campaignEndDate: "2026-09-30",
+    };
+
+    const campaign = createCampaignFromDraft(draft, MOCK_CURRENT_USER);
+
+    expect(campaign.startsAt).toBe(campaign.createdAt);
+    expect(toDateInputValue(new Date(campaign.endsAt as string))).toBe(
+      "2026-09-30",
+    );
+  });
+
+  it("uses the chosen start date and time for the run window", () => {
+    const draft = {
+      ...createDefaultSetupDraft(),
+      campaignName: "Scheduled window campaign",
+      campaignStartDate: "2026-09-01",
+      campaignStartTimeLocal: "09:15",
+      campaignEndDate: "2026-09-30",
+    };
+
+    const campaign = createCampaignFromDraft(draft, MOCK_CURRENT_USER);
+    const startsAt = new Date(campaign.startsAt as string);
+
+    expect(toDateInputValue(startsAt)).toBe("2026-09-01");
+    expect(startsAt.getHours()).toBe(9);
+    expect(startsAt.getMinutes()).toBe(15);
   });
 
   it("initializes click-through rate to zero and defaults to active", () => {

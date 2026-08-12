@@ -43,3 +43,9 @@ Parsed by `nuqs` in `CampaignListView`, `DealershipScopeBar`, and `CampaignFilte
 ## Interaction states
 
 Documented on `/campaigns/redlines` and implemented via Tailwind classes on table rows, buttons, inputs, badges, and pagination.
+
+## Archived campaigns
+
+- Default `status=All` excludes `archived` rows from the table and pagination totals.
+- Choosing Status → Archived shows only archived campaigns.
+- Archive action lives on campaign detail (not list rows); after confirm, status persists locally and the list shows an archive flash banner.

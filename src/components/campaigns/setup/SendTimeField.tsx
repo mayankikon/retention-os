@@ -25,6 +25,8 @@ interface SendTimeFieldProps {
   onChange: (value: string | null) => void;
   /** Id applied to the hour select so an external label can point at it. */
   id?: string;
+  /** Prefix for the select accessible names, e.g. "Send hour" or "Start hour". */
+  timeLabel?: string;
   hasError?: boolean;
 }
 
@@ -62,6 +64,7 @@ export function SendTimeField({
   value,
   onChange,
   id = "sendTimeLocal",
+  timeLabel = "Send",
   hasError,
 }: SendTimeFieldProps) {
   const [selection, setSelection] = useState<SendTimeSelection>(() =>
@@ -119,7 +122,7 @@ export function SendTimeField({
       >
         <SelectTrigger
           id={id}
-          aria-label="Send hour"
+          aria-label={`${timeLabel} hour`}
           aria-invalid={hasError}
           className="w-[5.5rem]"
         >
@@ -147,7 +150,7 @@ export function SendTimeField({
         items={minuteOptions}
       >
         <SelectTrigger
-          aria-label="Send minutes"
+          aria-label={`${timeLabel} minutes`}
           aria-invalid={hasError}
           className="w-[5.5rem]"
         >
@@ -171,7 +174,7 @@ export function SendTimeField({
         items={MERIDIEM_OPTIONS}
       >
         <SelectTrigger
-          aria-label="AM or PM"
+          aria-label={`${timeLabel} AM or PM`}
           aria-invalid={hasError}
           className="w-[6.75rem]"
         >

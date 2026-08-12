@@ -2,6 +2,7 @@
 
 import {
   Checkbox,
+  Input,
   Select,
   SelectContent,
   SelectItem,
@@ -12,10 +13,7 @@ import {
 import { AudienceFilters } from "@/components/campaigns/setup/AudienceFilters";
 import { FormField } from "@/components/campaigns/setup/FormField";
 import { SendTimeField } from "@/components/campaigns/setup/SendTimeField";
-import {
-  getTimeZoneLabel,
-  TIME_ZONE_SCHEDULE_REFERENCE,
-} from "@/data/campaign-setup.defaults";
+import { getTimeZoneLabel } from "@/data/campaign-setup.defaults";
 import {
   getOemMakes,
   getOemModelsForMake,
@@ -25,7 +23,9 @@ import {
   SERVICE_TRIGGER_MODE_OPTIONS,
   TIME_SERVICE_TRIGGER_OPTIONS,
 } from "@/data/service-triggers";
+import { toDateInputValue } from "@/lib/campaign-window";
 import { CONFIGURATION_DAY_LABELS } from "@/lib/format-schedule";
+import { getScheduleTimeZoneTable } from "@/lib/schedule-time-zones";
 import { formatSendTimeLabel } from "@/lib/send-time";
 import {
   getServiceTriggerMode,
@@ -60,12 +60,27 @@ export function ConfigurationStep({
     draft.oemMake && draft.oemModel
       ? getOemServiceSchedule(draft.oemMake, draft.oemModel)
       : undefined;
+  const scheduleTimeZones = getScheduleTimeZoneTable(
+    draft.sendTimeLocal,
+    draft.timeZone,
+  );
   const serviceTriggerError =
     errors.timeServiceTriggerPreset ??
     errors.mileageServiceTriggerPreset ??
     errors.oemMake ??
     errors.oemModel ??
     errors.audienceFilters;
+
+  const today = toDateInputValue(new Date());
+  const startDate = draft.campaignStartDate ?? "";
+
+  // Clearing the start date also drops the time so no orphan clock time is kept.
+  const handleStartDateChange = (nextStartDate: string) => {
+    onChange({
+      campaignStartDate: nextStartDate || null,
+      campaignStartTimeLocal: nextStartDate ? draft.campaignStartTimeLocal : null,
+    });
+  };
 
   const toggleDay = (day: ScheduleDay, checked: boolean) => {
     const next = checked
@@ -346,6 +361,75 @@ export function ConfigurationStep({
       </FormField>
 
       <FormField
+        label="Campaign Duration"
+        hint="How long the campaign runs. Sends stop after the end date."
+        required
+      >
+        <div className="space-y-4 rounded-[var(--radius-sm)] border border-border bg-card p-3">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <FormField
+              label="Start Date (optional)"
+              htmlFor="campaignStartDate"
+              hint="Leave blank to start the moment you create the campaign."
+              error={errors.campaignStartDate}
+            >
+              <Input
+                id="campaignStartDate"
+                type="date"
+                value={startDate}
+                min={today}
+                max={draft.campaignEndDate || undefined}
+                aria-invalid={Boolean(errors.campaignStartDate)}
+                onChange={(event) => handleStartDateChange(event.target.value)}
+              />
+            </FormField>
+
+            <FormField
+              label="End Date"
+              htmlFor="campaignEndDate"
+              hint="Last day this campaign sends."
+              error={errors.campaignEndDate}
+              required
+            >
+              <Input
+                id="campaignEndDate"
+                type="date"
+                value={draft.campaignEndDate}
+                min={startDate || today}
+                aria-invalid={Boolean(errors.campaignEndDate)}
+                onChange={(event) =>
+                  onChange({ campaignEndDate: event.target.value })
+                }
+              />
+            </FormField>
+          </div>
+
+          {startDate ? (
+            <FormField
+              label="Start Time (optional)"
+              htmlFor="campaignStartTimeLocal"
+              hint={
+                draft.campaignStartTimeLocal
+                  ? `Starts at ${formatSendTimeLabel(draft.campaignStartTimeLocal)} in ${getTimeZoneLabel(draft.timeZone)}.`
+                  : "Leave blank to start at the beginning of the start date."
+              }
+              error={errors.campaignStartTimeLocal}
+            >
+              <SendTimeField
+                id="campaignStartTimeLocal"
+                timeLabel="Start"
+                value={draft.campaignStartTimeLocal}
+                onChange={(campaignStartTimeLocal) =>
+                  onChange({ campaignStartTimeLocal })
+                }
+                hasError={Boolean(errors.campaignStartTimeLocal)}
+              />
+            </FormField>
+          ) : null}
+        </div>
+      </FormField>
+
+      <FormField
         label="Define Schedule"
         error={errors.scheduleDays ?? errors.sendTimeLocal}
         hint="Always Monday–Saturday. Optional send time uses the primary dealership time zone from General."
@@ -382,7 +466,7 @@ export function ConfigurationStep({
           htmlFor="sendTimeLocal"
           hint={
             draft.sendTimeLocal
-              ? `Sends at ${formatSendTimeLabel(draft.sendTimeLocal)} ${getTimeZoneLabel(draft.timeZone)}. Clear it to follow the SOP lunch windows below.`
+              ? `Sends at ${formatSendTimeLabel(draft.sendTimeLocal)} local time in each dealership's zone. Clear it to follow the SOP lunch windows below.`
               : "Leave blank to follow the SOP lunch windows below, or pick a local clock time to pin an exact send hour."
           }
           error={errors.sendTimeLocal}
@@ -397,20 +481,27 @@ export function ConfigurationStep({
 
         <div className="mt-4 overflow-x-auto rounded-md border border-border">
           <table className="w-full text-xs">
+            <caption className="px-3 py-2 text-left text-xs text-muted-foreground">
+              {scheduleTimeZones.isPinnedToSendTime
+                ? `Each dealership sends at ${formatSendTimeLabel(draft.sendTimeLocal)} local time. Manager column shows when that lands on your clock.`
+                : "SOP lunch windows apply while no send time is pinned."}
+            </caption>
             <thead>
               <tr className="border-b bg-muted/50 text-left">
                 <th className="px-3 py-2 font-medium">Time zone</th>
-                <th className="px-3 py-2 font-medium">SMS sent</th>
-                <th className="px-3 py-2 font-medium">Manager time (CST)</th>
+                <th className="px-3 py-2 font-medium">SMS sent (local)</th>
+                <th className="px-3 py-2 font-medium">
+                  Manager time ({scheduleTimeZones.managerTimeZone})
+                </th>
               </tr>
             </thead>
             <tbody>
-              {TIME_ZONE_SCHEDULE_REFERENCE.map((row) => (
+              {scheduleTimeZones.rows.map((row) => (
                 <tr
                   key={row.timeZone}
                   className={cn(
                     "border-b last:border-0",
-                    row.timeZone === draft.timeZone && "bg-muted/40",
+                    row.isManagerZone && "bg-muted/40",
                   )}
                 >
                   <td className="px-3 py-2">{row.timeZone}</td>

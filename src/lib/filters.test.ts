@@ -19,9 +19,25 @@ const baseFilters: CampaignFilters = {
 };
 
 describe("filterCampaigns", () => {
-  it("returns all campaigns when no filters are active", () => {
+  it("excludes archived campaigns when status filter is All", () => {
     const result = filterCampaigns(mockCampaigns, baseFilters);
-    expect(result).toHaveLength(mockCampaigns.length);
+    expect(result.every((campaign) => campaign.status !== "archived")).toBe(
+      true,
+    );
+    expect(result.length).toBe(
+      mockCampaigns.filter((campaign) => campaign.status !== "archived").length,
+    );
+  });
+
+  it("returns only archived campaigns when status filter is archived", () => {
+    const result = filterCampaigns(mockCampaigns, {
+      ...baseFilters,
+      status: "archived",
+    });
+    expect(result.length).toBeGreaterThan(0);
+    expect(result.every((campaign) => campaign.status === "archived")).toBe(
+      true,
+    );
   });
 
   it("filters by campaign name search", () => {
@@ -75,10 +91,13 @@ describe("filterCampaigns", () => {
 
 describe("selectCampaigns", () => {
   it("paginates filtered results", () => {
+    const nonArchivedCount = mockCampaigns.filter(
+      (campaign) => campaign.status !== "archived",
+    ).length;
     const result = selectCampaigns(mockCampaigns, { ...baseFilters, page: 2 }, 10);
     expect(result.rows).toHaveLength(10);
     expect(result.page).toBe(2);
-    expect(result.total).toBe(mockCampaigns.length);
+    expect(result.total).toBe(nonArchivedCount);
   });
 
   it("clamps page to last page when page is too high", () => {

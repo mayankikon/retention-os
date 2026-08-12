@@ -9,7 +9,10 @@ import {
   validateRemindersStep,
   validateSetupStep,
 } from "@/lib/campaign-setup-validation";
+import { toDateInputValue } from "@/lib/campaign-window";
 import type { CampaignSetupDraft } from "@/types/campaign-setup";
+
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
 function validDraft(): CampaignSetupDraft {
   return {
@@ -18,6 +21,7 @@ function validDraft(): CampaignSetupDraft {
     campaignImageFileName: "logo.png",
     groupId: "Ikon Motors",
     subfleets: ["Ikon Motors North"],
+    campaignEndDate: toDateInputValue(new Date(Date.now() + 30 * MS_PER_DAY)),
   };
 }
 
@@ -96,6 +100,33 @@ describe("validateConfigurationStep", () => {
     const result = validateConfigurationStep(draft);
     expect(result.isValid).toBe(false);
     expect(result.errors.scheduleDays).toBeDefined();
+  });
+
+  it("requires a campaign end date", () => {
+    const draft = { ...validDraft(), campaignEndDate: "" };
+    const result = validateConfigurationStep(draft);
+    expect(result.isValid).toBe(false);
+    expect(result.errors.campaignEndDate).toBeDefined();
+  });
+
+  it("allows an empty optional start date and start time", () => {
+    const draft = {
+      ...validDraft(),
+      campaignStartDate: null,
+      campaignStartTimeLocal: null,
+    };
+    expect(validateConfigurationStep(draft).isValid).toBe(true);
+  });
+
+  it("rejects an end date that falls before the start date", () => {
+    const draft = {
+      ...validDraft(),
+      campaignStartDate: toDateInputValue(new Date(Date.now() + 10 * MS_PER_DAY)),
+      campaignEndDate: toDateInputValue(new Date(Date.now() + 5 * MS_PER_DAY)),
+    };
+    const result = validateConfigurationStep(draft);
+    expect(result.isValid).toBe(false);
+    expect(result.errors.campaignEndDate).toBeDefined();
   });
 
   it("allows empty optional send time", () => {

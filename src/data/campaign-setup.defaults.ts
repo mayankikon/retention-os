@@ -57,18 +57,18 @@ export const TIME_ZONE_SCHEDULE_REFERENCE = [
   },
   {
     timeZone: "EST",
-    smsWindow: "12:05am – 1:00pm",
+    smsWindow: "12:05pm – 1:00pm",
     managerTime: "11:05am – 11:45am CST",
   },
   {
     timeZone: "PST",
-    smsWindow: "12:15am – 1:00pm",
-    managerTime: "14:15 – 15:00 CST",
+    smsWindow: "12:15pm – 1:00pm",
+    managerTime: "2:15pm – 3:00pm CST",
   },
   {
     timeZone: "MST",
     smsWindow: "12:00pm – 12:45pm",
-    managerTime: "13:00 – 13:45 CST",
+    managerTime: "1:00pm – 1:45pm CST",
   },
 ] as const;
 
@@ -129,6 +129,9 @@ export function createDefaultSetupDraft(): CampaignSetupDraft {
     subfleets: [],
     timezoneOverrides: {},
     scheduleDays: [...SCHEDULE_DAYS],
+    campaignStartDate: null,
+    campaignStartTimeLocal: null,
+    campaignEndDate: "",
     sendTimeLocal: null,
     timeZone: "CST",
     testPhoneNumber: "",

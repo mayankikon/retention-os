@@ -5,7 +5,12 @@ const STATUS_OVERRIDES_KEY = "retention-os-campaign-status-overrides";
 export const CAMPAIGNS_UPDATED_EVENT = "campaigns-updated";
 export const CAMPAIGN_FLASH_STORAGE_KEY = "retention-os-campaign-flash";
 
-export type CampaignFlashKind = "activated" | "scheduled" | "draft" | "status";
+export type CampaignFlashKind =
+  | "activated"
+  | "scheduled"
+  | "draft"
+  | "archived"
+  | "status";
 
 export interface CampaignFlashMessage {
   kind: CampaignFlashKind;

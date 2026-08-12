@@ -56,6 +56,13 @@ export function filterCampaigns(
     ) {
       return false;
     }
+    // Archived campaigns stay out of the default "All" list; opt in via status filter.
+    if (
+      (!filters.status || filters.status === FILTER_ALL) &&
+      campaign.status === "archived"
+    ) {
+      return false;
+    }
     if (
       filters.status &&
       filters.status !== FILTER_ALL &&

@@ -119,6 +119,18 @@ export interface CampaignSetupDraft {
    */
   timezoneOverrides: Partial<Record<string, SetupTimeZone>>;
   scheduleDays: ScheduleDay[];
+  /**
+   * Optional local start date (`yyyy-MM-dd`).
+   * Null/empty = the campaign starts the moment it is created.
+   */
+  campaignStartDate: string | null;
+  /**
+   * Optional local start clock time (HH:mm) applied on `campaignStartDate`.
+   * Null/empty = start of that day. Ignored when no start date is set.
+   */
+  campaignStartTimeLocal: string | null;
+  /** Required local end date (`yyyy-MM-dd`); the campaign stops after that day. */
+  campaignEndDate: string;
   /** Optional local send clock time (HH:mm). Null/empty = use SOP table guidance only. */
   sendTimeLocal: string | null;
   /** Primary timezone for schedule display (first selected dealership). */

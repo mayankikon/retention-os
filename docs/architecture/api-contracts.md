@@ -35,7 +35,7 @@ Query parameters (mirror URL state):
 }
 ```
 
-**Campaign object** — see `src/types/campaign.ts` (`createdBy` includes `id`, `name`, `initials`; `createdAt` ISO timestamp; `clickThroughRate` percentage 0–100 for list display; statuses: draft, active, paused, completed, archived; optional `scheduledActivateAt` for future go-live while status remains draft).
+**Campaign object** — see `src/types/campaign.ts` (`createdBy` includes `id`, `name`, `initials`; `createdAt` ISO timestamp; `clickThroughRate` percentage 0–100 for list display; statuses: draft, active, paused, completed, archived; optional `scheduledActivateAt` for future go-live while status remains draft; optional `startsAt` / `endsAt` ISO instants for the campaign run window collected on the Configuration step).
 
 **POST /campaigns** (proposed) — create from setup wizard; `createdBy` and `createdAt` set server-side from session.
 

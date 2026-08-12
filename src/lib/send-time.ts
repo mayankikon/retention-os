@@ -1,5 +1,20 @@
+import type { SetupTimeZone } from "@/types/campaign-setup";
+
 /** Minute granularity offered by the send time control. */
 export const SEND_TIME_MINUTE_STEP = 5;
+
+const MINUTES_PER_DAY = 24 * 60;
+
+/**
+ * Standard-time UTC offsets. This prototype models the four fixed zone labels
+ * without daylight saving, matching the authored SOP reference table.
+ */
+export const SETUP_TIME_ZONE_UTC_OFFSET_HOURS: Record<SetupTimeZone, number> = {
+  EST: -5,
+  CST: -6,
+  MST: -7,
+  PST: -8,
+};
 
 export const SEND_TIME_MERIDIEMS = ["AM", "PM"] as const;
 
@@ -56,6 +71,44 @@ export function formatSendTimeLabel(value: string | null | undefined): string {
   if (!parts) return "";
 
   return `${parts.hour12}:${String(parts.minute).padStart(2, "0")} ${parts.meridiem}`;
+}
+
+export interface ConvertedSendTime {
+  /** 24-hour `HH:mm` clock time in the target zone. */
+  time: string;
+  /** -1 when the moment lands on the previous day, +1 on the next day. */
+  dayOffset: number;
+}
+
+/**
+ * Re-expresses a wall-clock time in another zone, e.g. 6:10am EST is 5:10am CST.
+ * Returns null when the input is not a valid `HH:mm` value.
+ */
+export function convertSendTimeBetweenZones(
+  value: string | null | undefined,
+  fromTimeZone: SetupTimeZone,
+  toTimeZone: SetupTimeZone,
+): ConvertedSendTime | null {
+  const parts = parseSendTimeLocal(value);
+  if (!parts) return null;
+
+  const [hourText, minuteText] = toSendTimeLocal(parts).split(":");
+  const minutesFromMidnight =
+    Number.parseInt(hourText, 10) * 60 + Number.parseInt(minuteText, 10);
+  const offsetMinutes =
+    (SETUP_TIME_ZONE_UTC_OFFSET_HOURS[toTimeZone] -
+      SETUP_TIME_ZONE_UTC_OFFSET_HOURS[fromTimeZone]) *
+    60;
+
+  const shifted = minutesFromMidnight + offsetMinutes;
+  const normalized = ((shifted % MINUTES_PER_DAY) + MINUTES_PER_DAY) % MINUTES_PER_DAY;
+
+  return {
+    time: `${String(Math.floor(normalized / 60)).padStart(2, "0")}:${String(
+      normalized % 60,
+    ).padStart(2, "0")}`,
+    dayOffset: Math.floor(shifted / MINUTES_PER_DAY),
+  };
 }
 
 export function getSendTimeHourOptions(): { value: string; label: string }[] {

@@ -1,5 +1,6 @@
 import type { CampaignSetupDraft, SetupStepId } from "@/types/campaign-setup";
 import { getKnownDealerTimeZone } from "@/data/lookups";
+import { validateCampaignWindow } from "@/lib/campaign-window";
 import { validateServiceTriggerFields } from "@/lib/service-triggers";
 import { validateDeliveryChannels } from "@/lib/delivery-channels";
 
@@ -80,6 +81,8 @@ export function validateConfigurationStep(
   const errors: Record<string, string> = {};
 
   Object.assign(errors, validateServiceTriggerFields(draft));
+
+  Object.assign(errors, validateCampaignWindow(draft));
 
   if (draft.scheduleDays.length === 0) {
     errors.scheduleDays = "Schedule must include Monday through Saturday.";
