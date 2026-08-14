@@ -4,13 +4,18 @@ import {
   buttonVariants,
 } from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
 
-import { useMemo, useState } from "react";
+import { Check, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { CampaignChangelogTab } from "@/components/campaigns/detail/CampaignChangelogTab";
 import { CampaignDetailHeader } from "@/components/campaigns/detail/CampaignDetailHeader";
 import { CampaignDetailsTab } from "@/components/campaigns/detail/CampaignDetailsTab";
 import { getCampaignAnalytics } from "@/lib/campaign-analytics";
 import { buildCampaignChangelog } from "@/lib/campaign-changelog";
+import {
+  consumeCampaignFlashMessage,
+  type CampaignFlashMessage,
+} from "@/lib/campaign-store";
 import { useCampaigns } from "@/hooks/use-campaigns";
 import type { CampaignDetailTab } from "@/types/campaign-detail";
 import { cn } from "@/lib/utils";
@@ -24,9 +29,29 @@ const DETAIL_TABS: { id: CampaignDetailTab; label: string }[] = [
   { id: "changelog", label: "Change Log" },
 ];
 
+function flashCopy(message: CampaignFlashMessage): string {
+  switch (message.kind) {
+    case "draft":
+      return `${message.campaignName} saved as a draft.`;
+    case "activated":
+      return `${message.campaignName} is now active.`;
+    case "scheduled":
+      return `${message.campaignName} will activate on the selected date${message.detail ? ` · ${message.detail}` : ""}.`;
+    case "archived":
+      return `${message.campaignName} was archived.`;
+    default:
+      return message.campaignName;
+  }
+}
+
 export function CampaignDetailView({ campaignId }: CampaignDetailViewProps) {
   const campaigns = useCampaigns();
   const [activeTab, setActiveTab] = useState<CampaignDetailTab>("details");
+  const [flash, setFlash] = useState<CampaignFlashMessage | null>(null);
+
+  useEffect(() => {
+    setFlash(consumeCampaignFlashMessage());
+  }, []);
 
   const campaign = useMemo(
     () => campaigns.find((item) => item.id === campaignId),
@@ -63,6 +88,26 @@ export function CampaignDetailView({ campaignId }: CampaignDetailViewProps) {
       <CampaignDetailHeader campaign={campaign} />
 
       <div className="app-shell-content-px app-shell-content-pb space-y-6 pt-6">
+        {flash ? (
+          <div
+            className="flex items-start justify-between gap-3 rounded-lg border border-border bg-emerald-50 px-4 py-3 text-sm text-emerald-900"
+            role="status"
+          >
+            <div className="flex items-start gap-2">
+              <Check className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+              <p>{flashCopy(flash)}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setFlash(null)}
+              className="rounded-sm p-1 hover:bg-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              aria-label="Dismiss"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        ) : null}
+
         <div
           className="flex gap-6 border-b border-border"
           role="tablist"

@@ -74,11 +74,9 @@ export function ConfigurationStep({
   const today = toDateInputValue(new Date());
   const startDate = draft.campaignStartDate ?? "";
 
-  // Clearing the start date also drops the time so no orphan clock time is kept.
   const handleStartDateChange = (nextStartDate: string) => {
     onChange({
       campaignStartDate: nextStartDate || null,
-      campaignStartTimeLocal: nextStartDate ? draft.campaignStartTimeLocal : null,
     });
   };
 
@@ -362,7 +360,7 @@ export function ConfigurationStep({
 
       <FormField
         label="Campaign Duration"
-        hint="How long the campaign runs. Sends stop after the end date."
+        hint="How long the campaign runs. Sends stop after the end date when set."
         required
       >
         <div className="space-y-4 rounded-[var(--radius-sm)] border border-border bg-card p-3">
@@ -370,8 +368,9 @@ export function ConfigurationStep({
             <FormField
               label="Start Date"
               htmlFor="campaignStartDate"
-              hint="Leave blank to start the moment you create the campaign."
+              hint="First day this campaign can send."
               error={errors.campaignStartDate}
+              required
             >
               <Input
                 id="campaignStartDate"
@@ -387,9 +386,8 @@ export function ConfigurationStep({
             <FormField
               label="End Date"
               htmlFor="campaignEndDate"
-              hint="Last day this campaign sends."
+              hint="Optional. Last day this campaign sends when set."
               error={errors.campaignEndDate}
-              required
             >
               <Input
                 id="campaignEndDate"
@@ -403,36 +401,13 @@ export function ConfigurationStep({
               />
             </FormField>
           </div>
-
-          {startDate ? (
-            <FormField
-              label="Start Time (optional)"
-              htmlFor="campaignStartTimeLocal"
-              hint={
-                draft.campaignStartTimeLocal
-                  ? `Starts at ${formatSendTimeLabel(draft.campaignStartTimeLocal)} in ${getTimeZoneLabel(draft.timeZone)}.`
-                  : "Leave blank to start at the beginning of the start date."
-              }
-              error={errors.campaignStartTimeLocal}
-            >
-              <SendTimeField
-                id="campaignStartTimeLocal"
-                timeLabel="Start"
-                value={draft.campaignStartTimeLocal}
-                onChange={(campaignStartTimeLocal) =>
-                  onChange({ campaignStartTimeLocal })
-                }
-                hasError={Boolean(errors.campaignStartTimeLocal)}
-              />
-            </FormField>
-          ) : null}
         </div>
       </FormField>
 
       <FormField
         label="Define Schedule"
         error={errors.scheduleDays ?? errors.sendTimeLocal}
-        hint="Always Monday–Saturday. Optional send time uses the primary dealership time zone from General."
+        hint="Always Monday–Saturday. Send time uses the primary dealership time zone from General."
         required
       >
         <div className="mb-3 flex flex-wrap gap-2">
@@ -462,14 +437,15 @@ export function ConfigurationStep({
         </p>
 
         <FormField
-          label="Send Time (optional)"
+          label="Send Time"
           htmlFor="sendTimeLocal"
           hint={
             draft.sendTimeLocal
-              ? `Sends at ${formatSendTimeLabel(draft.sendTimeLocal)} local time in each dealership's zone. Clear it to follow the SOP lunch windows below.`
-              : "Leave blank to follow the SOP lunch windows below, or pick a local clock time to pin an exact send hour."
+              ? `Sends at ${formatSendTimeLabel(draft.sendTimeLocal)} local time in each dealership's zone.`
+              : "Pick a local clock time to pin an exact send hour for each dealership."
           }
           error={errors.sendTimeLocal}
+          required
         >
           <SendTimeField
             id="sendTimeLocal"
@@ -484,7 +460,7 @@ export function ConfigurationStep({
             <caption className="px-3 py-2 text-left text-xs text-muted-foreground">
               {scheduleTimeZones.isPinnedToSendTime
                 ? `Each dealership sends at ${formatSendTimeLabel(draft.sendTimeLocal)} local time. Manager column shows when that lands on your clock.`
-                : "SOP lunch windows apply while no send time is pinned."}
+                : "Choose a send time to pin the local send hour for every dealership."}
             </caption>
             <thead>
               <tr className="border-b bg-muted/50 text-left">

@@ -88,7 +88,9 @@ export function validateConfigurationStep(
     errors.scheduleDays = "Schedule must include Monday through Saturday.";
   }
 
-  if (draft.sendTimeLocal && !isValidSendTimeLocal(draft.sendTimeLocal)) {
+  if (!draft.sendTimeLocal) {
+    errors.sendTimeLocal = "Send time is required.";
+  } else if (!isValidSendTimeLocal(draft.sendTimeLocal)) {
     errors.sendTimeLocal = "Enter send time as HH:mm (24-hour).";
   }
 
@@ -116,7 +118,7 @@ export function validateAudienceStep(
 
 export function validateReviewStep(
   draft: CampaignSetupDraft,
-  options: { requireTestSend?: boolean; requireTcpaCompliance?: boolean } = {},
+  options: { requireTestSend?: boolean } = {},
 ): StepValidationResult {
   const errors: Record<string, string> = {};
 
@@ -125,18 +127,13 @@ export function validateReviewStep(
       "Enter a mobile number to send a campaign test before activating.";
   }
 
-  if (options.requireTcpaCompliance && !draft.tcpaComplianceConfirmed) {
-    errors.tcpaComplianceConfirmed =
-      "Confirm TCPA compliance and opt-out suppression before activating.";
-  }
-
   return { isValid: Object.keys(errors).length === 0, errors };
 }
 
 export function validateSetupStep(
   stepId: SetupStepId,
   draft: CampaignSetupDraft,
-  options?: { requireTestSend?: boolean; requireTcpaCompliance?: boolean },
+  options?: { requireTestSend?: boolean },
 ): StepValidationResult {
   switch (stepId) {
     case "general":
@@ -150,7 +147,6 @@ export function validateSetupStep(
     case "review":
       return validateReviewStep(draft, {
         requireTestSend: options?.requireTestSend ?? false,
-        requireTcpaCompliance: options?.requireTcpaCompliance ?? false,
       });
     default:
       return { isValid: true, errors: {} };

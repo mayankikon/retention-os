@@ -120,25 +120,22 @@ export interface CampaignSetupDraft {
   timezoneOverrides: Partial<Record<string, SetupTimeZone>>;
   scheduleDays: ScheduleDay[];
   /**
-   * Optional local start date (`yyyy-MM-dd`).
-   * Null/empty = the campaign starts the moment it is created.
+   * Required local start date (`yyyy-MM-dd`).
+   * The campaign starts at the beginning of this day.
    */
   campaignStartDate: string | null;
   /**
-   * Optional local start clock time (HH:mm) applied on `campaignStartDate`.
-   * Null/empty = start of that day. Ignored when no start date is set.
+   * Optional local end date (`yyyy-MM-dd`); the campaign stops after that day.
+   * Empty = no fixed end date.
    */
-  campaignStartTimeLocal: string | null;
-  /** Required local end date (`yyyy-MM-dd`); the campaign stops after that day. */
   campaignEndDate: string;
-  /** Optional local send clock time (HH:mm). Null/empty = use SOP table guidance only. */
+  /** Required local send clock time (HH:mm). */
   sendTimeLocal: string | null;
   /** Primary timezone for schedule display (first selected dealership). */
   timeZone: SetupTimeZone;
   testPhoneNumber: string;
   suppressionListFileName: string | null;
   suppressionListEntryCount: number | null;
-  tcpaComplianceConfirmed: boolean;
   audienceFilters: AudienceFilterRule[];
 }
 

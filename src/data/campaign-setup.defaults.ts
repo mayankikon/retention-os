@@ -130,14 +130,12 @@ export function createDefaultSetupDraft(): CampaignSetupDraft {
     timezoneOverrides: {},
     scheduleDays: [...SCHEDULE_DAYS],
     campaignStartDate: null,
-    campaignStartTimeLocal: null,
     campaignEndDate: "",
     sendTimeLocal: null,
     timeZone: "CST",
     testPhoneNumber: "",
     suppressionListFileName: null,
     suppressionListEntryCount: null,
-    tcpaComplianceConfirmed: false,
     audienceFilters: [],
   };
 }

@@ -48,6 +48,11 @@ export function addUserCreatedCampaign(campaign: Campaign): void {
   saveUserCreatedCampaigns([campaign, ...existing]);
 }
 
+/** Replace an existing user-created campaign by id, or insert if missing. */
+export function upsertUserCreatedCampaign(campaign: Campaign): void {
+  addUserCreatedCampaign(campaign);
+}
+
 export function getCampaignStatusOverrides(): Record<string, CampaignStatus> {
   if (!isBrowser()) return {};
 

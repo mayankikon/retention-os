@@ -18,6 +18,10 @@ function resolveDealers(subfleets: string[]): {
   };
 }
 
+function cloneSetupDraft(draft: CampaignSetupDraft): CampaignSetupDraft {
+  return structuredClone(draft);
+}
+
 export interface CreateCampaignFromDraftOptions {
   status?: Extract<CampaignStatus, "draft" | "active">;
   scheduledActivateAt?: string | null;
@@ -60,5 +64,41 @@ export function createCampaignFromDraft(
     scheduledActivateAt: options.scheduledActivateAt ?? null,
     startsAt,
     endsAt,
+    setupDraft: cloneSetupDraft(draft),
+  };
+}
+
+export function updateCampaignFromDraft(
+  existing: Campaign,
+  draft: CampaignSetupDraft,
+  options: CreateCampaignFromDraftOptions = {},
+): Campaign {
+  const now = new Date();
+  const nextHour = new Date(now);
+  nextHour.setHours(nextHour.getHours() + 1);
+  const status = options.status ?? existing.status;
+  const { startsAt, endsAt } = resolveCampaignWindow(draft, now);
+  const { dealer, dealers } = resolveDealers(draft.subfleets);
+
+  return {
+    ...existing,
+    name: draft.campaignName.trim() || existing.name || "Untitled campaign",
+    dealer,
+    dealers,
+    timeZone: draft.timeZone,
+    status,
+    group:
+      draft.groupId ||
+      (draft.subfleets[0] ? getDealerGroup(draft.subfleets[0]) : existing.group),
+    lastUpdatedAt: now.toISOString(),
+    nextUpdateAt: nextHour.toISOString(),
+    messageTemplateId: draft.messageTemplateId,
+    scheduledActivateAt:
+      options.scheduledActivateAt !== undefined
+        ? options.scheduledActivateAt
+        : existing.scheduledActivateAt,
+    startsAt,
+    endsAt,
+    setupDraft: cloneSetupDraft(draft),
   };
 }

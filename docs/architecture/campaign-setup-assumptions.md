@@ -16,7 +16,7 @@ Standard Operating Procedure for Campaign Setup in Smart Marketing Campaign Mana
 | Messaging & Variables | Step `messaging` | Delivery channels (SMS/email), templates, primary promo, dealer URL, optional image |
 | Reminder Sequences | Step `reminders` | Per-reminder enable toggles, optional image or reuse primary image |
 | Standard Configuration | Step `configuration` | Service trigger mode: interval, OEM, or audience query; Mon–Sat + TZ table |
-| QA & Activation | Step `review` | Test send, optional suppression list upload, TCPA compliance confirmation, Activate |
+| QA & Activation | Step `review` | Test send, optional suppression list upload, Activate |
 
 ## Defaults (from SOP)
 

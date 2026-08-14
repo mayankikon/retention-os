@@ -2,9 +2,11 @@
 
 import {
   Button,
+  buttonVariants,
 } from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
 
 import { Archive, Pause, Play } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CampaignStatusBadge } from "@/components/campaigns/CampaignStatusBadge";
 import { TitleBar } from "@/components/layout/TitleBar";
@@ -12,7 +14,12 @@ import {
   setCampaignFlashMessage,
   updateCampaignStatus,
 } from "@/lib/campaign-store";
+import {
+  hydrateSetupDraftFromCampaign,
+  isSetupDraftComplete,
+} from "@/lib/campaign-setup-resume";
 import type { Campaign, CampaignStatus } from "@/types/campaign";
+import { cn } from "@/lib/utils";
 
 interface CampaignDetailHeaderProps {
   campaign: Campaign;
@@ -29,6 +36,15 @@ export function CampaignDetailHeader({ campaign }: CampaignDetailHeaderProps) {
   const canPause = campaign.status === "active";
   const canResume = campaign.status === "paused";
   const canArchive = ARCHIVEABLE_STATUSES.has(campaign.status);
+  const isDraft = campaign.status === "draft";
+
+  const setupDraft = isDraft
+    ? hydrateSetupDraftFromCampaign(campaign)
+    : null;
+  const isCompleteDraft =
+    Boolean(setupDraft) && isSetupDraftComplete(setupDraft!);
+  const editHref = `/campaigns/${campaign.id}/edit`;
+  const reviewHref = `${editHref}?step=review`;
 
   const handleStatusChange = (status: CampaignStatus) => {
     updateCampaignStatus(campaign.id, status);
@@ -57,7 +73,33 @@ export function CampaignDetailHeader({ campaign }: CampaignDetailHeaderProps) {
       title={campaign.name}
       titleTrailing={<CampaignStatusBadge status={campaign.status} />}
       right={
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {isDraft && !isCompleteDraft ? (
+            <Link
+              href={editHref}
+              className={cn(buttonVariants({ size: "header" }))}
+            >
+              Continue setup
+            </Link>
+          ) : null}
+          {isDraft && isCompleteDraft ? (
+            <>
+              <Link
+                href={editHref}
+                className={cn(
+                  buttonVariants({ variant: "secondary", size: "header" }),
+                )}
+              >
+                Edit
+              </Link>
+              <Link
+                href={reviewHref}
+                className={cn(buttonVariants({ size: "header" }))}
+              >
+                Review & activate
+              </Link>
+            </>
+          ) : null}
           {canPause ? (
             <Button
               type="button"

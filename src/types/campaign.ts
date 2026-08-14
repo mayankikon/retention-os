@@ -1,3 +1,5 @@
+import type { CampaignSetupDraft } from "@/types/campaign-setup";
+
 export const CAMPAIGN_STATUSES = [
   "draft",
   "active",
@@ -52,6 +54,11 @@ export interface Campaign {
   startsAt?: string | null;
   /** ISO instant the campaign run window closes (end of the selected end day). */
   endsAt?: string | null;
+  /**
+   * Full wizard state for draft resume/edit.
+   * Absent on legacy thin drafts and most mock seed rows.
+   */
+  setupDraft?: CampaignSetupDraft | null;
 }
 
 export interface CampaignFilters {

@@ -11,6 +11,10 @@ interface StepShellLayoutProps {
   completedSteps: Set<SetupStepId>;
   draft: CampaignSetupDraft;
   children: React.ReactNode;
+  mode?: "create" | "edit";
+  campaignName?: string;
+  cancelHref?: string;
+  onStepSelect?: (stepId: SetupStepId) => void;
 }
 
 export function StepShellLayout({
@@ -18,8 +22,18 @@ export function StepShellLayout({
   completedSteps,
   draft,
   children,
+  mode = "create",
+  campaignName,
+  cancelHref = "/campaigns",
+  onStepSelect,
 }: StepShellLayoutProps) {
   const { requestNavigation } = useCampaignSetupLeaveGuard();
+  const isEditMode = mode === "edit";
+  const title = isEditMode
+    ? campaignName?.trim()
+      ? `Edit: ${campaignName.trim()}`
+      : "Edit Campaign Setup"
+    : "New Campaign Setup";
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
@@ -27,17 +41,18 @@ export function StepShellLayout({
         breadcrumbs={[
           {
             label: "Campaigns",
-            onClick: () => requestNavigation("/campaigns"),
+            onClick: () => requestNavigation(cancelHref),
           },
-          { label: "New Campaign Setup" },
+          { label: isEditMode ? "Edit Campaign Setup" : "New Campaign Setup" },
         ]}
-        title="New Campaign Setup"
+        title={title}
       />
 
       <div className="app-shell-scrollbar-dashed app-shell-content-px app-shell-content-pb min-h-0 flex-1 space-y-8 overflow-y-auto pt-6">
         <StepperHeader
           currentStepId={currentStepId}
           completedSteps={completedSteps}
+          onStepSelect={onStepSelect}
         />
 
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,360px)]">

@@ -8,12 +8,10 @@ import {
 
 function windowDraft(overrides: {
   campaignStartDate?: string | null;
-  campaignStartTimeLocal?: string | null;
   campaignEndDate?: string;
 }) {
   return {
     campaignStartDate: null,
-    campaignStartTimeLocal: null,
     campaignEndDate: "",
     ...overrides,
   };
@@ -52,11 +50,10 @@ describe("resolveCampaignWindow", () => {
     expect(window.startsAt).toBe(createdAt.toISOString());
   });
 
-  it("applies the chosen start date and time in local time", () => {
+  it("starts at the beginning of the chosen start date", () => {
     const window = resolveCampaignWindow(
       windowDraft({
         campaignStartDate: "2026-09-01",
-        campaignStartTimeLocal: "14:30",
         campaignEndDate: "2026-09-30",
       }),
       createdAt,
@@ -64,27 +61,16 @@ describe("resolveCampaignWindow", () => {
 
     const startsAt = new Date(window.startsAt);
     expect(toDateInputValue(startsAt)).toBe("2026-09-01");
-    expect(startsAt.getHours()).toBe(14);
-    expect(startsAt.getMinutes()).toBe(30);
-  });
-
-  it("starts at the beginning of the day when only a start date is set", () => {
-    const window = resolveCampaignWindow(
-      windowDraft({
-        campaignStartDate: "2026-09-01",
-        campaignEndDate: "2026-09-30",
-      }),
-      createdAt,
-    );
-
-    const startsAt = new Date(window.startsAt);
     expect(startsAt.getHours()).toBe(0);
     expect(startsAt.getMinutes()).toBe(0);
   });
 
   it("ends at the end of the local end date", () => {
     const window = resolveCampaignWindow(
-      windowDraft({ campaignEndDate: "2026-09-30" }),
+      windowDraft({
+        campaignStartDate: "2026-09-01",
+        campaignEndDate: "2026-09-30",
+      }),
       createdAt,
     );
 
@@ -95,21 +81,29 @@ describe("resolveCampaignWindow", () => {
   });
 
   it("returns a null end instant while no end date is chosen", () => {
-    expect(resolveCampaignWindow(windowDraft({}), createdAt).endsAt).toBeNull();
+    expect(
+      resolveCampaignWindow(
+        windowDraft({ campaignStartDate: "2026-09-01" }),
+        createdAt,
+      ).endsAt,
+    ).toBeNull();
   });
 });
 
 describe("validateCampaignWindow", () => {
   const now = new Date(2026, 7, 12, 9, 56);
 
-  it("requires an end date", () => {
-    const errors = validateCampaignWindow(windowDraft({}), now);
-    expect(errors.campaignEndDate).toBe("Campaign end date is required.");
-  });
-
-  it("accepts a future end date with no start date", () => {
+  it("requires a start date", () => {
     const errors = validateCampaignWindow(
       windowDraft({ campaignEndDate: "2026-08-31" }),
+      now,
+    );
+    expect(errors.campaignStartDate).toBe("Campaign start date is required.");
+  });
+
+  it("allows a blank optional end date when start date is set", () => {
+    const errors = validateCampaignWindow(
+      windowDraft({ campaignStartDate: "2026-08-20" }),
       now,
     );
     expect(errors).toEqual({});
@@ -119,7 +113,6 @@ describe("validateCampaignWindow", () => {
     const errors = validateCampaignWindow(
       windowDraft({
         campaignStartDate: "2026-08-20",
-        campaignStartTimeLocal: "08:00",
         campaignEndDate: "2026-08-20",
       }),
       now,
@@ -140,25 +133,27 @@ describe("validateCampaignWindow", () => {
     );
   });
 
-  it("rejects a past end date when the campaign starts on creation", () => {
-    const errors = validateCampaignWindow(
-      windowDraft({ campaignEndDate: "2026-08-11" }),
-      now,
-    );
-    expect(errors.campaignEndDate).toBe("End date must be today or later.");
-  });
-
-  it("rejects malformed start dates and start times", () => {
+  it("rejects malformed start dates", () => {
     const errors = validateCampaignWindow(
       windowDraft({
         campaignStartDate: "2026-02-30",
-        campaignStartTimeLocal: "25:99",
         campaignEndDate: "2026-09-30",
       }),
       now,
     );
 
     expect(errors.campaignStartDate).toBeDefined();
-    expect(errors.campaignStartTimeLocal).toBeDefined();
+  });
+
+  it("rejects malformed end dates when provided", () => {
+    const errors = validateCampaignWindow(
+      windowDraft({
+        campaignStartDate: "2026-08-20",
+        campaignEndDate: "2026-02-30",
+      }),
+      now,
+    );
+
+    expect(errors.campaignEndDate).toBeDefined();
   });
 });

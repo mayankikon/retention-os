@@ -9,9 +9,11 @@ src/
 │   │   ├── page.tsx            # List view (server shell + client list)
 │   │   ├── loading.tsx
 │   │   ├── error.tsx
-│   │   ├── new/page.tsx        # Campaign setup wizard
+│   │   ├── new/page.tsx        # Campaign setup wizard (create)
 │   │   ├── redlines/page.tsx   # Engineering handoff specs
-│   │   └── [id]/page.tsx       # Campaign detail (Details + Change log tabs)
+│   │   └── [id]/
+│   │       ├── page.tsx        # Campaign detail (Details + Change log tabs)
+│   │       └── edit/page.tsx   # Draft resume / edit setup wizard
 │   ├── accounts/
 │   │   ├── page.tsx            # Dealership accounts list
 │   │   └── loading.tsx
@@ -58,6 +60,8 @@ src/
 │   ├── format.ts
 │   ├── pagination.ts
 │   ├── campaign-search-params.ts
+│   ├── campaign-setup-resume.ts # Draft completeness + hydrate for edit
+│   ├── create-campaign-from-draft.ts
 │   ├── app-dialog-shell.ts     # Shared dialog chrome classes (productdemo parity)
 │   └── story-map/              # Timeline math, constants, localStorage
 ├── styles/globals.css            # App tokens + Shift package CSS imports

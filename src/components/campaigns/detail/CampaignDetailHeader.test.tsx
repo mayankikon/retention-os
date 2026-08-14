@@ -3,6 +3,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { ReactNode } from "react";
 import { CampaignDetailHeader } from "@/components/campaigns/detail/CampaignDetailHeader";
+import { createDefaultSetupDraft } from "@/data/campaign-setup.defaults";
 import type { Campaign } from "@/types/campaign";
 
 const pushMock = vi.fn();
@@ -56,6 +57,7 @@ vi.mock(
         {children}
       </button>
     ),
+    buttonVariants: () => "btn",
   }),
 );
 
@@ -153,5 +155,35 @@ describe("CampaignDetailHeader", () => {
 
     expect(updateCampaignStatusMock).not.toHaveBeenCalled();
     expect(pushMock).not.toHaveBeenCalled();
+  });
+
+  it("shows Continue setup for an incomplete draft", () => {
+    render(<CampaignDetailHeader campaign={buildCampaign("draft")} />);
+    expect(
+      screen.getByRole("link", { name: "Continue setup" }),
+    ).toHaveAttribute("href", "/campaigns/cmp-test/edit");
+    expect(screen.queryByRole("link", { name: "Edit" })).not.toBeInTheDocument();
+  });
+
+  it("shows Edit and Review & activate for a complete draft", () => {
+    const campaign = buildCampaign("draft");
+    campaign.setupDraft = {
+      ...createDefaultSetupDraft(),
+      campaignName: "Complete draft",
+      groupId: "Ikon Motors",
+      subfleets: ["Ikon Motors North"],
+      campaignStartDate: "2026-09-01",
+      campaignEndDate: "2026-09-30",
+      sendTimeLocal: "12:00",
+    };
+
+    render(<CampaignDetailHeader campaign={campaign} />);
+    expect(screen.getByRole("link", { name: "Edit" })).toHaveAttribute(
+      "href",
+      "/campaigns/cmp-test/edit",
+    );
+    expect(
+      screen.getByRole("link", { name: "Review & activate" }),
+    ).toHaveAttribute("href", "/campaigns/cmp-test/edit?step=review");
   });
 });

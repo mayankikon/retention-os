@@ -2,13 +2,11 @@
 
 import {
   Button,
-  Checkbox,
   Input,
-  Label,
 } from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
 
 import { useState } from "react";
-import { AlertCircle, CalendarClock, Send, ShieldCheck, Users } from "lucide-react";
+import { AlertCircle, CalendarClock, Send, Users } from "lucide-react";
 import { FormField } from "@/components/campaigns/setup/FormField";
 import { SuppressionListUpload } from "@/components/campaigns/setup/SuppressionListUpload";
 import { useProductVersion } from "@/contexts/product-version-context";
@@ -60,7 +58,7 @@ export function ReviewStep({
   const audienceSummary = summarizeAudienceFilters(draft.audienceFilters);
   const customersTargeted = estimateAudienceReach(draft.audienceFilters);
   const customersReached = estimateDeliverableReach(customersTargeted);
-  const canLaunch = draft.tcpaComplianceConfirmed && !isActivating;
+  const canLaunch = !isActivating;
 
   return (
     <div className="space-y-6">
@@ -136,48 +134,6 @@ export function ReviewStep({
           />
         </section>
       ) : null}
-
-      <section className="space-y-3 rounded-md border border-border bg-muted/20 p-4">
-        <div className="flex items-start gap-2">
-          <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-brand-primary" />
-          <div>
-            <h3 className="text-sm font-semibold">TCPA Compliance</h3>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Federal TCPA rules require consent for marketing texts and timely
-              honoring of opt-out requests (including STOP replies).
-            </p>
-          </div>
-        </div>
-
-        <label className="flex items-start gap-3 text-sm">
-          <Checkbox
-            id="tcpaComplianceConfirmed"
-            checked={draft.tcpaComplianceConfirmed}
-            onCheckedChange={(checked) =>
-              onChange({ tcpaComplianceConfirmed: checked })
-            }
-            className="mt-0.5"
-            aria-invalid={Boolean(errors.tcpaComplianceConfirmed)}
-          />
-          <span>
-            <Label
-              htmlFor="tcpaComplianceConfirmed"
-              className="cursor-pointer font-medium text-foreground"
-            >
-              I confirm TCPA compliance for this campaign
-            </Label>
-            <span className="mt-1 block text-muted-foreground">
-              I have excluded opted-out and suppressed phone numbers from this
-              audience, verified consent where required, and will honor STOP and
-              other opt-out requests in compliance with TCPA guidelines.
-            </span>
-          </span>
-        </label>
-
-        {errors.tcpaComplianceConfirmed ? (
-          <p className="text-sm text-destructive">{errors.tcpaComplianceConfirmed}</p>
-        ) : null}
-      </section>
 
       <FormField
         label="Test Mobile Number"
@@ -304,11 +260,6 @@ export function ReviewStep({
             </Button>
           </div>
         )}
-        {!draft.tcpaComplianceConfirmed ? (
-          <p className="text-sm text-muted-foreground">
-            Confirm TCPA compliance above to enable activation or scheduling.
-          </p>
-        ) : null}
       </div>
     </div>
   );

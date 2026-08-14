@@ -21,7 +21,9 @@ function validDraft(): CampaignSetupDraft {
     campaignImageFileName: "logo.png",
     groupId: "Ikon Motors",
     subfleets: ["Ikon Motors North"],
+    campaignStartDate: toDateInputValue(new Date()),
     campaignEndDate: toDateInputValue(new Date(Date.now() + 30 * MS_PER_DAY)),
+    sendTimeLocal: "12:00",
   };
 }
 
@@ -102,19 +104,15 @@ describe("validateConfigurationStep", () => {
     expect(result.errors.scheduleDays).toBeDefined();
   });
 
-  it("requires a campaign end date", () => {
-    const draft = { ...validDraft(), campaignEndDate: "" };
+  it("requires a campaign start date", () => {
+    const draft = { ...validDraft(), campaignStartDate: null };
     const result = validateConfigurationStep(draft);
     expect(result.isValid).toBe(false);
-    expect(result.errors.campaignEndDate).toBeDefined();
+    expect(result.errors.campaignStartDate).toBeDefined();
   });
 
-  it("allows an empty optional start date and start time", () => {
-    const draft = {
-      ...validDraft(),
-      campaignStartDate: null,
-      campaignStartTimeLocal: null,
-    };
+  it("allows an empty optional end date", () => {
+    const draft = { ...validDraft(), campaignEndDate: "" };
     expect(validateConfigurationStep(draft).isValid).toBe(true);
   });
 
@@ -129,19 +127,21 @@ describe("validateConfigurationStep", () => {
     expect(result.errors.campaignEndDate).toBeDefined();
   });
 
-  it("allows empty optional send time", () => {
+  it("requires send time", () => {
     const draft = { ...validDraft(), sendTimeLocal: null };
-    expect(validateConfigurationStep(draft).isValid).toBe(true);
+    const result = validateConfigurationStep(draft);
+    expect(result.isValid).toBe(false);
+    expect(result.errors.sendTimeLocal).toBeDefined();
   });
 
-  it("rejects invalid optional send time", () => {
+  it("rejects invalid send time", () => {
     const draft = { ...validDraft(), sendTimeLocal: "25:99" };
     const result = validateConfigurationStep(draft);
     expect(result.isValid).toBe(false);
     expect(result.errors.sendTimeLocal).toBeDefined();
   });
 
-  it("accepts valid optional send time", () => {
+  it("accepts valid send time", () => {
     const draft = { ...validDraft(), sendTimeLocal: "12:30" };
     expect(validateConfigurationStep(draft).isValid).toBe(true);
   });
@@ -198,15 +198,15 @@ describe("validateAllStepsBeforeActivate", () => {
 });
 
 describe("validateReviewStep", () => {
-  it("requires TCPA confirmation before activation", () => {
+  it("requires a test phone when requireTestSend is set", () => {
     const draft = {
       ...validDraft(),
-      tcpaComplianceConfirmed: false,
+      testPhoneNumber: "",
     };
     const result = validateSetupStep("review", draft, {
-      requireTcpaCompliance: true,
+      requireTestSend: true,
     });
     expect(result.isValid).toBe(false);
-    expect(result.errors.tcpaComplianceConfirmed).toBeDefined();
+    expect(result.errors.testPhoneNumber).toBeDefined();
   });
 });

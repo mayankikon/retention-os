@@ -24,13 +24,22 @@ import { useCurrentUser } from "@/contexts/session-context";
 import {
   addUserCreatedCampaign,
   setCampaignFlashMessage,
+  upsertUserCreatedCampaign,
 } from "@/lib/campaign-store";
-import { createCampaignFromDraft } from "@/lib/create-campaign-from-draft";
+import {
+  createCampaignFromDraft,
+  updateCampaignFromDraft,
+} from "@/lib/create-campaign-from-draft";
+import {
+  getCompletedSetupSteps,
+  isStepSelectable,
+} from "@/lib/campaign-setup-resume";
 import {
   validateAllStepsBeforeActivate,
   validateSetupStep,
 } from "@/lib/campaign-setup-validation";
 import { applyProductVersionToDraft } from "@/lib/product-version";
+import { findCampaignById } from "@/lib/campaign-lookup";
 import type { CampaignSetupDraft, SetupStepId } from "@/types/campaign-setup";
 import { SETUP_STEPS } from "@/types/campaign-setup";
 
@@ -52,29 +61,51 @@ function createInitialSetupDraft(dealership: string | null): CampaignSetupDraft 
   };
 }
 
-export function CampaignSetupWizard() {
+export interface CampaignSetupWizardProps {
+  mode?: "create" | "edit";
+  campaignId?: string;
+  initialDraft?: CampaignSetupDraft;
+  initialStep?: SetupStepId;
+}
+
+export function CampaignSetupWizard({
+  mode = "create",
+  campaignId,
+  initialDraft,
+  initialStep,
+}: CampaignSetupWizardProps = {}) {
   const router = useRouter();
   const currentUser = useCurrentUser();
   const { versionId } = useProductVersion();
   const { registerSetup, unregisterSetup, clearSetup, requestNavigation } =
     useCampaignSetupLeaveGuard();
+  const isEditMode = mode === "edit" && Boolean(campaignId);
+
   const [step, setStep] = useQueryState("step", stepParser);
   const [draft, setDraft] = useState<CampaignSetupDraft>(() =>
-    createInitialSetupDraft(currentUser.dealership),
+    initialDraft ?? createInitialSetupDraft(currentUser.dealership),
   );
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [completedSteps, setCompletedSteps] = useState<Set<SetupStepId>>(
-    () => new Set(),
+  const [completedSteps, setCompletedSteps] = useState<Set<SetupStepId>>(() =>
+    getCompletedSetupSteps(
+      initialDraft ?? createInitialSetupDraft(currentUser.dealership),
+    ),
   );
   const [isTestSent, setIsTestSent] = useState(false);
   const [isActivating, setIsActivating] = useState(false);
+  const hasAppliedInitialStep = useRef(false);
 
   const currentIndex = SETUP_STEPS.indexOf(step);
   const isFirstStep = currentIndex === 0;
   const isLastStep = step === "review";
+  const cancelHref = isEditMode ? `/campaigns/${campaignId}` : "/campaigns";
 
   const updateDraft = useCallback((patch: Partial<CampaignSetupDraft>) => {
-    setDraft((prev) => ({ ...prev, ...patch }));
+    setDraft((prev) => {
+      const next = { ...prev, ...patch };
+      setCompletedSteps(getCompletedSetupSteps(next));
+      return next;
+    });
     setErrors({});
   }, []);
 
@@ -82,9 +113,18 @@ export function CampaignSetupWizard() {
     setDraft((prev) => {
       const patch = applyProductVersionToDraft(prev, versionId);
       if (Object.keys(patch).length === 0) return prev;
-      return { ...prev, ...patch };
+      const next = { ...prev, ...patch };
+      setCompletedSteps(getCompletedSetupSteps(next));
+      return next;
     });
   }, [versionId]);
+
+  useEffect(() => {
+    if (hasAppliedInitialStep.current) return;
+    if (!initialStep) return;
+    hasAppliedInitialStep.current = true;
+    void setStep(initialStep);
+  }, [initialStep, setStep]);
 
   const goToStep = useCallback(
     (nextStep: SetupStepId) => {
@@ -94,6 +134,14 @@ export function CampaignSetupWizard() {
     [setStep],
   );
 
+  const handleStepSelect = useCallback(
+    (nextStep: SetupStepId) => {
+      if (!isStepSelectable(nextStep, completedSteps, step)) return;
+      goToStep(nextStep);
+    },
+    [completedSteps, step, goToStep],
+  );
+
   const handleNext = () => {
     const result = validateSetupStep(step, draft);
     if (!result.isValid) {
@@ -101,7 +149,8 @@ export function CampaignSetupWizard() {
       return;
     }
 
-    setCompletedSteps((prev) => new Set(prev).add(step));
+    const nextCompleted = new Set(getCompletedSetupSteps(draft)).add(step);
+    setCompletedSteps(nextCompleted);
 
     if (isLastStep) return;
 
@@ -136,18 +185,9 @@ export function CampaignSetupWizard() {
     if (!isTestSent) {
       const testResult = validateSetupStep("review", draft, {
         requireTestSend: true,
-        requireTcpaCompliance: true,
       });
       if (!testResult.isValid) {
         setErrors(testResult.errors);
-        return false;
-      }
-    } else {
-      const complianceResult = validateSetupStep("review", draft, {
-        requireTcpaCompliance: true,
-      });
-      if (!complianceResult.isValid) {
-        setErrors(complianceResult.errors);
         return false;
       }
     }
@@ -155,7 +195,7 @@ export function CampaignSetupWizard() {
     return true;
   }, [draft, isTestSent]);
 
-  const finishAndReturnHome = useCallback(
+  const finishCreateAndReturnHome = useCallback(
     (
       kind: "activated" | "scheduled" | "draft",
       campaignName: string,
@@ -168,19 +208,76 @@ export function CampaignSetupWizard() {
     [router, clearSetup],
   );
 
+  const finishEditSaveToDetail = useCallback(
+    (campaignName: string) => {
+      clearSetup();
+      setCampaignFlashMessage({ kind: "draft", campaignName });
+      router.push(`/campaigns/${campaignId}`);
+    },
+    [router, clearSetup, campaignId],
+  );
+
+  const finishEditLaunch = useCallback(
+    (
+      kind: "activated" | "scheduled",
+      campaignName: string,
+      detail?: string,
+    ) => {
+      clearSetup();
+      setCampaignFlashMessage({ kind, campaignName, detail });
+      router.push("/campaigns");
+    },
+    [router, clearSetup],
+  );
+
+  const persistEditCampaign = useCallback(
+    (options: {
+      status: "draft" | "active";
+      scheduledActivateAt?: string | null;
+    }) => {
+      if (!campaignId) return null;
+      const existing = findCampaignById(campaignId);
+      if (!existing) return null;
+
+      const campaign = updateCampaignFromDraft(existing, draft, {
+        status: options.status,
+        scheduledActivateAt: options.scheduledActivateAt,
+      });
+      upsertUserCreatedCampaign(campaign);
+      return campaign;
+    },
+    [campaignId, draft],
+  );
+
   const handleActivateNow = useCallback(async () => {
     if (!validateLaunch()) return;
 
     setIsActivating(true);
     await new Promise((resolve) => setTimeout(resolve, 800));
 
+    if (isEditMode) {
+      const campaign = persistEditCampaign({ status: "active" });
+      setIsActivating(false);
+      if (!campaign) return;
+      finishEditLaunch("activated", campaign.name);
+      return;
+    }
+
     const campaign = createCampaignFromDraft(draft, currentUser, {
       status: "active",
     });
     addUserCreatedCampaign(campaign);
     setIsActivating(false);
-    finishAndReturnHome("activated", campaign.name);
-  }, [draft, currentUser, validateLaunch, finishAndReturnHome]);
+    finishCreateAndReturnHome("activated", campaign.name);
+  }, [
+    draft,
+    currentUser,
+    validateLaunch,
+    finishCreateAndReturnHome,
+    finishEditLaunch,
+    isEditMode,
+    persistEditCampaign,
+  ]);
 
   const handleSchedule = useCallback(
     async (activateOnDate: string) => {
@@ -193,19 +290,37 @@ export function CampaignSetupWizard() {
       setIsActivating(true);
       await new Promise((resolve) => setTimeout(resolve, 800));
 
+      const scheduledActivateAt = `${activateOnDate}T12:00:00.000Z`;
+      const detail = `Activates ${new Date(scheduledActivateAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`;
+
+      if (isEditMode) {
+        const campaign = persistEditCampaign({
+          status: "draft",
+          scheduledActivateAt,
+        });
+        setIsActivating(false);
+        if (!campaign) return;
+        finishEditLaunch("scheduled", campaign.name, detail);
+        return;
+      }
+
       const campaign = createCampaignFromDraft(draft, currentUser, {
         status: "draft",
-        scheduledActivateAt: `${activateOnDate}T12:00:00.000Z`,
+        scheduledActivateAt,
       });
       addUserCreatedCampaign(campaign);
       setIsActivating(false);
-      finishAndReturnHome(
-        "scheduled",
-        campaign.name,
-        `Activates ${new Date(`${activateOnDate}T12:00:00.000Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`,
-      );
+      finishCreateAndReturnHome("scheduled", campaign.name, detail);
     },
-    [draft, currentUser, validateLaunch, finishAndReturnHome],
+    [
+      draft,
+      currentUser,
+      validateLaunch,
+      finishCreateAndReturnHome,
+      finishEditLaunch,
+      isEditMode,
+      persistEditCampaign,
+    ],
   );
 
   const persistDraft = useCallback(
@@ -219,14 +334,29 @@ export function CampaignSetupWizard() {
         return false;
       }
 
+      if (isEditMode) {
+        const campaign = persistEditCampaign({ status: "draft" });
+        if (!campaign) return false;
+        finishEditSaveToDetail(campaign.name);
+        return true;
+      }
+
       const campaign = createCampaignFromDraft(draft, currentUser, {
         status: "draft",
       });
       addUserCreatedCampaign(campaign);
-      finishAndReturnHome("draft", campaign.name);
+      finishCreateAndReturnHome("draft", campaign.name);
       return true;
     },
-    [draft, currentUser, finishAndReturnHome, goToStep],
+    [
+      draft,
+      currentUser,
+      finishCreateAndReturnHome,
+      finishEditSaveToDetail,
+      goToStep,
+      isEditMode,
+      persistEditCampaign,
+    ],
   );
 
   const handleSaveDraftFromReview = useCallback(() => {
@@ -248,7 +378,7 @@ export function CampaignSetupWizard() {
   }, [registerSetup, unregisterSetup]);
 
   const handleCancel = () => {
-    requestNavigation("/campaigns");
+    requestNavigation(cancelHref);
   };
 
   const stepContent = useMemo(() => {
@@ -308,6 +438,10 @@ export function CampaignSetupWizard() {
       currentStepId={step}
       completedSteps={completedSteps}
       draft={draft}
+      mode={isEditMode ? "edit" : "create"}
+      campaignName={draft.campaignName || undefined}
+      cancelHref={cancelHref}
+      onStepSelect={isEditMode ? handleStepSelect : undefined}
     >
       <div className="flex h-full min-h-0 flex-col">
         <div className="flex-1 p-6">{stepContent}</div>

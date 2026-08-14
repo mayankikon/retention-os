@@ -35,9 +35,11 @@ Query parameters (mirror URL state):
 }
 ```
 
-**Campaign object** — see `src/types/campaign.ts` (`createdBy` includes `id`, `name`, `initials`; `createdAt` ISO timestamp; `clickThroughRate` percentage 0–100 for list display; statuses: draft, active, paused, completed, archived; optional `scheduledActivateAt` for future go-live while status remains draft; optional `startsAt` / `endsAt` ISO instants for the campaign run window collected on the Configuration step; `dealer` is the primary/first dealership, optional `dealers` lists every selected dealership for multi-dealer campaigns).
+**Campaign object** — see `src/types/campaign.ts` (`createdBy` includes `id`, `name`, `initials`; `createdAt` ISO timestamp; `clickThroughRate` percentage 0–100 for list display; statuses: draft, active, paused, completed, archived; optional `scheduledActivateAt` for future go-live while status remains draft; optional `startsAt` / `endsAt` ISO instants for the campaign run window collected on the Configuration step; `dealer` is the primary/first dealership, optional `dealers` lists every selected dealership for multi-dealer campaigns; optional `setupDraft` holds the full wizard payload for draft resume/edit).
 
 **POST /campaigns** (proposed) — create from setup wizard; `createdBy` and `createdAt` set server-side from session.
+
+**PATCH /campaigns/:id** (proposed) — update draft setup in place (same id); accept setup fields / `setupDraft`; bump `updatedAt` / `lastUpdatedAt`. Not implemented in POC (local store `updateCampaignFromDraft` + upsert).
 
 ## Planned: Get campaign detail
 
