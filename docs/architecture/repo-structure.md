@@ -31,9 +31,10 @@ src/
 │   │   ├── detail/             # Campaign detail tabs (Details, Change log)
 │   │   └── setup/              # Wizard steps, shell, confirmation
 │   ├── story-map/              # Roadmap sidebar, timeline, bars
-│   ├── layout/AppShell.tsx       # Shift Sidebar + AppGroovedMainColumn (full-bleed main; pages own scroll)
+│   ├── layout/AppShell.tsx       # Shift Sidebar (Toolbox / Retention OS lockup when expanded, condensed mark when collapsed) + AppGroovedMainColumn
 │   ├── layout/AppDialogShell.tsx # Productdemo inventory-style dialog chrome
 │   ├── layout/TitleBar.tsx       # Shift 2.0 page title bar (app-level; not in package)
+│   ├── layout/ToolboxRetentionOsLogo.tsx  # Toolbox + Retention OS sidebar lockup
 │   ├── layout/VersionSwitcher.tsx  # Sidebar footer product version dropdown
 │   ├── layout/LoadingSkeleton.tsx  # Server-safe loading placeholder
 │   ├── providers/design-system-providers.tsx  # Shift AppTheme + chrome providers

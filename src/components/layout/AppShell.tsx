@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Building2, LayoutList, LayoutTemplate, Megaphone } from "lucide-react";
 import {
@@ -9,6 +9,7 @@ import {
   type SidebarNavSectionConfig,
   type SidebarProductConfig,
 } from "@ikontechnologies-arlington/nxtg-design-shiftpackage";
+import { ToolboxRetentionOsLogo } from "@/components/layout/ToolboxRetentionOsLogo";
 import { VersionSwitcher } from "@/components/layout/VersionSwitcher";
 import { useOptionalCampaignSetupLeaveGuard } from "@/contexts/campaign-setup-leave-guard";
 import { useCurrentUser } from "@/contexts/session-context";
@@ -65,6 +66,7 @@ export function AppShell({
   const user = useCurrentUser();
   const leaveGuard = useOptionalCampaignSetupLeaveGuard();
   const isSetupActive = Boolean(leaveGuard?.isSetupActive);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   const mainSections = useMemo<SidebarNavSectionConfig[]>(
     () => [
@@ -94,12 +96,15 @@ export function AppShell({
     <div className="flex h-svh min-h-0 overflow-hidden bg-shell font-sans dark:bg-background">
       <Sidebar
         homeHref="/campaigns"
-        // Omit `logo` so Shift renders the Toolbox wordmark + condensed mark
-        // (same size/weight morph as productdemo when the rail collapses).
+        // Full Toolbox / Retention OS lockup only while expanded; the collapsed
+        // rail falls back to Shift's condensed mark, which fits the icon column.
+        logo={isSidebarCollapsed ? undefined : <ToolboxRetentionOsLogo />}
         showTopProductSwitcher={false}
         showFooterProductToggle={false}
         showRightDivider={false}
         collapsible
+        collapsed={isSidebarCollapsed}
+        onCollapsedChange={setIsSidebarCollapsed}
         products={PRODUCTS}
         activeProductId="smart-marketing"
         mainSections={mainSections}
