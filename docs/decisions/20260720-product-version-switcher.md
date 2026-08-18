@@ -1,10 +1,10 @@
-# Product version switcher (POC / MVP)
+# Product version switcher (MVP / Post MVP)
 
 Date: 2026-07-20
 
 ## Context
 
-We need to demo and iterate on incremental product slices (POC → MVP → Post MVP) without maintaining separate apps. Features must be addable/removable per version.
+We need to demo and iterate on incremental product slices (MVP → Post MVP) without maintaining separate apps. Features must be addable/removable per version.
 
 ## Decision
 
@@ -12,19 +12,21 @@ Add a left-nav **Version** dropdown that persists the active product version in 
 
 Selectable now:
 
-- POC V0.5
-- MVP V1.0 (default)
+- MVP V1.0
+- Post MVP V1.1 (default)
 
 Listed but disabled:
 
-- Post MVP V1.1
 - Post MVP V1.2
+- Post MVP V1.3
 - Post MVP V1.4
 
-POC V0.5 feature gates for the current slice:
+MVP V1.0 feature gates for the current slice:
 
 - No email delivery channel
 - Oil Change Campaign messaging template only
+
+Ladder rename (2026-08-18): POC V0.5 → MVP V1.0; MVP V1.0 → Post MVP V1.1; V1.1 → V1.2; V1.2 → V1.3. Storage schema `2` remaps legacy ids once so saved preferences land on the equivalent slice.
 
 ## Consequences
 

@@ -35,23 +35,23 @@ Web UI for Ikon's Smart Marketing Campaign Manager. Phase 1 delivers the **Campa
 - Draft resume/edit at `/campaigns/[id]/edit` — detail CTAs Continue setup / Edit / Review & activate; Save Draft updates in place with full `setupDraft`
 - General: Group → multi-select Dealerships with per-dealer timezone (fallback when unknown)
 - Configuration: Time+Mileage or OEM trigger, each with nested audience query; campaign duration (required start date, optional end date); schedule days; required send time plus a timezone table that recomputes each zone's manager time from the selected send time
-- Review: audience reach card; Activate now / Schedule / Save draft (draft only on this step); leave-guard modal when navigating away mid-setup; Audience suppression hidden on POC V0.5
+- Review: audience reach card; Activate now / Schedule / Save draft (draft only on this step); leave-guard modal when navigating away mid-setup; Audience suppression hidden on MVP V1.0
 - After activate/schedule: success banner on `/campaigns` list (scheduled activation keeps status `draft` + `scheduledActivateAt`). Edit-mode Save Draft returns to campaign detail.
 - SOP-default SMS templates, timezone schedule reference table, test send (mock)
 
 ### Product versions
 
-- Sidebar **Version** switcher (bottom of left nav) with selectable **POC V0.5** and **MVP V1.0**
-- Post-MVP versions (**V1.1**, **V1.2**, **V1.4**) are listed but disabled for now
-- **POC V0.5** gates: SMS only (no email channel); Oil Change Campaign template only in campaign setup
-- Version preference persists in `localStorage` (`retention-os-product-version`)
+- Sidebar **Version** switcher (bottom of left nav) with selectable **MVP V1.0** and **Post MVP V1.1**
+- Post-MVP versions (**V1.2**, **V1.3**, **V1.4**) are listed but disabled for now
+- **MVP V1.0** gates: SMS only (no email channel); Oil Change Campaign template only in campaign setup
+- Version preference persists in `localStorage` (`retention-os-product-version`); schema v2 remaps legacy POC/MVP ids
 
 ### Templates
 
 - Top-level **Templates** nav (`/templates`) available in all product versions
 - Create/edit via multi-step wizard; Draft / Published / Archived statuses
 - Detail shows content, campaigns using the template, and audit history
-- Published templates populate campaign Messaging (plus Custom); POC setup still Oil Change–only
+- Published templates populate campaign Messaging (plus Custom); MVP V1.0 setup still Oil Change–only
 - Persistence: `localStorage` (`retention-os-message-templates-v2`) seeded with system templates
 
 ## External boundaries

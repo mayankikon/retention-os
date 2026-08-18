@@ -13,7 +13,7 @@ Close the remaining prototype gaps for Sprint 0 design tickets in this repo only
 | Topic | Decision |
 | --- | --- |
 | Delivery | Prototype-only MVP |
-| Product versions | Both POC V0.5 and MVP V1.0+ |
+| Product versions | Both MVP V1.0 and Post MVP V1.1+ |
 | List scope work | Build on existing `DealershipScopeBar` / group-dealer lookups |
 | Message preview (multi-dealer) | Use first selected dealership name |
 | Schedule | Keep SOP timezone table; add **optional** HH:mm send time |

@@ -1,8 +1,8 @@
 export const PRODUCT_VERSION_IDS = [
-  "poc_v0_5",
   "mvp_v1_0",
   "post_mvp_v1_1",
   "post_mvp_v1_2",
+  "post_mvp_v1_3",
   "post_mvp_v1_4",
 ] as const;
 
@@ -17,12 +17,6 @@ export interface ProductVersionOption {
 
 export const PRODUCT_VERSION_OPTIONS: ProductVersionOption[] = [
   {
-    id: "poc_v0_5",
-    label: "POC V0.5",
-    shortLabel: "POC V0.5",
-    isSelectable: true,
-  },
-  {
     id: "mvp_v1_0",
     label: "MVP V1.0",
     shortLabel: "MVP V1.0",
@@ -32,12 +26,18 @@ export const PRODUCT_VERSION_OPTIONS: ProductVersionOption[] = [
     id: "post_mvp_v1_1",
     label: "Post MVP V1.1",
     shortLabel: "V1.1",
-    isSelectable: false,
+    isSelectable: true,
   },
   {
     id: "post_mvp_v1_2",
     label: "Post MVP V1.2",
     shortLabel: "V1.2",
+    isSelectable: false,
+  },
+  {
+    id: "post_mvp_v1_3",
+    label: "Post MVP V1.3",
+    shortLabel: "V1.3",
     isSelectable: false,
   },
   {
@@ -48,4 +48,4 @@ export const PRODUCT_VERSION_OPTIONS: ProductVersionOption[] = [
   },
 ];
 
-export const DEFAULT_PRODUCT_VERSION_ID: ProductVersionId = "mvp_v1_0";
+export const DEFAULT_PRODUCT_VERSION_ID: ProductVersionId = "post_mvp_v1_1";

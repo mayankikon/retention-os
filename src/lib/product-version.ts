@@ -23,7 +23,21 @@ import {
 } from "@/types/product-version";
 
 export const PRODUCT_VERSION_STORAGE_KEY = "retention-os-product-version";
+export const PRODUCT_VERSION_STORAGE_SCHEMA_KEY =
+  "retention-os-product-version-schema";
+export const PRODUCT_VERSION_STORAGE_SCHEMA = "2";
 export const PRODUCT_VERSION_UPDATED_EVENT = "product-version-updated";
+
+/**
+ * One-time remap from the pre-rename ladder (POC V0.5 → … → Post MVP V1.2).
+ * Applied only when the storage schema is still unset / older than v2.
+ */
+const LEGACY_PRODUCT_VERSION_ID_MAP: Record<string, ProductVersionId> = {
+  poc_v0_5: "mvp_v1_0",
+  mvp_v1_0: "post_mvp_v1_1",
+  post_mvp_v1_1: "post_mvp_v1_2",
+  post_mvp_v1_2: "post_mvp_v1_3",
+};
 
 export function isProductVersionId(value: string): value is ProductVersionId {
   return (PRODUCT_VERSION_IDS as readonly string[]).includes(value);
@@ -45,9 +59,9 @@ export function canSelectProductVersion(versionId: ProductVersionId): boolean {
   return getProductVersionOption(versionId).isSelectable;
 }
 
-/** POC V0.5: SMS only. MVP+: SMS + email. */
+/** MVP V1.0: SMS only. Post MVP V1.1+: SMS + email. */
 export function isEmailChannelAvailable(versionId: ProductVersionId): boolean {
-  return versionId !== "poc_v0_5";
+  return versionId !== "mvp_v1_0";
 }
 
 export function getAvailableDeliveryChannelOptions(
@@ -62,7 +76,7 @@ export function getAvailableDeliveryChannelOptions(
 /**
  * Published managed templates available in campaign setup for this version.
  * Custom is added separately in the Messaging step UI.
- * POC V0.5: Oil Change only.
+ * MVP V1.0: Oil Change only.
  */
 export function getAvailableMessageTemplates(
   versionId: ProductVersionId,
@@ -71,7 +85,7 @@ export function getAvailableMessageTemplates(
     .filter((template) => template.status === "published")
     .map(messageTemplateToPickerItem);
 
-  if (versionId === "poc_v0_5") {
+  if (versionId === "mvp_v1_0") {
     return published.filter(
       (template) => template.id === OIL_CHANGE_TEMPLATE_ID,
     );
@@ -86,7 +100,7 @@ export function isMessageTemplateAvailable(
 ): boolean {
   if (!templateId) return false;
   if (templateId === CUSTOM_TEMPLATE_ID) {
-    return versionId !== "poc_v0_5";
+    return versionId !== "mvp_v1_0";
   }
   return getAvailableMessageTemplates(versionId).some(
     (template) => template.id === templateId,
@@ -124,11 +138,38 @@ function isBrowser(): boolean {
   return typeof window !== "undefined";
 }
 
+function migrateLegacyStoredProductVersion(raw: string): ProductVersionId {
+  const mapped = LEGACY_PRODUCT_VERSION_ID_MAP[raw];
+  if (mapped && canSelectProductVersion(mapped)) {
+    return mapped;
+  }
+  if (isProductVersionId(raw) && canSelectProductVersion(raw)) {
+    return raw;
+  }
+  return DEFAULT_PRODUCT_VERSION_ID;
+}
+
 export function readStoredProductVersion(): ProductVersionId {
   if (!isBrowser()) return DEFAULT_PRODUCT_VERSION_ID;
 
   try {
+    const schema = window.localStorage.getItem(
+      PRODUCT_VERSION_STORAGE_SCHEMA_KEY,
+    );
     const raw = window.localStorage.getItem(PRODUCT_VERSION_STORAGE_KEY);
+
+    if (schema !== PRODUCT_VERSION_STORAGE_SCHEMA) {
+      const migrated = raw
+        ? migrateLegacyStoredProductVersion(raw)
+        : DEFAULT_PRODUCT_VERSION_ID;
+      window.localStorage.setItem(PRODUCT_VERSION_STORAGE_KEY, migrated);
+      window.localStorage.setItem(
+        PRODUCT_VERSION_STORAGE_SCHEMA_KEY,
+        PRODUCT_VERSION_STORAGE_SCHEMA,
+      );
+      return migrated;
+    }
+
     if (!raw || !isProductVersionId(raw)) {
       return DEFAULT_PRODUCT_VERSION_ID;
     }
@@ -146,6 +187,10 @@ export function writeStoredProductVersion(versionId: ProductVersionId): void {
   if (!canSelectProductVersion(versionId)) return;
 
   window.localStorage.setItem(PRODUCT_VERSION_STORAGE_KEY, versionId);
+  window.localStorage.setItem(
+    PRODUCT_VERSION_STORAGE_SCHEMA_KEY,
+    PRODUCT_VERSION_STORAGE_SCHEMA,
+  );
   window.dispatchEvent(
     new CustomEvent(PRODUCT_VERSION_UPDATED_EVENT, {
       detail: { versionId },

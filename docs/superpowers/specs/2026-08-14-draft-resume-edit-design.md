@@ -112,7 +112,7 @@ flowchart TD
 While `status === "draft"`:
 
 - **All wizard fields editable** (Group, dealerships, messaging, reminders, configuration, review extras).
-- Product-version locks remain (e.g. POC V0.5 SMS-only, Oil Change template) — same as create.
+- Product-version locks remain (e.g. MVP V1.0 SMS-only, Oil Change template) — same as create.
 - Campaign **id** is immutable (not a form field).
 - Status stays `draft` until Activate / Schedule from Review succeeds.
 

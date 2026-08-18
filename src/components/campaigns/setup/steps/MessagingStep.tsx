@@ -54,13 +54,13 @@ export function MessagingStep({ draft, errors, onChange }: MessagingStepProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [isVariableDialogOpen, setIsVariableDialogOpen] = useState(false);
   const deliveryChannelOptions = getAvailableDeliveryChannelOptions(versionId);
-  const isPocVersion = versionId === "poc_v0_5";
+  const isMvpV10Version = versionId === "mvp_v1_0";
   const messageTemplates = useMemo(() => {
     const published = getAvailableMessageTemplates(versionId);
-    if (isPocVersion) return published;
+    if (isMvpV10Version) return published;
     return [...published, CUSTOM_PICKER_ITEM];
     // templates length/ids ensure picker refreshes after localStorage updates
-  }, [versionId, isPocVersion, templates]);
+  }, [versionId, isMvpV10Version, templates]);
 
   const handleInsertVariable = (token: string) => {
     const textarea = textareaRef.current;
@@ -99,8 +99,8 @@ export function MessagingStep({ draft, errors, onChange }: MessagingStepProps) {
   return (
     <div className="space-y-6">
       <p className="text-sm text-muted-foreground">
-        {isPocVersion
-          ? "POC includes Oil Change Campaign messaging over SMS only."
+        {isMvpV10Version
+          ? "MVP V1.0 includes Oil Change Campaign messaging over SMS only."
           : "Oil Change Campaign is selected by default. Pick another template or choose Custom to write your own primary promo and reminders."}
       </p>
 
@@ -108,8 +108,8 @@ export function MessagingStep({ draft, errors, onChange }: MessagingStepProps) {
         label="Delivery Channels"
         error={errors.deliveryChannels}
         hint={
-          isPocVersion
-            ? "POC supports SMS only. Email is available in MVP V1.0+."
+          isMvpV10Version
+            ? "MVP V1.0 supports SMS only. Email is available in Post MVP V1.1+."
             : "Select one or more channels. The preview updates for SMS and email."
         }
         required
@@ -149,8 +149,8 @@ export function MessagingStep({ draft, errors, onChange }: MessagingStepProps) {
       <FormField
         label="Message Template"
         hint={
-          isPocVersion
-            ? "POC includes the Oil Change Campaign template only."
+          isMvpV10Version
+            ? "MVP V1.0 includes the Oil Change Campaign template only."
             : "Published templates from Templates apply copy to messaging and reminders. Custom clears the fields so you can write from scratch."
         }
       >
@@ -196,7 +196,7 @@ export function MessagingStep({ draft, errors, onChange }: MessagingStepProps) {
             onChange={(e) =>
               onChange({
                 primaryPromoText: e.target.value,
-                ...(isPocVersion
+                ...(isMvpV10Version
                   ? {}
                   : { messageTemplateId: CUSTOM_TEMPLATE_ID }),
               })

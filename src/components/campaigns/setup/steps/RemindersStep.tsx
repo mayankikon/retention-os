@@ -136,7 +136,7 @@ function ReminderTemplateField({
   onChange: (patch: Partial<CampaignSetupDraft>) => void;
 }) {
   const { versionId } = useProductVersion();
-  const isPocVersion = versionId === "poc_v0_5";
+  const isMvpV10Version = versionId === "mvp_v1_0";
   const isEnabled = draft[field.enabledKey];
   const textValue = draft[field.textKey];
   const textError = isEnabled && field.textErrorKey
@@ -182,7 +182,7 @@ function ReminderTemplateField({
               onChange={(e) =>
                 onChange({
                   [field.textKey]: e.target.value,
-                  ...(isPocVersion
+                  ...(isMvpV10Version
                     ? {}
                     : { messageTemplateId: CUSTOM_TEMPLATE_ID }),
                 })

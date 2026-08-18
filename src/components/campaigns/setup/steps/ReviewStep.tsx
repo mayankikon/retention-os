@@ -41,7 +41,7 @@ export function ReviewStep({
   isActivating,
 }: ReviewStepProps) {
   const { versionId } = useProductVersion();
-  const isPocVersion = versionId === "poc_v0_5";
+  const isMvpV10Version = versionId === "mvp_v1_0";
   const [testStatus, setTestStatus] = useState<"idle" | "sending" | "sent">(
     "idle",
   );
@@ -111,7 +111,7 @@ export function ReviewStep({
         </div>
       </section>
 
-      {!isPocVersion ? (
+      {!isMvpV10Version ? (
         <section className="space-y-4 rounded-md border border-border p-4">
           <div>
             <h3 className="text-sm font-semibold">Audience Suppression</h3>
