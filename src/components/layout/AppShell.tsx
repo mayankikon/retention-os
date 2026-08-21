@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
-import { Building2, LayoutList, LayoutTemplate, Megaphone } from "lucide-react";
+import { Megaphone } from "lucide-react";
 import {
   AppGroovedMainColumn,
   Sidebar,
@@ -11,6 +11,10 @@ import {
 } from "@ikontechnologies-arlington/nxtg-design-shiftpackage";
 import { ToolboxRetentionOsLogo } from "@/components/layout/ToolboxRetentionOsLogo";
 import { VersionSwitcher } from "@/components/layout/VersionSwitcher";
+import {
+  isSmartMarketingNavItemActive,
+  SMART_MARKETING_NAV_ITEMS,
+} from "@/components/layout/app-navigation";
 import { useOptionalCampaignSetupLeaveGuard } from "@/contexts/campaign-setup-leave-guard";
 import { useCurrentUser } from "@/contexts/session-context";
 import { cn } from "@/lib/utils";
@@ -21,41 +25,9 @@ interface AppShellProps {
   contentClassName?: string;
 }
 
-const NAV_ITEMS = [
-  {
-    href: "/campaigns",
-    label: "Campaigns",
-    icon: LayoutList,
-  },
-  {
-    href: "/templates",
-    label: "Templates",
-    icon: LayoutTemplate,
-  },
-  {
-    href: "/accounts",
-    label: "Accounts",
-    icon: Building2,
-  },
-] as const;
-
 const PRODUCTS: SidebarProductConfig[] = [
   { id: "smart-marketing", label: "Smart Marketing", icon: Megaphone },
 ];
-
-function isNavItemActive(href: string, pathname: string): boolean {
-  if (href === "/campaigns") {
-    return (
-      pathname === "/campaigns" ||
-      (pathname.startsWith("/campaigns/") &&
-        !pathname.startsWith("/campaigns/redlines"))
-    );
-  }
-  if (href === "/accounts") {
-    return pathname === "/accounts" || pathname.startsWith("/accounts/");
-  }
-  return pathname === href || pathname.startsWith(`${href}/`);
-}
 
 export function AppShell({
   children,
@@ -71,10 +43,10 @@ export function AppShell({
   const mainSections = useMemo<SidebarNavSectionConfig[]>(
     () => [
       {
-        items: NAV_ITEMS.map((item) => ({
+        items: SMART_MARKETING_NAV_ITEMS.map((item) => ({
           label: item.label,
           icon: item.icon,
-          isActive: isNavItemActive(item.href, pathname),
+          isActive: isSmartMarketingNavItemActive(item.href, pathname),
           // Omit href while setup leave-guard is active so Sidebar renders
           // buttons we can intercept (Links cannot be preventDefault'd via API).
           href: isSetupActive ? undefined : item.href,
@@ -85,7 +57,9 @@ export function AppShell({
   );
 
   const handleNavItemClick = (label: string) => {
-    const item = NAV_ITEMS.find((navItem) => navItem.label === label);
+    const item = SMART_MARKETING_NAV_ITEMS.find(
+      (navItem) => navItem.label === label,
+    );
     if (!item) return;
     if (leaveGuard?.isSetupActive) {
       leaveGuard.requestNavigation(item.href);

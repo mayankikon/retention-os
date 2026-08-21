@@ -1,7 +1,7 @@
 # ADR: Campaign run window on the Configuration step
 
 **Date:** 2026-08-12  
-**Status:** Superseded in part by `20260814-campaign-window-and-review-requirements.md`
+**Status:** Superseded in part by `20260814-campaign-window-and-review-requirements.md` and `20260821-live-copy-and-activation-actions.md`
 
 ## Context
 
@@ -20,5 +20,5 @@ Date values are compared and formatted as local `yyyy-MM-dd` text. `toDateInputV
 
 ## Consequences
 
-- The run window is deliberately separate from `scheduledActivateAt`. Activation scheduling stays on the Review step; a campaign can be scheduled to activate later and still carry its own start/end window.
+- Review no longer has a separate activation-scheduling action. **Activate Now** moves the campaign to Active; `startsAt` gates eligible sends when the configured start date is in the future. `scheduledActivateAt` remains only as a legacy prototype field.
 - `startsAt` / `endsAt` are stored but not yet surfaced on the list or detail views, and no job enforces the end date — that is follow-up work when the campaign lifecycle moves server-side.

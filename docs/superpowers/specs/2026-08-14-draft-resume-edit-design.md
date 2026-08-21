@@ -2,7 +2,7 @@
 
 ## Goal
 
-Creators can reopen a **Draft** campaign from detail, change setup fields in the existing New Campaign wizard, Save Draft without losing the campaign identity, and either return to Draft detail or continue toward Activate / Schedule from Review.
+Creators can reopen a **Draft** campaign from detail, change setup fields in the existing New Campaign wizard, Save Draft without losing the campaign identity, and either return to Draft detail or continue toward Activate Now from Review.
 
 ## Non-goals
 
@@ -24,7 +24,7 @@ Creators can reopen a **Draft** campaign from detail, change setup fields in the
 | Editable fields | Everything editable while status is `draft` |
 | Save Draft | Update in place (same `campaign.id`); bump `updatedAt`; redirect to Draft detail |
 | Cancel / leave | Same leave-guard pattern as New Campaign |
-| Abandon | Discard **unsaved edits only**; never delete the draft campaign |
+| Discard changes | Discard **unsaved edits only**; never delete the draft campaign |
 | Persistence | Full `CampaignSetupDraft` (or equivalent) must be stored with the campaign for true resume |
 
 ---
@@ -50,7 +50,7 @@ UI may show a short subtitle under the title when incomplete, e.g. “Setup inco
 
 ### Out of scope from detail
 
-- No Activate / Schedule buttons on detail itself (activation stays on Review).
+- No Activate Now button on detail itself (activation stays on Review).
 - No Archive on draft (unchanged from archive/pause spec).
 
 ---
@@ -114,13 +114,13 @@ While `status === "draft"`:
 - **All wizard fields editable** (Group, dealerships, messaging, reminders, configuration, review extras).
 - Product-version locks remain (e.g. MVP V1.0 SMS-only, Oil Change template) — same as create.
 - Campaign **id** is immutable (not a form field).
-- Status stays `draft` until Activate / Schedule from Review succeeds.
+- Status stays `draft` until Activate Now from Review succeeds.
 
 No field locks unique to edit mode in this pass.
 
 ---
 
-## Save Draft / Cancel / Abandon
+## Save Draft / Cancel / Discard changes
 
 ### Save Draft (edit mode)
 
@@ -136,13 +136,13 @@ Create mode unchanged: Save Draft creates new id and may still land on list with
 
 ### Leave-guard (edit mode)
 
-Reuse **Campaign In Progress** modal:
+Draft editing uses a distinct **Leave draft editing?** modal. The New Campaign Setup copy from SM2-187 is create-mode only.
 
 | Action | Result |
 |--------|--------|
-| **Keep Editing** | Dismiss; stay on wizard |
-| **Save Draft** | Persist update-in-place; go to Draft detail |
-| **Abandon** | Discard **in-memory unsaved changes**; navigate to requested destination (usually Draft detail or list). **Do not delete** the campaign. Last saved draft remains. |
+| **Keep editing** | Dismiss; stay on wizard |
+| **Save draft** | Persist update-in-place; go to Draft detail |
+| **Discard changes** | Discard **in-memory unsaved changes**; navigate to requested destination (usually Draft detail or list). **Do not delete** the campaign. Last saved draft remains. |
 
 Triggers: Cancel, breadcrumb Campaigns, sidebar nav, `beforeunload` while dirty — same as create.
 
@@ -151,10 +151,11 @@ Triggers: Cancel, breadcrumb Campaigns, sidebar nav, `beforeunload` while dirty 
 - Edit mode: dirty when current form ≠ hydrated snapshot (or ≠ last successful save).
 - Leave-guard only when dirty (recommended). If not dirty, Cancel navigates away with no modal.
 
-### Activate / Schedule from Review (edit mode)
+### Activate from Review (edit mode)
 
-- Same UI as create Review.
-- On success: campaign leaves draft (active or scheduled-activate-at + draft, per existing status rules); redirect/confirmation matches create flow.
+- Same **Activate Now** + **Save Draft** UI as create Review; no Schedule CTA.
+- Activate Now moves the campaign to Active. A future configured start date gates sends without introducing a Scheduled status.
+- On success, redirect/confirmation matches create flow.
 - Does not create a second campaign.
 
 ---
@@ -242,7 +243,7 @@ Detail tabs (Details / Change Log) unchanged in content scope; Details may later
 - Draft incomplete: header shows Continue setup → edit route → first incomplete step
 - Draft complete: Edit → Review; Review & activate → Review
 - Save Draft updates same id; detail shows new `updatedAt`; no duplicate row
-- Abandon after edits restores last saved values; campaign still listed as draft
+- Discard changes after edits restores last saved values; campaign still listed as draft
 - Edit URL for active campaign blocked
 - Missing id → not found
 - Keyboard: CTAs and stepper reachable; leave-guard operable

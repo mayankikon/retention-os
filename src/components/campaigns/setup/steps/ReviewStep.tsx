@@ -6,7 +6,7 @@ import {
 } from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
 
 import { useState } from "react";
-import { AlertCircle, CalendarClock, Send, Users } from "lucide-react";
+import { AlertCircle, Send, Users } from "lucide-react";
 import { FormField } from "@/components/campaigns/setup/FormField";
 import { SuppressionListUpload } from "@/components/campaigns/setup/SuppressionListUpload";
 import { useProductVersion } from "@/contexts/product-version-context";
@@ -23,7 +23,6 @@ interface ReviewStepProps {
   onChange: (patch: Partial<CampaignSetupDraft>) => void;
   onTestSend: () => void;
   onActivateNow: () => void;
-  onSchedule: (activateOnDate: string) => void;
   onSaveDraft: () => void;
   isTestSent: boolean;
   isActivating: boolean;
@@ -35,7 +34,6 @@ export function ReviewStep({
   onChange,
   onTestSend,
   onActivateNow,
-  onSchedule,
   onSaveDraft,
   isTestSent,
   isActivating,
@@ -45,9 +43,6 @@ export function ReviewStep({
   const [testStatus, setTestStatus] = useState<"idle" | "sending" | "sent">(
     "idle",
   );
-  const [scheduleMode, setScheduleMode] = useState(false);
-  const [activateOnDate, setActivateOnDate] = useState("");
-
   const handleTestSend = async () => {
     setTestStatus("sending");
     await new Promise((resolve) => setTimeout(resolve, 800));
@@ -181,85 +176,29 @@ export function ReviewStep({
       ) : null}
 
       <div className="space-y-4 border-t border-border pt-6">
-        {scheduleMode ? (
-          <div className="space-y-3 rounded-md border border-border bg-muted/20 p-4">
-            <div className="flex items-start gap-2">
-              <CalendarClock className="mt-0.5 h-4 w-4 shrink-0 text-brand-primary" />
-              <div>
-                <h3 className="text-sm font-semibold">Schedule Activation</h3>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Choose the date this campaign should become active.
-                </p>
-              </div>
-            </div>
-            <FormField
-              label="Activation Date"
-              htmlFor="activateOnDate"
-              required
-              error={errors.scheduledActivateAt}
-            >
-              <Input
-                id="activateOnDate"
-                type="date"
-                value={activateOnDate}
-                min={new Date().toISOString().slice(0, 10)}
-                onChange={(e) => setActivateOnDate(e.target.value)}
-              />
-            </FormField>
-            <div className="flex flex-wrap gap-2">
-              <Button
-                type="button"
-                disabled={!canLaunch || !activateOnDate}
-                onClick={() => onSchedule(activateOnDate)}
-              >
-                {isActivating ? "Scheduling…" : "Confirm Schedule"}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setScheduleMode(false)}
-                disabled={isActivating}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onSaveDraft}
-                disabled={isActivating}
-              >
-                Save Draft
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-            <Button
-              type="button"
-              onClick={onActivateNow}
-              disabled={!canLaunch}
-            >
-              {isActivating ? "Activating…" : "Activate Now"}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setScheduleMode(true)}
-              disabled={!canLaunch}
-            >
-              <CalendarClock className="h-4 w-4" aria-hidden />
-              Schedule
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onSaveDraft}
-              disabled={isActivating}
-            >
-              Save Draft
-            </Button>
-          </div>
-        )}
+        <p className="text-sm text-muted-foreground">
+          Timing comes from the start date, optional end date, and send time set
+          in Configuration. Activate Now moves the campaign to Active; a future
+          start date remains Active and waits until that date before eligible
+          sends begin.
+        </p>
+        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+          <Button
+            type="button"
+            onClick={onActivateNow}
+            disabled={!canLaunch}
+          >
+            {isActivating ? "Activating…" : "Activate Now"}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onSaveDraft}
+            disabled={isActivating}
+          >
+            Save Draft
+          </Button>
+        </div>
       </div>
     </div>
   );

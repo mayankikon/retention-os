@@ -5,7 +5,7 @@ import {
   buttonVariants,
 } from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
 
-import { Archive, Pause, Play } from "lucide-react";
+import { Archive, Pause, Pencil, Play } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CampaignStatusBadge } from "@/components/campaigns/CampaignStatusBadge";
@@ -36,6 +36,8 @@ export function CampaignDetailHeader({ campaign }: CampaignDetailHeaderProps) {
   const canPause = campaign.status === "active";
   const canResume = campaign.status === "paused";
   const canArchive = ARCHIVEABLE_STATUSES.has(campaign.status);
+  const canEditLiveCopy =
+    campaign.status === "active" || campaign.status === "paused";
   const isDraft = campaign.status === "draft";
 
   const setupDraft = isDraft
@@ -99,6 +101,17 @@ export function CampaignDetailHeader({ campaign }: CampaignDetailHeaderProps) {
                 Review & activate
               </Link>
             </>
+          ) : null}
+          {canEditLiveCopy ? (
+            <Link
+              href={`/campaigns/${campaign.id}/copy`}
+              className={cn(
+                buttonVariants({ variant: "secondary", size: "header" }),
+              )}
+            >
+              <Pencil className="h-4 w-4" aria-hidden />
+              Edit copy
+            </Link>
           ) : null}
           {canPause ? (
             <Button

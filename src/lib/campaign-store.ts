@@ -9,6 +9,7 @@ export type CampaignFlashKind =
   | "activated"
   | "scheduled"
   | "draft"
+  | "copyUpdated"
   | "archived"
   | "status";
 

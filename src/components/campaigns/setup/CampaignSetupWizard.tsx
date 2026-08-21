@@ -197,7 +197,7 @@ export function CampaignSetupWizard({
 
   const finishCreateAndReturnHome = useCallback(
     (
-      kind: "activated" | "scheduled" | "draft",
+      kind: "activated" | "draft",
       campaignName: string,
       detail?: string,
     ) => {
@@ -218,13 +218,9 @@ export function CampaignSetupWizard({
   );
 
   const finishEditLaunch = useCallback(
-    (
-      kind: "activated" | "scheduled",
-      campaignName: string,
-      detail?: string,
-    ) => {
+    (campaignName: string) => {
       clearSetup();
-      setCampaignFlashMessage({ kind, campaignName, detail });
+      setCampaignFlashMessage({ kind: "activated", campaignName });
       router.push("/campaigns");
     },
     [router, clearSetup],
@@ -259,7 +255,7 @@ export function CampaignSetupWizard({
       const campaign = persistEditCampaign({ status: "active" });
       setIsActivating(false);
       if (!campaign) return;
-      finishEditLaunch("activated", campaign.name);
+      finishEditLaunch(campaign.name);
       return;
     }
 
@@ -278,50 +274,6 @@ export function CampaignSetupWizard({
     isEditMode,
     persistEditCampaign,
   ]);
-
-  const handleSchedule = useCallback(
-    async (activateOnDate: string) => {
-      if (!validateLaunch()) return;
-      if (!activateOnDate) {
-        setErrors({ scheduledActivateAt: "Select an activation date." });
-        return;
-      }
-
-      setIsActivating(true);
-      await new Promise((resolve) => setTimeout(resolve, 800));
-
-      const scheduledActivateAt = `${activateOnDate}T12:00:00.000Z`;
-      const detail = `Activates ${new Date(scheduledActivateAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`;
-
-      if (isEditMode) {
-        const campaign = persistEditCampaign({
-          status: "draft",
-          scheduledActivateAt,
-        });
-        setIsActivating(false);
-        if (!campaign) return;
-        finishEditLaunch("scheduled", campaign.name, detail);
-        return;
-      }
-
-      const campaign = createCampaignFromDraft(draft, currentUser, {
-        status: "draft",
-        scheduledActivateAt,
-      });
-      addUserCreatedCampaign(campaign);
-      setIsActivating(false);
-      finishCreateAndReturnHome("scheduled", campaign.name, detail);
-    },
-    [
-      draft,
-      currentUser,
-      validateLaunch,
-      finishCreateAndReturnHome,
-      finishEditLaunch,
-      isEditMode,
-      persistEditCampaign,
-    ],
-  );
 
   const persistDraft = useCallback(
     (options?: { requireName?: boolean }) => {
@@ -372,10 +324,11 @@ export function CampaignSetupWizard({
 
   useEffect(() => {
     registerSetup({
+      mode: isEditMode ? "edit" : "create",
       onSaveDraft: () => leaveSaveDraftRef.current(),
     });
     return () => unregisterSetup();
-  }, [registerSetup, unregisterSetup]);
+  }, [isEditMode, registerSetup, unregisterSetup]);
 
   const handleCancel = () => {
     requestNavigation(cancelHref);
@@ -411,7 +364,6 @@ export function CampaignSetupWizard({
             onChange={updateDraft}
             onTestSend={handleTestSend}
             onActivateNow={handleActivateNow}
-            onSchedule={handleSchedule}
             onSaveDraft={handleSaveDraftFromReview}
             isTestSent={isTestSent}
             isActivating={isActivating}
@@ -429,7 +381,6 @@ export function CampaignSetupWizard({
     isActivating,
     handleTestSend,
     handleActivateNow,
-    handleSchedule,
     handleSaveDraftFromReview,
   ]);
 

@@ -20,6 +20,17 @@ export interface CampaignCreator {
   initials: string;
 }
 
+export interface CampaignLiveCopy {
+  initialMessage: string;
+  reminders: CampaignLiveCopyReminder[];
+}
+
+export interface CampaignLiveCopyReminder {
+  id: "reminder1" | "reminder2" | "reminder3";
+  label: string;
+  body: string;
+}
+
 export interface Campaign {
   id: string;
   name: string;
@@ -54,6 +65,10 @@ export interface Campaign {
   startsAt?: string | null;
   /** ISO instant the campaign run window closes (end of the selected end day). */
   endsAt?: string | null;
+  /** ISO instant of the most recent live message-body-only edit. */
+  copyUpdatedAt?: string | null;
+  /** Current editable body copy for live campaigns, independent of locked setup. */
+  liveCopy?: CampaignLiveCopy | null;
   /**
    * Full wizard state for draft resume/edit.
    * Absent on legacy thin drafts and most mock seed rows.

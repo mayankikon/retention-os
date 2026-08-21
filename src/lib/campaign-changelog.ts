@@ -115,13 +115,18 @@ export function buildCampaignChangelog(
   }
 
   if (campaign.lastUpdatedAt !== campaign.createdAt) {
+    const isLiveCopyUpdate = campaign.copyUpdatedAt === campaign.lastUpdatedAt;
     entries.push({
       id: `${campaign.id}-updated`,
       timestamp: campaign.lastUpdatedAt,
       actor: campaign.createdBy,
       action: "updated",
-      summary: "Campaign settings updated",
-      details: "Configuration or schedule changes were saved.",
+      summary: isLiveCopyUpdate
+        ? "Live message copy updated"
+        : "Campaign settings updated",
+      details: isLiveCopyUpdate
+        ? "Initial and reminder body copy changed for future eligible sends only."
+        : "Configuration or schedule changes were saved.",
     });
   }
 

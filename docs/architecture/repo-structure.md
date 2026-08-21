@@ -13,10 +13,8 @@ src/
 │   │   ├── redlines/page.tsx   # Engineering handoff specs
 │   │   └── [id]/
 │   │       ├── page.tsx        # Campaign detail (Details + Change log tabs)
-│   │       └── edit/page.tsx   # Draft resume / edit setup wizard
-│   ├── accounts/
-│   │   ├── page.tsx            # Dealership accounts list
-│   │   └── loading.tsx
+│   │       ├── edit/page.tsx   # Draft resume / edit setup wizard
+│   │       └── copy/page.tsx   # Active/paused message-body-only edit
 │   ├── templates/
 │   │   ├── page.tsx            # Templates list
 │   │   ├── new/page.tsx        # Create template wizard
@@ -25,13 +23,14 @@ src/
 │   │       └── edit/page.tsx   # Edit template wizard
 │   └── story-map/page.tsx      # Story map roadmap board
 ├── components/
-│   ├── accounts/               # Dealership accounts list
+│   ├── accounts/               # Dormant Toolbox-owned account UI modules; no SM route
 │   ├── templates/              # Template list, wizard, detail
 │   ├── campaigns/              # List + detail + setup feature components
-│   │   ├── detail/             # Campaign detail tabs (Details, Change log)
+│   │   ├── detail/             # Detail tabs + live copy-only editor
 │   │   └── setup/              # Wizard steps, shell, confirmation
 │   ├── story-map/              # Roadmap sidebar, timeline, bars
 │   ├── layout/AppShell.tsx       # Shift Sidebar (Toolbox / Retention OS lockup when expanded, condensed mark when collapsed) + AppGroovedMainColumn
+│   ├── layout/app-navigation.ts   # Smart Marketing-owned nav destinations only
 │   ├── layout/AppDialogShell.tsx # Productdemo inventory-style dialog chrome
 │   ├── layout/TitleBar.tsx       # Shift 2.0 page title bar (app-level; not in package)
 │   ├── layout/ToolboxRetentionOsLogo.tsx  # Toolbox + Retention OS sidebar lockup
@@ -62,6 +61,7 @@ src/
 │   ├── pagination.ts
 │   ├── campaign-search-params.ts
 │   ├── campaign-setup-resume.ts # Draft completeness + hydrate for edit
+│   ├── campaign-live-copy.ts    # Live copy extraction, variable locks, update
 │   ├── create-campaign-from-draft.ts
 │   ├── app-dialog-shell.ts     # Shared dialog chrome classes (productdemo parity)
 │   └── story-map/              # Timeline math, constants, localStorage

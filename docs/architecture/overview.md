@@ -23,7 +23,8 @@ Web UI for Ikon's Smart Marketing Campaign Manager. Phase 1 delivers the **Campa
 - Search by campaign name
 - Pagination (10 per page)
 - Status badges: draft, active, paused, completed, archived
-- Detail actions: Pause (active), Resume (paused), Archive (active / paused / completed) with confirm; archive is terminal
+- Detail actions: live copy-only Edit (active / paused), Pause (active), Resume (paused), Archive (active / paused / completed) with confirm; archive is terminal
+- Live copy edit at `/campaigns/[id]/copy`: initial and enabled reminder bodies only; variables and all campaign configuration stay locked; saving preserves status and applies only to future eligible sends
 - Default list excludes archived rows; set Status filter to Archived to view them
 - Data refresh indicator (hourly cadence)
 - Empty states: no data, no search results, filtered zero
@@ -35,8 +36,9 @@ Web UI for Ikon's Smart Marketing Campaign Manager. Phase 1 delivers the **Campa
 - Draft resume/edit at `/campaigns/[id]/edit` — detail CTAs Continue setup / Edit / Review & activate; Save Draft updates in place with full `setupDraft`
 - General: Group → multi-select Dealerships with per-dealer timezone (fallback when unknown)
 - Configuration: Time+Mileage or OEM trigger, each with nested audience query; campaign duration (required start date, optional end date); schedule days; required send time plus a timezone table that recomputes each zone's manager time from the selected send time
-- Review: audience reach card; Activate now / Schedule / Save draft (draft only on this step); leave-guard modal when navigating away mid-setup; Audience suppression hidden on MVP V1.0
-- After activate/schedule: success banner on `/campaigns` list (scheduled activation keeps status `draft` + `scheduledActivateAt`). Edit-mode Save Draft returns to campaign detail.
+- Review: audience reach card; Activate Now / Save Draft only; timing comes from Configuration start/end dates and send time; Audience suppression hidden on MVP V1.0
+- Activate Now always moves Draft → Active. A future start date gates sends without adding a Scheduled status. Edit-mode Save Draft returns to campaign detail.
+- New Campaign Setup leave guard uses unfinished-draft language with Keep editing, Discard draft, and Save draft actions.
 - SOP-default SMS templates, timezone schedule reference table, test send (mock)
 
 ### Product versions
@@ -53,6 +55,11 @@ Web UI for Ikon's Smart Marketing Campaign Manager. Phase 1 delivers the **Campa
 - Detail shows content, campaigns using the template, and audit history
 - Published templates populate campaign Messaging (plus Custom); MVP V1.0 setup still Oil Change–only
 - Persistence: `localStorage` (`retention-os-message-templates-v2`) seeded with system templates
+
+### Product boundary
+
+- Smart Marketing navigation contains Campaigns and Templates only.
+- Account administration belongs to the Toolbox Web host; Smart Marketing does not expose an `/accounts` route.
 
 ## External boundaries
 

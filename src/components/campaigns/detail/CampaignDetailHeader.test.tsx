@@ -92,6 +92,10 @@ describe("CampaignDetailHeader", () => {
 
   it("shows Pause and Archive for an active campaign", () => {
     render(<CampaignDetailHeader campaign={buildCampaign("active")} />);
+    expect(screen.getByRole("link", { name: "Edit copy" })).toHaveAttribute(
+      "href",
+      "/campaigns/cmp-test/copy",
+    );
     expect(screen.getByRole("button", { name: "Pause" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Archive" })).toBeInTheDocument();
     expect(
@@ -101,12 +105,19 @@ describe("CampaignDetailHeader", () => {
 
   it("shows Resume and Archive for a paused campaign", () => {
     render(<CampaignDetailHeader campaign={buildCampaign("paused")} />);
+    expect(screen.getByRole("link", { name: "Edit copy" })).toHaveAttribute(
+      "href",
+      "/campaigns/cmp-test/copy",
+    );
     expect(screen.getByRole("button", { name: "Resume" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Archive" })).toBeInTheDocument();
   });
 
   it("shows Archive for a completed campaign without pause controls", () => {
     render(<CampaignDetailHeader campaign={buildCampaign("completed")} />);
+    expect(
+      screen.queryByRole("link", { name: "Edit copy" }),
+    ).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Archive" })).toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: "Pause" }),

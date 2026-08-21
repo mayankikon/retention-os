@@ -41,6 +41,26 @@ describe("campaign changelog", () => {
       true,
     );
   });
+
+  it("identifies a live copy update in the audit trail", () => {
+    const campaign = mockCampaigns.find((c) => c.id === "cmp-001");
+    expect(campaign).toBeDefined();
+
+    const entries = buildCampaignChangelog({
+      ...campaign!,
+      copyUpdatedAt: "2026-08-21T17:00:00.000Z",
+      lastUpdatedAt: "2026-08-21T17:00:00.000Z",
+    });
+
+    expect(entries).toContainEqual(
+      expect.objectContaining({
+        action: "updated",
+        summary: "Live message copy updated",
+        details:
+          "Initial and reminder body copy changed for future eligible sends only.",
+      }),
+    );
+  });
 });
 
 describe("campaign lookup", () => {

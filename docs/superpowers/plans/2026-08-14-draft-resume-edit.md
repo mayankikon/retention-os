@@ -15,7 +15,7 @@
 - Wizard steps remain General → Messaging → Reminders → Configuration → Review
 - Edit only when `status === "draft"`; Active/Paused out of scope
 - Save Draft in edit mode updates in place and returns to `/campaigns/[id]`
-- Abandon discards unsaved edits only; never deletes the campaign
+- Discard changes discards unsaved edits only; never deletes the campaign
 - Full `setupDraft` required for true resume; thin legacy drafts use recovery hydrate
 
 ## File map
@@ -66,7 +66,7 @@
 - Consumes: resume helpers + `updateCampaignFromDraft` / `addUserCreatedCampaign`
 - Produces: `CampaignSetupWizardProps { mode?: "create" | "edit"; campaignId?: string; initialDraft?: CampaignSetupDraft; initialStep?: SetupStepId }`
 
-- [ ] **Step 1: Extend wizard** — hydrate initial draft/completed steps; edit Save/Activate/Schedule update same id; edit Save redirects to detail; Cancel targets detail in edit mode; leave-guard Abandon goes to detail without delete.
+- [ ] **Step 1: Extend wizard** — hydrate initial draft/completed steps; edit Save/Activate Now update same id; edit Save redirects to detail; Cancel targets detail in edit mode; leave-guard Discard changes goes to detail without delete.
 
 - [ ] **Step 2: Stepper** — optional `onStepSelect`; only completed + current clickable; `aria-current` on current.
 

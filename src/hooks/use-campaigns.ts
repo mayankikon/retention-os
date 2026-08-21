@@ -16,6 +16,22 @@ function sortByCreatedAtDesc(campaigns: Campaign[]): Campaign[] {
   );
 }
 
+export function mergeCampaignCollections(
+  userCreated: Campaign[],
+  seededCampaigns: Campaign[],
+  statusOverrides: Record<string, Campaign["status"]>,
+): Campaign[] {
+  const byId = new Map<string, Campaign>();
+  for (const campaign of [...seededCampaigns, ...userCreated]) {
+    const overrideStatus = statusOverrides[campaign.id];
+    byId.set(
+      campaign.id,
+      overrideStatus ? { ...campaign, status: overrideStatus } : campaign,
+    );
+  }
+  return sortByCreatedAtDesc(Array.from(byId.values()));
+}
+
 export function useCampaigns(): Campaign[] {
   const [userCreated, setUserCreated] = useState<Campaign[]>([]);
   const [statusOverrides, setStatusOverrides] = useState<
@@ -28,23 +44,15 @@ export function useCampaigns(): Campaign[] {
   }, []);
 
   useEffect(() => {
-    refreshUserCampaigns();
-
     const handleUpdate = () => refreshUserCampaigns();
     window.addEventListener(CAMPAIGNS_UPDATED_EVENT, handleUpdate);
+    queueMicrotask(refreshUserCampaigns);
     return () =>
       window.removeEventListener(CAMPAIGNS_UPDATED_EVENT, handleUpdate);
   }, [refreshUserCampaigns]);
 
-  return useMemo(() => {
-    const merged = [...userCreated, ...mockCampaigns];
-    const byId = new Map<string, Campaign>();
-    for (const campaign of merged) {
-      const overrideStatus = statusOverrides[campaign.id];
-      byId.set(campaign.id, overrideStatus
-        ? { ...campaign, status: overrideStatus }
-        : campaign);
-    }
-    return sortByCreatedAtDesc(Array.from(byId.values()));
-  }, [userCreated, statusOverrides]);
+  return useMemo(
+    () => mergeCampaignCollections(userCreated, mockCampaigns, statusOverrides),
+    [userCreated, statusOverrides],
+  );
 }

@@ -21,7 +21,7 @@ flowchart LR
 | Messaging | `messaging` | Messaging & Variables | Delivery channels, templates, primary promo, dealer URL, optional image |
 | Reminders | `reminders` | Reminder Sequences | Enable 1–3 reminders, text + image or reuse primary image |
 | Configuration | `configuration` | Standard Configuration | Service trigger mode (interval, OEM, or audience query), campaign duration (required start date, optional end date), schedule days, required send time + timezone table that recomputes from the selected send time |
-| Review | `review` | QA & Activation | Test send, suppression list, Activate |
+| Review | `review` | QA & Activation | Test send, suppression list, Activate Now, Save Draft |
 
 ## Components
 
@@ -54,23 +54,32 @@ flowchart LR
 
 - Detail (`/campaigns/[id]`) for `draft`: **Continue setup** when incomplete; **Edit** + **Review & activate** when all progress steps validate
 - Edit route: `/campaigns/[id]/edit?step=…` — hydrates wizard from `setupDraft` (or recovery from thin legacy drafts)
-- Edit Save Draft updates the same campaign id and returns to detail; Abandon discards unsaved edits only
+- Edit Save Draft updates the same campaign id and returns to detail; Discard draft leaves setup without saving the current in-memory changes
 - Edit-mode stepper allows jumping to completed steps + current; future steps stay locked
 - Spec: `docs/superpowers/specs/2026-08-14-draft-resume-edit-design.md`
 
 ## Campaign run window
 
-Configuration collects how long the campaign runs, separate from Review's activation date.
+Configuration is the only place that collects campaign timing. Review has no separate Schedule action.
 
 - `campaignStartDate` is required; the campaign starts at the beginning of that local day.
 - End date is optional; blank means no fixed end. When set, `createCampaignFromDraft` resolves fields into `startsAt` / `endsAt` instants via `resolveCampaignWindow(draft, now)`; the end date always runs through 23:59:59.999 local.
+- Activate Now moves the campaign to `active`. When the start date is in the future, sends wait for the start-date gate; no `scheduled` status or last-step scheduling flow is introduced.
 
 ## Campaign statuses (list / filters)
 
 `draft` · `active` · `paused` · `completed` · `archived`  
-Future activation date is stored on `scheduledActivateAt` while status remains `draft` (Scheduled is not a status).
+Future campaign starts use `startsAt` while status is `active` (Scheduled is not a status).
 
 Default list (`status=All`) hides `archived` campaigns. Filter Status → Archived to see them. From detail: Pause / Resume when live; Archive (confirm, irreversible) from active, paused, or completed.
+
+## Live campaign copy edit
+
+- Route: `/campaigns/[id]/copy`, available only for `active` and `paused`.
+- Editable fields: initial message body and each enabled reminder body.
+- Locked fields: campaign name, audience, dealerships, trigger, schedule, CTA/link configuration, reminder structure, and personalization variable sequence.
+- Save preserves the current campaign status, updates `lastUpdatedAt` / `copyUpdatedAt`, and records a live-message-copy `updated` changelog event.
+- Updated copy applies only to new or not-yet-sent recipients. It does not resend completed steps or bypass consent, STOP, quiet-hours, or suppression controls.
 
 ## Mock behaviors
 
