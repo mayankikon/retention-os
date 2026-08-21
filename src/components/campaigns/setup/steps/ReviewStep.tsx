@@ -12,9 +12,9 @@ import { SuppressionListUpload } from "@/components/campaigns/setup/SuppressionL
 import { useProductVersion } from "@/contexts/product-version-context";
 import {
   estimateAudienceReach,
-  estimateDeliverableReach,
   summarizeAudienceFilters,
 } from "@/lib/audience-filters";
+import { isFutureCampaignStartDate } from "@/lib/campaign-window";
 import type { CampaignSetupDraft } from "@/types/campaign-setup";
 
 interface ReviewStepProps {
@@ -52,8 +52,10 @@ export function ReviewStep({
 
   const audienceSummary = summarizeAudienceFilters(draft.audienceFilters);
   const customersTargeted = estimateAudienceReach(draft.audienceFilters);
-  const customersReached = estimateDeliverableReach(customersTargeted);
   const canLaunch = !isActivating;
+  const isScheduledStart = isFutureCampaignStartDate(draft.campaignStartDate);
+  const launchLabel = isScheduledStart ? "Schedule" : "Activate";
+  const launchingLabel = isScheduledStart ? "Scheduling…" : "Activating…";
 
   return (
     <div className="space-y-6">
@@ -71,23 +73,13 @@ export function ReviewStep({
               audience filters.
             </p>
 
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <div className="rounded-md border border-border bg-muted/20 px-4 py-3">
-                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  Customers Targeted
-                </p>
-                <p className="mt-1 text-2xl font-semibold tabular-nums text-foreground">
-                  ~{customersTargeted.toLocaleString("en-US")}
-                </p>
-              </div>
-              <div className="rounded-md border border-border bg-muted/20 px-4 py-3">
-                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  Roughly Reachable
-                </p>
-                <p className="mt-1 text-2xl font-semibold tabular-nums text-foreground">
-                  ~{customersReached.toLocaleString("en-US")}
-                </p>
-              </div>
+            <div className="mt-4 max-w-xs rounded-md border border-border bg-muted/20 px-4 py-3">
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                Customers Targeted
+              </p>
+              <p className="mt-1 text-2xl font-semibold tabular-nums text-foreground">
+                ~{customersTargeted.toLocaleString("en-US")}
+              </p>
             </div>
 
             {audienceSummary.length > 0 ? (
@@ -178,8 +170,9 @@ export function ReviewStep({
       <div className="space-y-4 border-t border-border pt-6">
         <p className="text-sm text-muted-foreground">
           Timing comes from the start date, optional end date, and send time set
-          in Configuration. Activate Now moves the campaign to Active; a future
-          start date remains Active and waits until that date before eligible
+          in Configuration. Activate is shown when the start date is today;
+          Schedule is shown when it is later. Either action moves the campaign
+          to Active; a future start date waits until that date before eligible
           sends begin.
         </p>
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
@@ -188,7 +181,7 @@ export function ReviewStep({
             onClick={onActivateNow}
             disabled={!canLaunch}
           >
-            {isActivating ? "Activating…" : "Activate Now"}
+            {isActivating ? launchingLabel : launchLabel}
           </Button>
           <Button
             type="button"

@@ -2,7 +2,7 @@
 
 ## Goal
 
-Creators can reopen a **Draft** campaign from detail, change setup fields in the existing New Campaign wizard, Save Draft without losing the campaign identity, and either return to Draft detail or continue toward Activate Now from Review.
+Creators can reopen a **Draft** campaign from detail, change setup fields in the existing New Campaign wizard, Save Draft without losing the campaign identity, and either return to Draft detail or continue toward Activate / Schedule from Review.
 
 ## Non-goals
 
@@ -50,7 +50,7 @@ UI may show a short subtitle under the title when incomplete, e.g. “Setup inco
 
 ### Out of scope from detail
 
-- No Activate Now button on detail itself (activation stays on Review).
+- No Activate / Schedule button on detail itself (activation stays on Review).
 - No Archive on draft (unchanged from archive/pause spec).
 
 ---
@@ -114,7 +114,7 @@ While `status === "draft"`:
 - **All wizard fields editable** (Group, dealerships, messaging, reminders, configuration, review extras).
 - Product-version locks remain (e.g. MVP V1.0 SMS-only, Oil Change template) — same as create.
 - Campaign **id** is immutable (not a form field).
-- Status stays `draft` until Activate Now from Review succeeds.
+- Status stays `draft` until Activate or Schedule from Review succeeds.
 
 No field locks unique to edit mode in this pass.
 
@@ -153,8 +153,8 @@ Triggers: Cancel, breadcrumb Campaigns, sidebar nav, `beforeunload` while dirty 
 
 ### Activate from Review (edit mode)
 
-- Same **Activate Now** + **Save Draft** UI as create Review; no Schedule CTA.
-- Activate Now moves the campaign to Active. A future configured start date gates sends without introducing a Scheduled status.
+- Same **Activate** / **Schedule** + **Save Draft** UI as create Review. The launch label is Activate when the start date is today and Schedule when it is later.
+- Either action moves the campaign to Active. A future configured start date gates sends without introducing a Scheduled status.
 - On success, redirect/confirmation matches create flow.
 - Does not create a second campaign.
 

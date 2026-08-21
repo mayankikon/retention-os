@@ -21,7 +21,7 @@ flowchart LR
 | Messaging | `messaging` | Messaging & Variables | Delivery channels, templates, primary promo, dealer URL, optional image |
 | Reminders | `reminders` | Reminder Sequences | Enable 1–3 reminders, text + image or reuse primary image |
 | Configuration | `configuration` | Standard Configuration | Service trigger mode (interval, OEM, or audience query), campaign duration (required start date, optional end date), schedule days, required send time + timezone table that recomputes from the selected send time |
-| Review | `review` | QA & Activation | Test send, suppression list, Activate Now, Save Draft |
+| Review | `review` | QA & Activation | Test send, suppression list, Activate or Schedule (from start date), Save Draft |
 
 ## Components
 
@@ -60,11 +60,11 @@ flowchart LR
 
 ## Campaign run window
 
-Configuration is the only place that collects campaign timing. Review has no separate Schedule action.
+Configuration is the only place that collects campaign timing. Review has a single launch button whose label depends on the start date.
 
 - `campaignStartDate` is required; the campaign starts at the beginning of that local day.
 - End date is optional; blank means no fixed end. When set, `createCampaignFromDraft` resolves fields into `startsAt` / `endsAt` instants via `resolveCampaignWindow(draft, now)`; the end date always runs through 23:59:59.999 local.
-- Activate Now moves the campaign to `active`. When the start date is in the future, sends wait for the start-date gate; no `scheduled` status or last-step scheduling flow is introduced.
+- The Review launch button is **Activate** when the start date is today and **Schedule** when it is later. Both move the campaign to `active`. When the start date is in the future, sends wait for the start-date gate; no `scheduled` status is introduced.
 
 ## Campaign statuses (list / filters)
 

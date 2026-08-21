@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  isFutureCampaignStartDate,
   isValidDateInput,
   resolveCampaignWindow,
   toDateInputValue,
@@ -21,6 +22,21 @@ describe("toDateInputValue", () => {
   it("formats the local calendar date without shifting to UTC", () => {
     expect(toDateInputValue(new Date(2026, 0, 5, 23, 30))).toBe("2026-01-05");
     expect(toDateInputValue(new Date(2026, 11, 31, 0, 15))).toBe("2026-12-31");
+  });
+});
+
+describe("isFutureCampaignStartDate", () => {
+  const now = new Date(2026, 7, 21, 15, 0);
+
+  it("is false for today, the past, and missing dates", () => {
+    expect(isFutureCampaignStartDate("2026-08-21", now)).toBe(false);
+    expect(isFutureCampaignStartDate("2026-08-20", now)).toBe(false);
+    expect(isFutureCampaignStartDate(null, now)).toBe(false);
+    expect(isFutureCampaignStartDate("not-a-date", now)).toBe(false);
+  });
+
+  it("is true only when the start date is after today", () => {
+    expect(isFutureCampaignStartDate("2026-08-22", now)).toBe(true);
   });
 });
 

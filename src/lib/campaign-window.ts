@@ -23,6 +23,19 @@ export function isValidDateInput(value: string | null | undefined): boolean {
   return parseDateInput(value) !== null;
 }
 
+/**
+ * True when the campaign start date is a real calendar day after local today.
+ * Missing, invalid, today, and past start dates are not treated as future.
+ */
+export function isFutureCampaignStartDate(
+  campaignStartDate: string | null | undefined,
+  now: Date = new Date(),
+): boolean {
+  const startDate = campaignStartDate?.trim() ?? "";
+  if (!isValidDateInput(startDate)) return false;
+  return startDate > toDateInputValue(now);
+}
+
 /** Local midnight for a `yyyy-MM-dd` value, or null when it is not a real date. */
 function parseDateInput(value: string | null | undefined): Date | null {
   if (!value) return null;

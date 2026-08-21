@@ -20,5 +20,5 @@ Date values are compared and formatted as local `yyyy-MM-dd` text. `toDateInputV
 
 ## Consequences
 
-- Review no longer has a separate activation-scheduling action. **Activate Now** moves the campaign to Active; `startsAt` gates eligible sends when the configured start date is in the future. `scheduledActivateAt` remains only as a legacy prototype field.
+- Review has a single launch button: **Activate** when the start date is today, **Schedule** when it is later. Both move the campaign to Active; `startsAt` gates eligible sends when the configured start date is in the future. `scheduledActivateAt` remains only as a legacy prototype field.
 - `startsAt` / `endsAt` are stored but not yet surfaced on the list or detail views, and no job enforces the end date — that is follow-up work when the campaign lifecycle moves server-side.
