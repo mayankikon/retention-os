@@ -5,11 +5,12 @@ import {
 } from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
 
 import { Check, X } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { CampaignChangelogTab } from "@/components/campaigns/detail/CampaignChangelogTab";
 import { CampaignDetailHeader } from "@/components/campaigns/detail/CampaignDetailHeader";
 import { CampaignDetailsTab } from "@/components/campaigns/detail/CampaignDetailsTab";
+import { AppToast } from "@/components/layout/AppToast";
 import { getCampaignAnalytics } from "@/lib/campaign-analytics";
 import { buildCampaignChangelog } from "@/lib/campaign-changelog";
 import {
@@ -50,10 +51,17 @@ export function CampaignDetailView({ campaignId }: CampaignDetailViewProps) {
   const campaigns = useCampaigns();
   const [activeTab, setActiveTab] = useState<CampaignDetailTab>("details");
   const [flash, setFlash] = useState<CampaignFlashMessage | null>(null);
+  const dismissFlash = useCallback(() => setFlash(null), []);
 
   useEffect(() => {
-    setFlash(consumeCampaignFlashMessage());
+    // Strict Mode runs mount effects twice; the second pass finds an empty
+    // slot, so only a real message may replace current state.
+    const message = consumeCampaignFlashMessage();
+    if (message) setFlash(message);
   }, []);
+
+  const copyUpdatedToast = flash?.kind === "copyUpdated" ? flash : null;
+  const bannerFlash = flash && flash.kind !== "copyUpdated" ? flash : null;
 
   const campaign = useMemo(
     () => campaigns.find((item) => item.id === campaignId),
@@ -90,24 +98,31 @@ export function CampaignDetailView({ campaignId }: CampaignDetailViewProps) {
       <CampaignDetailHeader campaign={campaign} />
 
       <div className="app-shell-content-px app-shell-content-pb space-y-6 pt-6">
-        {flash ? (
+        {bannerFlash ? (
           <div
             className="flex items-start justify-between gap-3 rounded-lg border border-border bg-emerald-50 px-4 py-3 text-sm text-emerald-900"
             role="status"
           >
             <div className="flex items-start gap-2">
               <Check className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
-              <p>{flashCopy(flash)}</p>
+              <p>{flashCopy(bannerFlash)}</p>
             </div>
             <button
               type="button"
-              onClick={() => setFlash(null)}
+              onClick={dismissFlash}
               className="rounded-sm p-1 hover:bg-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               aria-label="Dismiss"
             >
               <X className="h-4 w-4" />
             </button>
           </div>
+        ) : null}
+
+        {copyUpdatedToast ? (
+          <AppToast
+            message={flashCopy(copyUpdatedToast)}
+            onDismiss={dismissFlash}
+          />
         ) : null}
 
         <div

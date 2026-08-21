@@ -52,7 +52,10 @@ export function CampaignListView() {
   const [flash, setFlash] = useState<CampaignFlashMessage | null>(null);
 
   useEffect(() => {
-    setFlash(consumeCampaignFlashMessage());
+    // Strict Mode runs mount effects twice; the second pass finds an empty
+    // slot, so only a real message may replace current state.
+    const message = consumeCampaignFlashMessage();
+    if (message) setFlash(message);
   }, []);
 
   const result = selectCampaigns(campaigns, {

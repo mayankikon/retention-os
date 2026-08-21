@@ -31,7 +31,7 @@ src/
 │   ├── story-map/              # Roadmap sidebar, timeline, bars
 │   ├── layout/AppShell.tsx       # Shift Sidebar (Toolbox / Retention OS lockup when expanded, condensed mark when collapsed) + AppGroovedMainColumn
 │   ├── layout/app-navigation.ts   # Smart Marketing-owned nav destinations only
-│   ├── layout/AppDialogShell.tsx # Productdemo inventory-style dialog chrome
+│   ├── layout/AppToast.tsx       # Bottom-right success toast (live copy save)
 │   ├── layout/TitleBar.tsx       # Shift 2.0 page title bar (app-level; not in package)
 │   ├── layout/ToolboxRetentionOsLogo.tsx  # Toolbox + Retention OS sidebar lockup
 │   ├── layout/VersionSwitcher.tsx  # Sidebar footer product version dropdown

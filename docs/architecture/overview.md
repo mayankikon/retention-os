@@ -24,7 +24,7 @@ Web UI for Ikon's Smart Marketing Campaign Manager. Phase 1 delivers the **Campa
 - Pagination (10 per page)
 - Status badges: draft, active, paused, completed, archived
 - Detail actions: live copy-only Edit (active / paused), Pause (active), Resume (paused), Archive (active / paused / completed) with confirm; archive is terminal
-- Live copy edit at `/campaigns/[id]/copy`: initial and enabled reminder bodies only; variables and all campaign configuration stay locked; saving preserves status and applies only to future eligible sends
+- Live copy edit at `/campaigns/[id]/copy`: initial and enabled reminder bodies only; variables and all campaign configuration stay locked; saving preserves status and applies only to future eligible sends; success is a bottom-right toast on campaign detail
 - Default list excludes archived rows; set Status filter to Archived to view them
 - Data refresh indicator (hourly cadence)
 - Empty states: no data, no search results, filtered zero
