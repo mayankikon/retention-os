@@ -21,7 +21,7 @@ flowchart LR
 | Messaging | `messaging` | Messaging & Variables | Delivery channels, templates, primary promo, dealer URL, optional image |
 | Reminders | `reminders` | Reminder Sequences | Enable 1–3 reminders, text + image or reuse primary image |
 | Configuration | `configuration` | Standard Configuration | Service trigger mode (interval, OEM, or audience query), campaign duration (required start date, optional end date), schedule days, required send time + timezone table that recomputes from the selected send time |
-| Review | `review` | QA & Activation | Test send, suppression list, Activate or Schedule (from start date), Save Draft |
+| Review | `review` | QA & Activation | Test send, suppression list, Activate, Save Draft |
 
 ## Components
 
@@ -60,11 +60,11 @@ flowchart LR
 
 ## Campaign run window
 
-Configuration is the only place that collects campaign timing. Review has a single launch button whose label depends on the start date.
+Configuration is the only place that collects campaign timing. Review has a single **Activate** launch button.
 
 - `campaignStartDate` is required; the campaign starts at the beginning of that local day.
 - End date is optional; blank means no fixed end. When set, `createCampaignFromDraft` resolves fields into `startsAt` / `endsAt` instants via `resolveCampaignWindow(draft, now)`; the end date always runs through 23:59:59.999 local.
-- The Review launch button is **Activate** when the start date is today and **Schedule** when it is later. Both move the campaign to `active`. When the start date is in the future, sends wait for the start-date gate; no `scheduled` status is introduced.
+- Activate moves the campaign to `active`. When the start date is in the future, sends wait for the start-date gate; no `scheduled` status is introduced.
 
 ## Campaign statuses (list / filters)
 
@@ -78,7 +78,7 @@ Default list (`status=All`) hides `archived` campaigns. Filter Status → Archiv
 - Route: `/campaigns/[id]/copy`, available only for `active` and `paused`.
 - Editable fields: initial message body and each enabled reminder body.
 - Locked fields: campaign name, audience, dealerships, trigger, schedule, CTA/link configuration, reminder structure, and personalization variable sequence.
-- Save preserves the current campaign status, updates `lastUpdatedAt` / `copyUpdatedAt`, and records a live-message-copy `updated` changelog event.
+- Save preserves the current campaign status, updates `lastUpdatedAt` / `copyUpdatedAt`, records a live-message-copy `updated` changelog event, and shows a bottom-right toast on campaign detail.
 - Updated copy applies only to new or not-yet-sent recipients. It does not resend completed steps or bypass consent, STOP, quiet-hours, or suppression controls.
 
 ## Mock behaviors

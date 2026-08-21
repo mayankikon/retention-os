@@ -59,7 +59,7 @@ function renderReviewStep(startDate: string | null) {
 describe("ReviewStep", () => {
   afterEach(() => cleanup());
 
-  it("labels the launch button Activate when the start date is today", () => {
+  it("keeps the launch button labeled Activate for today and future start dates", () => {
     renderReviewStep(shiftLocalDate(0));
 
     expect(screen.getByRole("button", { name: "Activate" })).toBeInTheDocument();
@@ -71,14 +71,13 @@ describe("ReviewStep", () => {
     ).not.toBeInTheDocument();
     expect(screen.getByText("Customers Targeted")).toBeInTheDocument();
     expect(screen.queryByText("Roughly Reachable")).not.toBeInTheDocument();
-  });
 
-  it("labels the launch button Schedule when the start date is later than today", () => {
+    cleanup();
     renderReviewStep(shiftLocalDate(1));
 
-    expect(screen.getByRole("button", { name: "Schedule" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Activate" })).toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: "Activate" }),
+      screen.queryByRole("button", { name: "Schedule" }),
     ).not.toBeInTheDocument();
   });
 });

@@ -14,7 +14,6 @@ import {
   estimateAudienceReach,
   summarizeAudienceFilters,
 } from "@/lib/audience-filters";
-import { isFutureCampaignStartDate } from "@/lib/campaign-window";
 import type { CampaignSetupDraft } from "@/types/campaign-setup";
 
 interface ReviewStepProps {
@@ -53,9 +52,6 @@ export function ReviewStep({
   const audienceSummary = summarizeAudienceFilters(draft.audienceFilters);
   const customersTargeted = estimateAudienceReach(draft.audienceFilters);
   const canLaunch = !isActivating;
-  const isScheduledStart = isFutureCampaignStartDate(draft.campaignStartDate);
-  const launchLabel = isScheduledStart ? "Schedule" : "Activate";
-  const launchingLabel = isScheduledStart ? "Scheduling…" : "Activating…";
 
   return (
     <div className="space-y-6">
@@ -170,9 +166,8 @@ export function ReviewStep({
       <div className="space-y-4 border-t border-border pt-6">
         <p className="text-sm text-muted-foreground">
           Timing comes from the start date, optional end date, and send time set
-          in Configuration. Activate is shown when the start date is today;
-          Schedule is shown when it is later. Either action moves the campaign
-          to Active; a future start date waits until that date before eligible
+          in Configuration. Activate moves the campaign to Active; a future
+          start date remains Active and waits until that date before eligible
           sends begin.
         </p>
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
@@ -181,7 +176,7 @@ export function ReviewStep({
             onClick={onActivateNow}
             disabled={!canLaunch}
           >
-            {isActivating ? launchingLabel : launchLabel}
+            {isActivating ? "Activating…" : "Activate"}
           </Button>
           <Button
             type="button"
