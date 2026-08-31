@@ -1,4 +1,6 @@
-import { LayoutList, LayoutTemplate } from "lucide-react";
+import { BarChart3, LayoutList, LayoutTemplate } from "lucide-react";
+import { isExistingReportingAvailable } from "@/lib/product-version";
+import type { ProductVersionId } from "@/types/product-version";
 
 export const SMART_MARKETING_NAV_ITEMS = [
   {
@@ -11,7 +13,21 @@ export const SMART_MARKETING_NAV_ITEMS = [
     label: "Templates",
     icon: LayoutTemplate,
   },
+  {
+    href: "/reporting",
+    label: "Reporting",
+    icon: BarChart3,
+  },
 ] as const;
+
+export function getSmartMarketingNavItems(versionId: ProductVersionId) {
+  return SMART_MARKETING_NAV_ITEMS.filter((item) => {
+    if (item.href === "/reporting") {
+      return isExistingReportingAvailable(versionId);
+    }
+    return true;
+  });
+}
 
 export function isSmartMarketingNavItemActive(
   href: string,

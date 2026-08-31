@@ -49,3 +49,13 @@ export const PRODUCT_VERSION_OPTIONS: ProductVersionOption[] = [
 ];
 
 export const DEFAULT_PRODUCT_VERSION_ID: ProductVersionId = "post_mvp_v1_1";
+
+export const EXISTING_REPORTING_MODE_ID = "existing_reporting";
+export const EXISTING_REPORTING_MODE_LABEL = "Existing reporting";
+
+export const EXISTING_REPORTING_MODE_OPTIONS = [
+  {
+    id: EXISTING_REPORTING_MODE_ID,
+    label: EXISTING_REPORTING_MODE_LABEL,
+  },
+] as const;

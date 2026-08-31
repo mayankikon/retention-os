@@ -78,6 +78,30 @@ Phase 1 derives analytics client-side via `getCampaignAnalytics()` from mock/lis
 
 Returns `CampaignChangelogEntry[]` — see `src/types/campaign-detail.ts` (`timestamp`, `actor`, `action`, `summary`, optional `details`). Phase 1 builds mock changelog from campaign lifecycle in `buildCampaignChangelog()`.
 
+## Planned: Reporting
+
+Phase 1 uses mock data in `src/data/reporting.mock.ts`. Screens are structured for future reporting endpoints.
+
+**`GET /reporting/leaderboard`**
+
+Query: `period=mtd|lm|ytd`, `q`, `scope=portfolio|ungrouped`
+
+Response: ranked rooftop rows (`rank`, `rooftop`, `dealerGroup`, `sent`, `retried`, `clickedFirstTime`, `cerPercent`, `isLowSample`). Server must omit single-rooftop groups and apply the min-sent sample guardrail (`MIN_CER_SAMPLE_SENT = 50`).
+
+**`GET /reporting/weekly-cer`**
+
+Query: `year`, `month`, `dealer`
+
+Response: weekly performance cards with Initial / Reminder 1–3 sent, clicks, and CER%.
+
+**`GET /reporting/activity`**
+
+Query: `dateFrom`, `dateTo`, `dealer`, `rooftop`
+
+Response: summary cards (`messagesSent`, `totalClicks`, `upliftPercent`, `cerPercent`) plus customer rows including `mileage` (null when unknown).
+
+CSV export is currently client-side from the filtered mock set.
+
 ## Data refresh
 
 Global indicator values may come from a separate `GET /campaigns/sync-status` or be embedded in the list response.

@@ -46,6 +46,7 @@ Web UI for Ikon's Smart Marketing Campaign Manager. Phase 1 delivers the **Campa
 - Sidebar **Version** switcher (bottom of left nav) with selectable **MVP V1.0** and **Post MVP V1.1**
 - Post-MVP versions (**V1.2**, **V1.3**, **V1.4**) are listed but disabled for now
 - **MVP V1.0** gates: SMS only (no email channel); Oil Change Campaign template only in campaign setup
+- **Post MVP V1.1** only: sidebar **Existing reporting** dropdown (single value `Existing reporting`) and the Reporting nav
 - Version preference persists in `localStorage` (`retention-os-product-version`); schema v2 remaps legacy POC/MVP ids
 
 ### Templates
@@ -56,12 +57,23 @@ Web UI for Ikon's Smart Marketing Campaign Manager. Phase 1 delivers the **Campa
 - Published templates populate campaign Messaging (plus Custom); MVP V1.0 setup still Oil Change–only
 - Persistence: `localStorage` (`retention-os-message-templates-v2`) seeded with system templates
 
+### Reporting (MVP)
+
+- Top-level **Reporting** nav (`/reporting`) for Ikon SM Admin portfolio reports — **Post MVP V1.1 / Existing reporting** only
+- Shared tabs: **Leaderboard** (`/reporting`), **Weekly CER** (`/reporting/weekly`), **Activity Detail** (`/reporting/activity`)
+- Leaderboard ranks **rooftops** by CER% in multi-rooftop dealer groups only; dealer group is a secondary label
+- Ungrouped / single-rooftop accounts hide the leaderboard (`?scope=ungrouped` or the Preview control)
+- Low-sample guardrail: rooftops with fewer than 50 messages sent stay visible, get a Low sample badge, and are not ranked
+- Weekly CER is titled **Smart Service Lead Weekly CER (By Message)** with Year / Month / Dealer + Apply + Export CSV
+- Activity detail is titled **Smart Service Lead Activity Detail** and adds a **Mileage** column (`—` when unknown)
+- Data is mock (`src/data/reporting.mock.ts`); CSV export is client-side
+
 ### Product boundary
 
-- Smart Marketing navigation contains Campaigns and Templates only.
+- Smart Marketing navigation contains Campaigns, Templates, and Reporting.
 - Account administration belongs to the Toolbox Web host; Smart Marketing does not expose an `/accounts` route.
 
 ## External boundaries
 
 - **In scope later**: REST/GraphQL API replacing mock data (`docs/architecture/api-contracts.md`)
-- **Out of scope**: Campaign analytics backend, reporting dashboards, user management
+- **Out of scope**: Campaign analytics backend, Dealer Admin in-group leaderboard (SM2-211), user management

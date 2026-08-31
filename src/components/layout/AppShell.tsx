@@ -12,10 +12,11 @@ import {
 import { ToolboxRetentionOsLogo } from "@/components/layout/ToolboxRetentionOsLogo";
 import { VersionSwitcher } from "@/components/layout/VersionSwitcher";
 import {
+  getSmartMarketingNavItems,
   isSmartMarketingNavItemActive,
-  SMART_MARKETING_NAV_ITEMS,
 } from "@/components/layout/app-navigation";
 import { useOptionalCampaignSetupLeaveGuard } from "@/contexts/campaign-setup-leave-guard";
+import { useProductVersion } from "@/contexts/product-version-context";
 import { useCurrentUser } from "@/contexts/session-context";
 import { cn } from "@/lib/utils";
 
@@ -36,14 +37,19 @@ export function AppShell({
 }: AppShellProps) {
   const pathname = usePathname();
   const user = useCurrentUser();
+  const { versionId } = useProductVersion();
   const leaveGuard = useOptionalCampaignSetupLeaveGuard();
   const isSetupActive = Boolean(leaveGuard?.isSetupActive);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const navItems = useMemo(
+    () => getSmartMarketingNavItems(versionId),
+    [versionId],
+  );
 
   const mainSections = useMemo<SidebarNavSectionConfig[]>(
     () => [
       {
-        items: SMART_MARKETING_NAV_ITEMS.map((item) => ({
+        items: navItems.map((item) => ({
           label: item.label,
           icon: item.icon,
           isActive: isSmartMarketingNavItemActive(item.href, pathname),
@@ -53,13 +59,11 @@ export function AppShell({
         })),
       },
     ],
-    [pathname, isSetupActive],
+    [navItems, pathname, isSetupActive],
   );
 
   const handleNavItemClick = (label: string) => {
-    const item = SMART_MARKETING_NAV_ITEMS.find(
-      (navItem) => navItem.label === label,
-    );
+    const item = navItems.find((navItem) => navItem.label === label);
     if (!item) return;
     if (leaveGuard?.isSetupActive) {
       leaveGuard.requestNavigation(item.href);

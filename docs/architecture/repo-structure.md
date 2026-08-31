@@ -15,6 +15,11 @@ src/
 │   │       ├── page.tsx        # Campaign detail (Details + Change log tabs)
 │   │       ├── edit/page.tsx   # Draft resume / edit setup wizard
 │   │       └── copy/page.tsx   # Active/paused message-body-only edit
+│   ├── reporting/
+│   │   ├── layout.tsx          # App shell + reporting tabs
+│   │   ├── page.tsx            # CER leaderboard (SM2-207)
+│   │   ├── weekly/page.tsx     # Weekly CER by message (SM2-208)
+│   │   └── activity/page.tsx   # Activity detail + mileage (SM2-209)
 │   ├── templates/
 │   │   ├── page.tsx            # Templates list
 │   │   ├── new/page.tsx        # Create template wizard
@@ -28,6 +33,7 @@ src/
 │   ├── campaigns/              # List + detail + setup feature components
 │   │   ├── detail/             # Detail tabs + live copy-only editor
 │   │   └── setup/              # Wizard steps, shell, confirmation
+│   ├── reporting/              # Leaderboard, weekly CER, activity detail
 │   ├── story-map/              # Roadmap sidebar, timeline, bars
 │   ├── layout/AppShell.tsx       # Shift Sidebar (Toolbox / Retention OS lockup when expanded, condensed mark when collapsed) + AppGroovedMainColumn
 │   ├── layout/app-navigation.ts   # Smart Marketing-owned nav destinations only
@@ -44,6 +50,7 @@ src/
 ├── data/
 │   ├── accounts.mock.ts
 │   ├── campaigns.mock.ts
+│   ├── reporting.mock.ts       # CER leaderboard, weekly CER, activity rows
 │   ├── templates.seed.ts       # Seeded system message templates
 │   ├── lookups.ts
 │   └── story-map.defaults.ts   # Predefined story map backlog features
@@ -59,6 +66,7 @@ src/
 │   ├── dates.ts
 │   ├── format.ts
 │   ├── pagination.ts
+│   ├── reporting.ts            # CER rank, weekly/activity filters, CSV
 │   ├── campaign-search-params.ts
 │   ├── campaign-setup-resume.ts # Draft completeness + hydrate for edit
 │   ├── campaign-live-copy.ts    # Live copy extraction, variable locks, update
@@ -70,6 +78,7 @@ src/
     ├── account.ts
     ├── product-version.ts
     ├── template.ts
+    ├── reporting.ts
     └── campaign.ts
 
 docs/

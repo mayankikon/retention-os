@@ -6,6 +6,7 @@ import {
   getAvailableDeliveryChannelOptions,
   getAvailableMessageTemplates,
   isEmailChannelAvailable,
+  isExistingReportingAvailable,
 } from "@/lib/product-version";
 
 describe("product version feature gates", () => {
@@ -59,6 +60,12 @@ describe("product version feature gates", () => {
     expect(patch.deliveryChannels).toEqual(["sms"]);
     expect(patch.messageTemplateId).toBe("oil_change");
     expect(patch.primaryPromoText).toContain("oil change");
+  });
+
+  it("saves existing reporting on Post MVP V1.1 only", () => {
+    expect(isExistingReportingAvailable("post_mvp_v1_1")).toBe(true);
+    expect(isExistingReportingAvailable("mvp_v1_0")).toBe(false);
+    expect(isExistingReportingAvailable("post_mvp_v1_2")).toBe(false);
   });
 
   it("does not change a compliant Post MVP V1.1 draft when applying that version", () => {

@@ -64,6 +64,13 @@ export function isEmailChannelAvailable(versionId: ProductVersionId): boolean {
   return versionId !== "mvp_v1_0";
 }
 
+/** SM2 reporting prototype is saved as Existing reporting on Post MVP V1.1 only. */
+export function isExistingReportingAvailable(
+  versionId: ProductVersionId,
+): boolean {
+  return versionId === "post_mvp_v1_1";
+}
+
 export function getAvailableDeliveryChannelOptions(
   versionId: ProductVersionId,
 ) {
