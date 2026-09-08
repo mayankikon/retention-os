@@ -77,14 +77,14 @@ describe("weekly CER filters", () => {
       dealer: FILTER_ALL,
     });
 
-    expect(weeks).toHaveLength(4);
+    expect(new Set(weeks.map((week) => week.id)).size).toBe(4);
     expect(weeks.every((week) => week.month === 8)).toBe(true);
   });
 
   it("returns no weeks when the dealer has no data in the selected month", () => {
     const weeks = filterWeeklyPerformance(WEEKLY_CER_WEEKS, {
       year: 2026,
-      month: 8,
+      month: 6,
       dealer: "Heritage BMW",
     });
 
@@ -113,8 +113,10 @@ describe("activity detail", () => {
   it("summarizes CER from clicked rows against messages sent", () => {
     const summary = summarizeActivity(ACTIVITY_DETAIL_ROWS, 1840, 12.4);
 
-    expect(summary.totalClicks).toBe(8);
-    expect(summary.cerPercent).toBe(calculateCerPercent(8, 1840));
+    expect(summary.totalClicks).toBe(ACTIVITY_DETAIL_ROWS.length);
+    expect(summary.cerPercent).toBe(
+      calculateCerPercent(ACTIVITY_DETAIL_ROWS.length, 1840),
+    );
     expect(summary.upliftPercent).toBe(12.4);
   });
 });

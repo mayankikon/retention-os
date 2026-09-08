@@ -4,7 +4,9 @@ Date: 2026-08-31
 
 ## Status
 
-Accepted
+Superseded by [20260903-dashboards-standard-reporting](20260903-dashboards-standard-reporting.md).
+
+The Reporting destination, its three tabs, and the Reporting functionality dropdown were all removed on 2026-09-03. The rooftop ranking rules, the 50-message low-sample guardrail, and the CER language below still hold — they now live on Dashboards.
 
 ## Context
 
@@ -12,8 +14,8 @@ SM2-207 / SM2-208 / SM2-209 add Ikon SM Admin reporting. The Campaign Manager pr
 
 ## Decision
 
-- Add a first-class **Reporting** destination in Smart Marketing nav, gated to **Post MVP V1.1**.
-- Persist that slice as a sidebar **Existing reporting** dropdown (single value). Other versions do not show the field.
+- Add a first-class **Reporting** destination in Smart Marketing nav, gated to **Post MVP V1.1** and **Robert's version**.
+- Persist that slice as a sidebar **Reporting functionality** dropdown that switches **Robert's version** and **Mayank's version**. Other versions do not show the field. **Mayank's version** hides Reporting and shows Dashboards instead.
 - Share one reporting shell with three tabs: Leaderboard, Weekly CER, Activity Detail.
 - Rank **rooftops** by CER%; show dealer group as a secondary label.
 - Hide the leaderboard for ungrouped / single-rooftop accounts.

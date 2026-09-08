@@ -78,29 +78,23 @@ Phase 1 derives analytics client-side via `getCampaignAnalytics()` from mock/lis
 
 Returns `CampaignChangelogEntry[]` — see `src/types/campaign-detail.ts` (`timestamp`, `actor`, `action`, `summary`, optional `details`). Phase 1 builds mock changelog from campaign lifecycle in `buildCampaignChangelog()`.
 
-## Planned: Reporting
+## Planned: Reports
 
-Phase 1 uses mock data in `src/data/reporting.mock.ts`. Screens are structured for future reporting endpoints.
+Phase 1 uses mock data in `src/data/reporting.mock.ts`. Reports is the only reporting surface; the `/reporting/*` endpoints planned for Robert's Leaderboard / Weekly CER / Activity Detail slice were dropped with that slice on 2026-09-03.
 
-**`GET /reporting/leaderboard`**
+Server-side ranking must omit single-rooftop groups and apply the min-sent sample guardrail (`MIN_CER_SAMPLE_SENT = 50`). CSV export is currently client-side from the filtered mock set.
 
-Query: `period=mtd|lm|ytd`, `q`, `scope=portfolio|ungrouped`
+**`GET /reports/performance`**
 
-Response: ranked rooftop rows (`rank`, `rooftop`, `dealerGroup`, `sent`, `retried`, `clickedFirstTime`, `cerPercent`, `isLowSample`). Server must omit single-rooftop groups and apply the min-sent sample guardrail (`MIN_CER_SAMPLE_SENT = 50`).
+Query: `mode=weekly|monthly`, `group`, `dealer`, `page`
 
-**`GET /reporting/weekly-cer`**
+Response: KPI totals (`messagesSent`, `totalClicks`, `upliftPercent`, `cerPercent`) plus ranked dealership rows (`rank`, `dealership`, `group`, `messages`, `firstMessage`, `retried`, `clicks`, `firstTime`, `cerPercent`, `isLowSample`).
 
-Query: `year`, `month`, `dealer`
+**`GET /reports/activity`**
 
-Response: weekly performance cards with Initial / Reminder 1–3 sent, clicks, and CER%.
+Query: `dealership`
 
-**`GET /reporting/activity`**
-
-Query: `dateFrom`, `dateTo`, `dealer`, `rooftop`
-
-Response: summary cards (`messagesSent`, `totalClicks`, `upliftPercent`, `cerPercent`) plus customer rows including `mileage` (null when unknown).
-
-CSV export is currently client-side from the filtered mock set.
+Response: at least 10 customer rows for that dealership (`customer`, `vin`, `phone`, `email`, `clickDate`, `message`, `dealership`, `mileage`).
 
 ## Data refresh
 

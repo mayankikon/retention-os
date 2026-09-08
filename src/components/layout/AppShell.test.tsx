@@ -1,37 +1,43 @@
 import { describe, expect, it } from "vitest";
 import {
-  getSmartMarketingNavItems,
   isSmartMarketingNavItemActive,
   SMART_MARKETING_NAV_ITEMS,
 } from "@/components/layout/app-navigation";
+
+const navHrefs: string[] = SMART_MARKETING_NAV_ITEMS.map((item) => item.href);
 
 describe("Smart Marketing navigation", () => {
   it("contains only Smart Marketing-owned destinations", () => {
     expect(SMART_MARKETING_NAV_ITEMS.map((item) => item.label)).toEqual([
       "Campaigns",
       "Templates",
-      "Reporting",
+      "Reports",
     ]);
-    expect(
-      SMART_MARKETING_NAV_ITEMS.some((item) => item.href === "/accounts"),
-    ).toBe(false);
+    expect(navHrefs).not.toContain("/accounts");
   });
 
-  it("shows Reporting nav only on Post MVP V1.1", () => {
-    expect(
-      getSmartMarketingNavItems("post_mvp_v1_1").map((item) => item.label),
-    ).toEqual(["Campaigns", "Templates", "Reporting"]);
-    expect(
-      getSmartMarketingNavItems("mvp_v1_0").map((item) => item.label),
-    ).toEqual(["Campaigns", "Templates"]);
+  it("no longer exposes Robert's Reporting destination", () => {
+    expect(navHrefs).not.toContain("/reporting");
   });
 
-  it("marks reporting child routes as active", () => {
-    expect(isSmartMarketingNavItemActive("/reporting", "/reporting/weekly")).toBe(
+  it("marks report child routes as active", () => {
+    expect(
+      isSmartMarketingNavItemActive("/reports", "/reports/activity"),
+    ).toBe(true);
+    expect(isSmartMarketingNavItemActive("/reports", "/reports")).toBe(
       true,
     );
-    expect(isSmartMarketingNavItemActive("/templates", "/reporting")).toBe(
+    expect(isSmartMarketingNavItemActive("/templates", "/reports")).toBe(
       false,
+    );
+  });
+
+  it("keeps Campaigns inactive on the redlines route", () => {
+    expect(
+      isSmartMarketingNavItemActive("/campaigns", "/campaigns/redlines"),
+    ).toBe(false);
+    expect(isSmartMarketingNavItemActive("/campaigns", "/campaigns/123")).toBe(
+      true,
     );
   });
 });

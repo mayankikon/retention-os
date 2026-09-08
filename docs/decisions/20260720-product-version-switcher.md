@@ -25,13 +25,15 @@ MVP V1.0 feature gates for the current slice:
 
 - No email delivery channel
 - Oil Change Campaign messaging template only
-- No Existing reporting dropdown and no Reporting nav
 
 Post MVP V1.1 adds:
 
 - Email delivery channel
 - Additional messaging templates
-- Sidebar **Existing reporting** dropdown with the single value `Existing reporting` (SM2-207 / SM2-208 / SM2-209 prototype)
+
+Not version-gated:
+
+- **Reports** nav and `/reports` routes ship in every version (2026-09-03). `/dashboards*` permanently redirects to `/reports*`. The sidebar has one Version dropdown; the Reporting functionality dropdown was removed with Robert's slice — see [20260903-rename-dashboards-to-reports](20260903-rename-dashboards-to-reports.md).
 
 Ladder rename (2026-08-18): POC V0.5 → MVP V1.0; MVP V1.0 → Post MVP V1.1; V1.1 → V1.2; V1.2 → V1.3. Storage schema `2` remaps legacy ids once so saved preferences land on the equivalent slice.
 

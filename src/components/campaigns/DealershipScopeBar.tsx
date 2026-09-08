@@ -86,7 +86,7 @@ interface ScopeSelectProps {
   className?: string;
 }
 
-function ScopeSelect({
+export function ScopeSelect({
   label,
   value,
   options,

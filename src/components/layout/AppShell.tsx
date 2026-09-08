@@ -12,11 +12,10 @@ import {
 import { ToolboxRetentionOsLogo } from "@/components/layout/ToolboxRetentionOsLogo";
 import { VersionSwitcher } from "@/components/layout/VersionSwitcher";
 import {
-  getSmartMarketingNavItems,
+  SMART_MARKETING_NAV_ITEMS,
   isSmartMarketingNavItemActive,
 } from "@/components/layout/app-navigation";
 import { useOptionalCampaignSetupLeaveGuard } from "@/contexts/campaign-setup-leave-guard";
-import { useProductVersion } from "@/contexts/product-version-context";
 import { useCurrentUser } from "@/contexts/session-context";
 import { cn } from "@/lib/utils";
 
@@ -37,14 +36,10 @@ export function AppShell({
 }: AppShellProps) {
   const pathname = usePathname();
   const user = useCurrentUser();
-  const { versionId } = useProductVersion();
   const leaveGuard = useOptionalCampaignSetupLeaveGuard();
   const isSetupActive = Boolean(leaveGuard?.isSetupActive);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const navItems = useMemo(
-    () => getSmartMarketingNavItems(versionId),
-    [versionId],
-  );
+  const navItems = SMART_MARKETING_NAV_ITEMS;
 
   const mainSections = useMemo<SidebarNavSectionConfig[]>(
     () => [

@@ -46,7 +46,7 @@ Web UI for Ikon's Smart Marketing Campaign Manager. Phase 1 delivers the **Campa
 - Sidebar **Version** switcher (bottom of left nav) with selectable **MVP V1.0** and **Post MVP V1.1**
 - Post-MVP versions (**V1.2**, **V1.3**, **V1.4**) are listed but disabled for now
 - **MVP V1.0** gates: SMS only (no email channel); Oil Change Campaign template only in campaign setup
-- **Post MVP V1.1** only: sidebar **Existing reporting** dropdown (single value `Existing reporting`) and the Reporting nav
+- Reports ship in every version, so the sidebar has a single Version dropdown and no reporting-mode field
 - Version preference persists in `localStorage` (`retention-os-product-version`); schema v2 remaps legacy POC/MVP ids
 
 ### Templates
@@ -57,20 +57,19 @@ Web UI for Ikon's Smart Marketing Campaign Manager. Phase 1 delivers the **Campa
 - Published templates populate campaign Messaging (plus Custom); MVP V1.0 setup still Oil Change–only
 - Persistence: `localStorage` (`retention-os-message-templates-v2`) seeded with system templates
 
-### Reporting (MVP)
+### Reports
 
-- Top-level **Reporting** nav (`/reporting`) for Ikon SM Admin portfolio reports — **Post MVP V1.1 / Existing reporting** only
-- Shared tabs: **Leaderboard** (`/reporting`), **Weekly CER** (`/reporting/weekly`), **Activity Detail** (`/reporting/activity`)
-- Leaderboard ranks **rooftops** by CER% in multi-rooftop dealer groups only; dealer group is a secondary label
-- Ungrouped / single-rooftop accounts hide the leaderboard (`?scope=ungrouped` or the Preview control)
-- Low-sample guardrail: rooftops with fewer than 50 messages sent stay visible, get a Low sample badge, and are not ranked
-- Weekly CER is titled **Smart Service Lead Weekly CER (By Message)** with Year / Month / Dealer + Apply + Export CSV
-- Activity detail is titled **Smart Service Lead Activity Detail** and adds a **Mileage** column (`—` when unknown)
+- Top-level **Reports** nav (`/reports`) for Ikon SM Admin portfolio reporting, available in **every product version**
+- KPI strip (Messages sent, Total clicks, Reminder Uplift, CER %), black/green weekly/monthly toggle, Group + Dealer scope filters, date range filter, and Export CSV
+- Monthly mode ranks dealerships by CER% and names the live campaign covering each rooftop; weekly mode stacks week sections cumulative across the dealers in scope
+- Low-sample guardrail: dealerships with fewer than 50 messages sent stay visible, get a Low sample badge, and are not ranked
+- `/reports/activity` lists the customers behind a dealership, including **Campaign** (one per customer, dealt round-robin across the dealership's campaigns) and a **Mileage** column (`—` when unknown)
 - Data is mock (`src/data/reporting.mock.ts`); CSV export is client-side
+- Robert's `/reporting` slice (Leaderboard / Weekly CER / Activity Detail) was removed on 2026-09-03; the remaining surface was renamed Reports the same day — see `docs/decisions/20260903-rename-dashboards-to-reports.md`
 
 ### Product boundary
 
-- Smart Marketing navigation contains Campaigns, Templates, and Reporting.
+- Smart Marketing navigation contains Campaigns, Templates, and Reports.
 - Account administration belongs to the Toolbox Web host; Smart Marketing does not expose an `/accounts` route.
 
 ## External boundaries

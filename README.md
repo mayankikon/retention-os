@@ -29,9 +29,8 @@ Open [http://localhost:3000/campaigns](http://localhost:3000/campaigns).
 | `/campaigns/redlines` | Engineering handoff / interaction specs |
 | `/campaigns/[id]` | Detail stub |
 | `/campaigns/[id]/copy` | Active/paused campaign copy-only editor |
-| `/reporting` | CER leaderboard (Ikon SM Admin) |
-| `/reporting/weekly` | Smart Service Lead Weekly CER (By Message) |
-| `/reporting/activity` | Smart Service Lead Activity Detail |
+| `/reports` | Dealership performance reports (KPIs, weekly/monthly) |
+| `/reports/activity` | Dealership activity (customers) |
 | `/story-map` | Story map roadmap (features on Jun 2026–Jun 2027 timeline) |
 
 ## Documentation

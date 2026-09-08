@@ -24,6 +24,7 @@ interface ProductVersionContextValue {
   versionId: ProductVersionId;
   version: ProductVersionOption;
   setVersionId: (versionId: ProductVersionId) => void;
+  hasHydrated: boolean;
 }
 
 const ProductVersionContext =
@@ -55,8 +56,9 @@ export function ProductVersionProvider({
       versionId,
       version: getProductVersionOption(versionId),
       setVersionId,
+      hasHydrated,
     }),
-    [versionId, setVersionId],
+    [versionId, setVersionId, hasHydrated],
   );
 
   // Avoid flashing the wrong version label before localStorage hydrates.
@@ -67,6 +69,7 @@ export function ProductVersionProvider({
           versionId: DEFAULT_PRODUCT_VERSION_ID,
           version: getProductVersionOption(DEFAULT_PRODUCT_VERSION_ID),
           setVersionId,
+          hasHydrated: false,
         }}
       >
         {children}

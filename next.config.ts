@@ -8,6 +8,20 @@ const nextConfig: NextConfig = {
       "lucide-react",
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: "/dashboards",
+        destination: "/reports",
+        permanent: true,
+      },
+      {
+        source: "/dashboards/:path*",
+        destination: "/reports/:path*",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

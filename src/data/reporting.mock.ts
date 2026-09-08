@@ -154,7 +154,11 @@ export const REPORTING_ROOFTOPS: ReportingRooftop[] = [
   },
 ];
 
-export const WEEKLY_CER_WEEKS: WeeklyPerformanceWeek[] = [
+/**
+ * One record per dealer per week. Reports sums dealers inside each week so a
+ * group or portfolio scope can show cumulative weekly totals.
+ */
+const WEEKLY_CER_SEED_WEEKS: WeeklyPerformanceWeek[] = [
   {
     id: "week-2026-08-01",
     year: 2026,
@@ -171,6 +175,66 @@ export const WEEKLY_CER_WEEKS: WeeklyPerformanceWeek[] = [
     },
   },
   {
+    id: "week-2026-08-01",
+    year: 2026,
+    month: 8,
+    label: "Aug 01–Aug 07",
+    startDate: "2026-08-01",
+    endDate: "2026-08-07",
+    dealer: "Ikon Motors South",
+    metricsByMessage: {
+      initial: { sent: 388, clicks: 61 },
+      reminder1: { sent: 172, clicks: 19 },
+      reminder2: { sent: 88, clicks: 7 },
+      reminder3: { sent: 36, clicks: 2 },
+    },
+  },
+  {
+    id: "week-2026-08-01",
+    year: 2026,
+    month: 8,
+    label: "Aug 01–Aug 07",
+    startDate: "2026-08-01",
+    endDate: "2026-08-07",
+    dealer: "Premier Auto Group",
+    metricsByMessage: {
+      initial: { sent: 351, clicks: 64 },
+      reminder1: { sent: 154, clicks: 21 },
+      reminder2: { sent: 72, clicks: 8 },
+      reminder3: { sent: 29, clicks: 2 },
+    },
+  },
+  {
+    id: "week-2026-08-01",
+    year: 2026,
+    month: 8,
+    label: "Aug 01–Aug 07",
+    startDate: "2026-08-01",
+    endDate: "2026-08-07",
+    dealer: "Lakeside Honda",
+    metricsByMessage: {
+      initial: { sent: 296, clicks: 52 },
+      reminder1: { sent: 128, clicks: 16 },
+      reminder2: { sent: 61, clicks: 5 },
+      reminder3: { sent: 22, clicks: 1 },
+    },
+  },
+  {
+    id: "week-2026-08-08",
+    year: 2026,
+    month: 8,
+    label: "Aug 08–Aug 14",
+    startDate: "2026-08-08",
+    endDate: "2026-08-14",
+    dealer: "Ikon Motors North",
+    metricsByMessage: {
+      initial: { sent: 402, clicks: 71 },
+      reminder1: { sent: 178, clicks: 22 },
+      reminder2: { sent: 90, clicks: 8 },
+      reminder3: { sent: 38, clicks: 2 },
+    },
+  },
+  {
     id: "week-2026-08-08",
     year: 2026,
     month: 8,
@@ -179,10 +243,70 @@ export const WEEKLY_CER_WEEKS: WeeklyPerformanceWeek[] = [
     endDate: "2026-08-14",
     dealer: "Ikon Motors South",
     metricsByMessage: {
-      initial: { sent: 388, clicks: 61 },
-      reminder1: { sent: 172, clicks: 19 },
-      reminder2: { sent: 88, clicks: 7 },
-      reminder3: { sent: 36, clicks: 2 },
+      initial: { sent: 372, clicks: 57 },
+      reminder1: { sent: 164, clicks: 18 },
+      reminder2: { sent: 84, clicks: 6 },
+      reminder3: { sent: 34, clicks: 2 },
+    },
+  },
+  {
+    id: "week-2026-08-08",
+    year: 2026,
+    month: 8,
+    label: "Aug 08–Aug 14",
+    startDate: "2026-08-08",
+    endDate: "2026-08-14",
+    dealer: "Premier Auto Group",
+    metricsByMessage: {
+      initial: { sent: 338, clicks: 59 },
+      reminder1: { sent: 148, clicks: 19 },
+      reminder2: { sent: 69, clicks: 7 },
+      reminder3: { sent: 27, clicks: 2 },
+    },
+  },
+  {
+    id: "week-2026-08-08",
+    year: 2026,
+    month: 8,
+    label: "Aug 08–Aug 14",
+    startDate: "2026-08-08",
+    endDate: "2026-08-14",
+    dealer: "Lakeside Honda",
+    metricsByMessage: {
+      initial: { sent: 284, clicks: 47 },
+      reminder1: { sent: 122, clicks: 14 },
+      reminder2: { sent: 58, clicks: 4 },
+      reminder3: { sent: 20, clicks: 1 },
+    },
+  },
+  {
+    id: "week-2026-08-15",
+    year: 2026,
+    month: 8,
+    label: "Aug 15–Aug 21",
+    startDate: "2026-08-15",
+    endDate: "2026-08-21",
+    dealer: "Ikon Motors North",
+    metricsByMessage: {
+      initial: { sent: 438, clicks: 84 },
+      reminder1: { sent: 194, clicks: 27 },
+      reminder2: { sent: 98, clicks: 10 },
+      reminder3: { sent: 43, clicks: 3 },
+    },
+  },
+  {
+    id: "week-2026-08-15",
+    year: 2026,
+    month: 8,
+    label: "Aug 15–Aug 21",
+    startDate: "2026-08-15",
+    endDate: "2026-08-21",
+    dealer: "Ikon Motors South",
+    metricsByMessage: {
+      initial: { sent: 401, clicks: 66 },
+      reminder1: { sent: 178, clicks: 21 },
+      reminder2: { sent: 91, clicks: 8 },
+      reminder3: { sent: 38, clicks: 2 },
     },
   },
   {
@@ -194,10 +318,70 @@ export const WEEKLY_CER_WEEKS: WeeklyPerformanceWeek[] = [
     endDate: "2026-08-21",
     dealer: "Premier Auto Group",
     metricsByMessage: {
-      initial: { sent: 351, clicks: 64 },
-      reminder1: { sent: 154, clicks: 21 },
-      reminder2: { sent: 72, clicks: 8 },
-      reminder3: { sent: 29, clicks: 2 },
+      initial: { sent: 364, clicks: 70 },
+      reminder1: { sent: 160, clicks: 23 },
+      reminder2: { sent: 75, clicks: 9 },
+      reminder3: { sent: 31, clicks: 2 },
+    },
+  },
+  {
+    id: "week-2026-08-15",
+    year: 2026,
+    month: 8,
+    label: "Aug 15–Aug 21",
+    startDate: "2026-08-15",
+    endDate: "2026-08-21",
+    dealer: "Lakeside Honda",
+    metricsByMessage: {
+      initial: { sent: 308, clicks: 56 },
+      reminder1: { sent: 134, clicks: 18 },
+      reminder2: { sent: 64, clicks: 6 },
+      reminder3: { sent: 24, clicks: 2 },
+    },
+  },
+  {
+    id: "week-2026-08-22",
+    year: 2026,
+    month: 8,
+    label: "Aug 22–Aug 28",
+    startDate: "2026-08-22",
+    endDate: "2026-08-28",
+    dealer: "Ikon Motors North",
+    metricsByMessage: {
+      initial: { sent: 386, clicks: 66 },
+      reminder1: { sent: 170, clicks: 20 },
+      reminder2: { sent: 86, clicks: 7 },
+      reminder3: { sent: 36, clicks: 2 },
+    },
+  },
+  {
+    id: "week-2026-08-22",
+    year: 2026,
+    month: 8,
+    label: "Aug 22–Aug 28",
+    startDate: "2026-08-22",
+    endDate: "2026-08-28",
+    dealer: "Ikon Motors South",
+    metricsByMessage: {
+      initial: { sent: 359, clicks: 52 },
+      reminder1: { sent: 158, clicks: 16 },
+      reminder2: { sent: 80, clicks: 6 },
+      reminder3: { sent: 32, clicks: 1 },
+    },
+  },
+  {
+    id: "week-2026-08-22",
+    year: 2026,
+    month: 8,
+    label: "Aug 22–Aug 28",
+    startDate: "2026-08-22",
+    endDate: "2026-08-28",
+    dealer: "Premier Auto Group",
+    metricsByMessage: {
+      initial: { sent: 327, clicks: 55 },
+      reminder1: { sent: 143, clicks: 17 },
+      reminder2: { sent: 67, clicks: 6 },
+      reminder3: { sent: 26, clicks: 1 },
     },
   },
   {
@@ -209,10 +393,10 @@ export const WEEKLY_CER_WEEKS: WeeklyPerformanceWeek[] = [
     endDate: "2026-08-28",
     dealer: "Lakeside Honda",
     metricsByMessage: {
-      initial: { sent: 296, clicks: 52 },
-      reminder1: { sent: 128, clicks: 16 },
-      reminder2: { sent: 61, clicks: 5 },
-      reminder3: { sent: 22, clicks: 1 },
+      initial: { sent: 272, clicks: 43 },
+      reminder1: { sent: 118, clicks: 13 },
+      reminder2: { sent: 56, clicks: 4 },
+      reminder3: { sent: 19, clicks: 1 },
     },
   },
   {
@@ -230,9 +414,232 @@ export const WEEKLY_CER_WEEKS: WeeklyPerformanceWeek[] = [
       reminder3: { sent: 18, clicks: 1 },
     },
   },
+  {
+    id: "week-2026-07-04",
+    year: 2026,
+    month: 7,
+    label: "Jul 04–Jul 10",
+    startDate: "2026-07-04",
+    endDate: "2026-07-10",
+    dealer: "Ikon Motors North",
+    metricsByMessage: {
+      initial: { sent: 364, clicks: 62 },
+      reminder1: { sent: 160, clicks: 19 },
+      reminder2: { sent: 81, clicks: 7 },
+      reminder3: { sent: 34, clicks: 2 },
+    },
+  },
 ];
 
-export const ACTIVITY_DETAIL_ROWS: ActivityDetailRow[] = [
+interface WeeklyTemplate {
+  id: string;
+  year: number;
+  month: number;
+  label: string;
+  startDate: string;
+  endDate: string;
+}
+
+const WEEKLY_SEED_BASELINE_DEALER = "Ikon Motors North";
+const WEEKLY_REMINDER_CLICK_MULTIPLIER = {
+  initial: 1,
+  reminder1: 0.58,
+  reminder2: 0.42,
+  reminder3: 0.3,
+} as const;
+
+function listWeeklyTemplates(weeks: WeeklyPerformanceWeek[]): WeeklyTemplate[] {
+  const templatesById = new Map<string, WeeklyTemplate>();
+  for (const week of weeks) {
+    if (templatesById.has(week.id)) continue;
+    templatesById.set(week.id, {
+      id: week.id,
+      year: week.year,
+      month: week.month,
+      label: week.label,
+      startDate: week.startDate,
+      endDate: week.endDate,
+    });
+  }
+
+  return [...templatesById.values()].sort((left, right) =>
+    left.startDate.localeCompare(right.startDate),
+  );
+}
+
+function buildGeneratedWeeklyMetrics(input: {
+  baselineWeek: WeeklyPerformanceWeek;
+  rooftop: ReportingRooftop;
+  rooftopIndex: number;
+  weekIndex: number;
+  baselineRooftop: ReportingRooftop;
+  period: "mtd" | "lm";
+}): WeeklyPerformanceWeek["metricsByMessage"] {
+  const baselinePeriodMetrics = input.baselineRooftop.metricsByPeriod[input.period];
+  const rooftopPeriodMetrics = input.rooftop.metricsByPeriod[input.period];
+  const sentScale = rooftopPeriodMetrics.sent / baselinePeriodMetrics.sent;
+  const clickScale =
+    rooftopPeriodMetrics.clickedFirstTime / baselinePeriodMetrics.clickedFirstTime;
+  const variance =
+    1 + ((input.rooftopIndex % 5) - 2) * 0.03 + (input.weekIndex - 2) * 0.01;
+
+  return {
+    initial: scaleWeeklyMessageMetrics(
+      input.baselineWeek.metricsByMessage.initial,
+      sentScale,
+      clickScale * WEEKLY_REMINDER_CLICK_MULTIPLIER.initial,
+      variance,
+    ),
+    reminder1: scaleWeeklyMessageMetrics(
+      input.baselineWeek.metricsByMessage.reminder1,
+      sentScale,
+      clickScale * WEEKLY_REMINDER_CLICK_MULTIPLIER.reminder1,
+      variance,
+    ),
+    reminder2: scaleWeeklyMessageMetrics(
+      input.baselineWeek.metricsByMessage.reminder2,
+      sentScale,
+      clickScale * WEEKLY_REMINDER_CLICK_MULTIPLIER.reminder2,
+      variance,
+    ),
+    reminder3: scaleWeeklyMessageMetrics(
+      input.baselineWeek.metricsByMessage.reminder3,
+      sentScale,
+      clickScale * WEEKLY_REMINDER_CLICK_MULTIPLIER.reminder3,
+      variance,
+    ),
+  };
+}
+
+function scaleWeeklyMessageMetrics(
+  metrics: { sent: number; clicks: number },
+  sentScale: number,
+  clickScale: number,
+  variance: number,
+): { sent: number; clicks: number } {
+  const sent = Math.max(1, Math.round(metrics.sent * sentScale * variance));
+  const clicks = Math.min(
+    sent,
+    Math.max(0, Math.round(metrics.clicks * clickScale * variance)),
+  );
+  return { sent, clicks };
+}
+
+function buildWeeklyCerWeeks(): WeeklyPerformanceWeek[] {
+  const templates = listWeeklyTemplates(WEEKLY_CER_SEED_WEEKS);
+  const baselineRooftop = REPORTING_ROOFTOPS.find(
+    (rooftop) => rooftop.rooftop === WEEKLY_SEED_BASELINE_DEALER,
+  );
+  if (!baselineRooftop) return WEEKLY_CER_SEED_WEEKS;
+
+  const baselineWeeksById = new Map(
+    WEEKLY_CER_SEED_WEEKS.filter(
+      (week) => week.dealer === WEEKLY_SEED_BASELINE_DEALER,
+    ).map((week) => [week.id, week]),
+  );
+  const existingDealerWeekKeys = new Set(
+    WEEKLY_CER_SEED_WEEKS.map((week) => `${week.dealer}::${week.id}`),
+  );
+  const generated: WeeklyPerformanceWeek[] = [];
+
+  REPORTING_ROOFTOPS.forEach((rooftop, rooftopIndex) => {
+    templates.forEach((template, weekIndex) => {
+      const dealerWeekKey = `${rooftop.rooftop}::${template.id}`;
+      if (existingDealerWeekKeys.has(dealerWeekKey)) return;
+
+      const baselineWeek = baselineWeeksById.get(template.id);
+      if (!baselineWeek) return;
+
+      const period = template.month >= 8 ? "mtd" : "lm";
+      generated.push({
+        ...template,
+        dealer: rooftop.rooftop,
+        metricsByMessage: buildGeneratedWeeklyMetrics({
+          baselineWeek,
+          rooftop,
+          rooftopIndex,
+          weekIndex,
+          baselineRooftop,
+          period,
+        }),
+      });
+    });
+  });
+
+  return [...WEEKLY_CER_SEED_WEEKS, ...generated];
+}
+
+export const WEEKLY_CER_WEEKS: WeeklyPerformanceWeek[] = buildWeeklyCerWeeks();
+
+const ACTIVITY_CUSTOMERS_PER_DEALERSHIP = 10;
+const ACTIVITY_MESSAGE_LABELS = [
+  "Initial",
+  "Reminder 1",
+  "Reminder 2",
+  "Reminder 3",
+] as const;
+const ACTIVITY_FIRST_NAMES = [
+  "Lena",
+  "David",
+  "Sofia",
+  "Marcus",
+  "Yuki",
+  "Hannah",
+  "Theo",
+  "Camila",
+  "Andre",
+  "Nora",
+  "Ibrahim",
+  "Grace",
+  "Felix",
+  "Maya",
+  "Julian",
+  "Clara",
+  "Omar",
+  "Ruby",
+  "Nico",
+  "Ivy",
+] as const;
+const ACTIVITY_LAST_NAMES = [
+  "Brooks",
+  "Chen",
+  "Okoye",
+  "Keller",
+  "Morales",
+  "Singh",
+  "Walsh",
+  "Kim",
+  "Diaz",
+  "Foster",
+  "Haddad",
+  "Reed",
+  "Navarro",
+  "Price",
+  "Sato",
+  "Bennett",
+  "Cruz",
+  "Hughes",
+  "Ibarra",
+  "Cole",
+] as const;
+const ACTIVITY_AREA_CODES = [
+  "312",
+  "214",
+  "480",
+  "615",
+  "702",
+  "858",
+  "404",
+  "503",
+  "713",
+  "206",
+] as const;
+
+/**
+ * Named customers behind the activity drill-down. Extra generated rows stay on
+ * 2026-08-01–20 so the rooftop + Aug 24–28 filter still returns Maria.
+ */
+const SEED_ACTIVITY_ROWS: ActivityDetailRow[] = [
   {
     id: "act-1",
     customer: "Maria Alvarez",
@@ -330,6 +737,77 @@ export const ACTIVITY_DETAIL_ROWS: ActivityDetailRow[] = [
     mileage: 18990,
   },
 ];
+
+function padDigits(value: number, width: number): string {
+  return String(value).padStart(width, "0");
+}
+
+function buildGeneratedActivityRow(
+  rooftop: ReportingRooftop,
+  rooftopIndex: number,
+  slot: number,
+  sequentialId: number,
+): ActivityDetailRow {
+  const nameIndex = rooftopIndex * ACTIVITY_CUSTOMERS_PER_DEALERSHIP + slot;
+  const firstName =
+    ACTIVITY_FIRST_NAMES[nameIndex % ACTIVITY_FIRST_NAMES.length];
+  const lastName =
+    ACTIVITY_LAST_NAMES[(nameIndex + slot + rooftopIndex) % ACTIVITY_LAST_NAMES.length];
+  const day = padDigits((slot % 20) + 1, 2);
+  const areaCode =
+    ACTIVITY_AREA_CODES[nameIndex % ACTIVITY_AREA_CODES.length];
+
+  return {
+    id: `act-gen-${sequentialId}`,
+    customer: `${firstName} ${lastName}`,
+    vin: `1HGCM82633A${padDigits(sequentialId, 6)}`,
+    phone: `(${areaCode}) 555-${padDigits(1000 + sequentialId, 4).slice(-4)}`,
+    email: `${firstName}.${lastName}.${sequentialId}@email.com`.toLowerCase(),
+    clickDate: `2026-08-${day}`,
+    message: ACTIVITY_MESSAGE_LABELS[slot % ACTIVITY_MESSAGE_LABELS.length],
+    dealer: rooftop.dealerGroup,
+    rooftop: rooftop.rooftop,
+    mileage: slot % 7 === 0 ? null : 14_200 + sequentialId * 137,
+  };
+}
+
+function buildActivityDetailRows(): ActivityDetailRow[] {
+  const seedRowsByRooftop = new Map<string, ActivityDetailRow[]>();
+  for (const row of SEED_ACTIVITY_ROWS) {
+    const existing = seedRowsByRooftop.get(row.rooftop) ?? [];
+    existing.push(row);
+    seedRowsByRooftop.set(row.rooftop, existing);
+  }
+
+  const rows: ActivityDetailRow[] = [];
+  let sequentialId = SEED_ACTIVITY_ROWS.length;
+
+  REPORTING_ROOFTOPS.forEach((rooftop, rooftopIndex) => {
+    const seedRows = seedRowsByRooftop.get(rooftop.rooftop) ?? [];
+    rows.push(...seedRows);
+
+    const extraCount = Math.max(
+      ACTIVITY_CUSTOMERS_PER_DEALERSHIP - seedRows.length,
+      0,
+    );
+    for (let slot = 0; slot < extraCount; slot += 1) {
+      sequentialId += 1;
+      rows.push(
+        buildGeneratedActivityRow(
+          rooftop,
+          rooftopIndex,
+          seedRows.length + slot,
+          sequentialId,
+        ),
+      );
+    }
+  });
+
+  return rows;
+}
+
+export const ACTIVITY_DETAIL_ROWS: ActivityDetailRow[] =
+  buildActivityDetailRows();
 
 export const ACTIVITY_MESSAGES_SENT = 1840;
 export const ACTIVITY_UPLIFT_PERCENT = 12.4;
