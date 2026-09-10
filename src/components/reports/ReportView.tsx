@@ -531,7 +531,7 @@ export function ReportView() {
                                 href={activityHref}
                                 className={cn(
                                   DATA_TABLE_SLOT_LABEL_CLASS,
-                                  "min-w-0 truncate font-medium hover:underline",
+                                  "min-w-0 truncate font-medium text-primary hover:underline",
                                 )}
                               >
                                 {row.dealership}
