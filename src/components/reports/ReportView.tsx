@@ -381,7 +381,11 @@ export function ReportView() {
             {filters.mode === "monthly" ? (
               <ScopeSelect
                 label="Sort By"
-                triggerLabel="Sort By"
+                triggerLabel={
+                  filters.metric == null
+                    ? "Sort By"
+                    : `Sort By: ${REPORT_RANK_METRIC_LABELS[filters.metric]}`
+                }
                 value={filters.metric ?? ""}
                 options={REPORT_METRIC_FILTER_OPTIONS}
                 onValueChange={(metric) => {
@@ -390,7 +394,7 @@ export function ReportView() {
                     page: 1,
                   });
                 }}
-                className="w-[11.5rem] sm:w-[13rem]"
+                className="w-[11.5rem] sm:w-[15rem]"
               />
             ) : null}
             <ReportToggleGroup
