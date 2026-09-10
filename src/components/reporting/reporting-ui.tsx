@@ -59,6 +59,7 @@ export function ReportingExportButton({
       leadingIcon={<Download aria-hidden />}
       onClick={onExport}
       disabled={disabled}
+      className="bg-white dark:bg-sidebar"
     >
       Export CSV
     </Button>

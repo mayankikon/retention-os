@@ -12,10 +12,10 @@ flowchart LR
   Home -->|export| Csv[CSV download]
 ```
 
-- KPIs stay in one row: Messages sent, Total clicks, Reminder Uplift, CER %.
+- KPIs stay in one row on monthly mode: Messages sent, Total clicks, Reminder Uplift, CER %. Weekly mode hides the strip; each week card already carries sent / clicks / CER %.
 - Mode toggle is uppercase black, green when selected.
 - Monthly mode ranks dealerships in a stacked list (rank badge, dealership, group, campaign, metric grid, and CER %). Click a dealership to open activity. Campaign names the live campaign covering that rooftop (active over paused over completed); extra campaigns collapse to a +N count. Drafts and archives stay off the column. Rooftops with no sent campaign show —.
-- Weekly mode stacks one card per week, newest first, with vertical spacing between cards. A plain header above the stack names the scope once — a single dealership links to activity, a group or the portfolio reads "cumulative (N rooftops)" — and counts the visible weeks, so no card repeats the dealer name.
+- Weekly mode stacks one card per week, newest first, with vertical spacing between cards. Cards start at the date range; there is no extra "Weekly performance" / cumulative rooftop header above the stack.
 - Each week card leads with its date range and carries its own column header, so it reads standalone. It sums every dealer in scope across Initial / Reminder 1–3 plus a Total column, over Messages Sent / Clicks / CER % rows. A week covering fewer rooftops than the scope notes "N rooftops reporting" beside its date range.
 - Campaign-style Group and Dealer filters scope the card; the weekly paginator pages week sections, not dealer cards.
 - The reports list title bar has no subtitle. The date range filter sits on the same row as the Reports heading, top right, above Export CSV. It defaults to the current month to date and reads `This month · Sep 1 – 8, 2026`. Its preset sidebar offers This month, Last month, Last 3 days, Last 7 days, Last week, Last 30 days, Last 90 days, Last 6 months, and Year to date; two clicks on the two-month calendar set any custom range, which the trigger labels `Custom`. Future days are not selectable, and picking a preset or completing a range closes the popover. The range lives in the `from`/`to` query params, and an unparseable or reversed pair falls back to the default.

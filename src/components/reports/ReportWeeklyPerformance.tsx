@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { formatMessageCount } from "@/lib/format";
 import {
   formatCerPercent,
@@ -21,42 +20,14 @@ type WeeklyMetricKey = (typeof WEEKLY_METRIC_ROWS)[number]["key"];
 interface ReportWeeklyPerformanceProps {
   sections: ReportWeeklySection[];
   scope: ReportWeeklyScope;
-  scopeHref: string | null;
 }
 
 export function ReportWeeklyPerformance({
   sections,
   scope,
-  scopeHref,
 }: ReportWeeklyPerformanceProps) {
   return (
     <section className="flex flex-col gap-4" aria-label="Weekly performance">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 className="text-sm font-semibold text-foreground">
-            Weekly performance
-          </h2>
-          <p className="text-xs text-muted-foreground">
-            {scopeHref ? (
-              <Link
-                href={scopeHref}
-                className="font-medium text-brand-primary underline-offset-2 hover:underline"
-              >
-                {scope.name}
-              </Link>
-            ) : (
-              <span className="font-medium text-foreground">{scope.name}</span>
-            )}
-            {scope.isCumulative
-              ? ` — cumulative (${formatRooftopCount(scope.dealershipCount)})`
-              : null}
-          </p>
-        </div>
-        <span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-foreground">
-          {sections.length === 1 ? "1 week" : `${sections.length} weeks`}
-        </span>
-      </div>
-
       {sections.map((section) => (
         <WeeklySectionCard
           key={section.weekId}

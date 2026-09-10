@@ -257,10 +257,6 @@ export function ReportView() {
     [filters.group],
   );
 
-  const weeklyScopeHref = weeklyScope.dealershipId
-    ? `/reports/activity?dealership=${weeklyScope.dealershipId}`
-    : null;
-
   const handlePageChange = (page: number) => {
     void setFilters({ page });
   };
@@ -386,27 +382,29 @@ export function ReportView() {
         </div>
       </section>
 
-      <section
-        className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4"
-        aria-label="Report KPIs"
-      >
-        <ReportingSummaryCard
-          label="Messages sent"
-          value={formatMessageCount(kpis.messagesSent)}
-        />
-        <ReportingSummaryCard
-          label="Total clicks"
-          value={formatMessageCount(kpis.totalClicks)}
-        />
-        <ReportingSummaryCard
-          label="Reminder Uplift"
-          value={formatSignedPercent(kpis.upliftPercent)}
-        />
-        <ReportingSummaryCard
-          label="CER %"
-          value={formatCerPercent(kpis.cerPercent)}
-        />
-      </section>
+      {filters.mode === "monthly" ? (
+        <section
+          className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4"
+          aria-label="Report KPIs"
+        >
+          <ReportingSummaryCard
+            label="Messages sent"
+            value={formatMessageCount(kpis.messagesSent)}
+          />
+          <ReportingSummaryCard
+            label="Total clicks"
+            value={formatMessageCount(kpis.totalClicks)}
+          />
+          <ReportingSummaryCard
+            label="Reminder Uplift"
+            value={formatSignedPercent(kpis.upliftPercent)}
+          />
+          <ReportingSummaryCard
+            label="CER %"
+            value={formatCerPercent(kpis.cerPercent)}
+          />
+        </section>
+      ) : null}
 
       {filters.mode === "weekly" ? (
         currentWeeks.length === 0 ? (
@@ -418,7 +416,6 @@ export function ReportView() {
           <ReportWeeklyPerformance
             sections={pagedWeeks.items}
             scope={weeklyScope}
-            scopeHref={weeklyScopeHref}
           />
         )
       ) : rows.length === 0 ? (

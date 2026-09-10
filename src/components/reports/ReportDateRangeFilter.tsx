@@ -166,6 +166,8 @@ export function ReportDateRangeFilter({
               months: "flex gap-0",
               month:
                 "flex h-[304px] w-[250px] flex-col overflow-clip first:border-r first:border-border",
+              // Shift paints today as a red circle; this filter does not need that marker.
+              today: "",
             }}
           />
         </div>
