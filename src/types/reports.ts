@@ -4,7 +4,7 @@ import type {
   WeeklyMessageType,
 } from "@/types/reporting";
 
-export const REPORT_PERFORMANCE_MODES = ["weekly", "monthly"] as const;
+export const REPORT_PERFORMANCE_MODES = ["monthly", "weekly"] as const;
 
 export type ReportPerformanceMode =
   (typeof REPORT_PERFORMANCE_MODES)[number];
