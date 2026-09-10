@@ -22,15 +22,15 @@ import {
 export const DEFAULT_REPORT_DATE_PRESET: ReportDatePresetId = "monthToDate";
 
 export const REPORT_DATE_PRESET_LABELS: Record<ReportDatePresetId, string> = {
-  monthToDate: "This month",
-  lastMonth: "Last month",
-  last3Days: "Last 3 days",
-  last7Days: "Last 7 days",
-  lastWeek: "Last week",
-  last30Days: "Last 30 days",
-  last90Days: "Last 90 days",
-  last6Months: "Last 6 months",
-  yearToDate: "Year to date",
+  monthToDate: "This Month",
+  lastMonth: "Last Month",
+  last3Days: "Last 3 Days",
+  last7Days: "Last 7 Days",
+  lastWeek: "Last Week",
+  last30Days: "Last 30 Days",
+  last90Days: "Last 90 Days",
+  last6Months: "Last 6 Months",
+  yearToDate: "Year To Date",
 };
 
 export interface ReportDatePresetOption {

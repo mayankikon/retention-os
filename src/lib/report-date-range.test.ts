@@ -78,7 +78,7 @@ describe("report date presets", () => {
     expect(presets).toHaveLength(9);
     expect(presets[0]).toEqual({
       id: "monthToDate",
-      label: "This month",
+      label: "This Month",
       range: SEPTEMBER_TO_DATE,
     });
     expect(matchReportDatePreset(SEPTEMBER_TO_DATE, TODAY)).toBe("monthToDate");

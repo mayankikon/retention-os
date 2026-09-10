@@ -84,6 +84,8 @@ interface ScopeSelectProps {
   options: { value: string; label: string }[];
   onValueChange: (value: string) => void;
   className?: string;
+  /** When set, the trigger always shows this text instead of the selected option. */
+  triggerLabel?: string;
 }
 
 export function ScopeSelect({
@@ -92,10 +94,11 @@ export function ScopeSelect({
   options,
   onValueChange,
   className,
+  triggerLabel,
 }: ScopeSelectProps) {
   return (
     <Select
-      value={value}
+      value={value === "" ? null : value}
       onValueChange={(next) => {
         if (next == null) return;
         onValueChange(next);
@@ -110,7 +113,11 @@ export function ScopeSelect({
           className,
         )}
       >
-        <SelectValue placeholder={label} />
+        {triggerLabel != null ? (
+          <span className="min-w-0 truncate">{triggerLabel}</span>
+        ) : (
+          <SelectValue placeholder={label} />
+        )}
       </SelectTrigger>
       <SelectContent>
         {options.map((option) => (

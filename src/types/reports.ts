@@ -9,6 +9,15 @@ export const REPORT_PERFORMANCE_MODES = ["weekly", "monthly"] as const;
 export type ReportPerformanceMode =
   (typeof REPORT_PERFORMANCE_MODES)[number];
 
+export const REPORT_RANK_METRICS = [
+  "messages",
+  "clicks",
+  "uplift",
+  "cer",
+] as const;
+
+export type ReportRankMetric = (typeof REPORT_RANK_METRICS)[number];
+
 /** Inclusive calendar range, stored as local ISO `YYYY-MM-DD` days. */
 export interface ReportDateRange {
   startDate: string;

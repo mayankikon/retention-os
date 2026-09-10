@@ -60,7 +60,7 @@ Web UI for Ikon's Smart Marketing Campaign Manager. Phase 1 delivers the **Campa
 ### Reports
 
 - Top-level **Reports** nav (`/reports`) for Ikon SM Admin portfolio reporting, available in **every product version**
-- Monthly KPI strip (Messages sent, Total clicks, Reminder Uplift, CER %), black/green weekly/monthly toggle, Group + Dealer scope filters, a date range filter on the Reports title row, and Export CSV. Weekly mode hides the KPI strip.
+- Monthly KPI strip (Messages sent, Total clicks, Reminder Uplift, CER %), black/green weekly/monthly toggle, Group + Dealer scope filters, Sort By dropdown, a date range filter on the Reports title row, and Export CSV. Weekly mode hides the KPI strip and Sort By dropdown.
 - Monthly mode ranks dealerships by CER% and names the live campaign covering each rooftop; weekly mode stacks week sections cumulative across the dealers in scope
 - Low-sample guardrail: dealerships with fewer than 50 messages sent stay visible, get a Low sample badge, and are not ranked
 - `/reports/activity` lists the customers behind a dealership, including **Campaign** (one per customer, dealt round-robin across the dealership's campaigns) and a **Mileage** column (`—` when unknown)

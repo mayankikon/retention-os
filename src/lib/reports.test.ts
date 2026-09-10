@@ -21,6 +21,7 @@ import {
   listReportDealerships,
   paginateReportItems,
   rankReportDealerships,
+  rankReportRowsByMetric,
   sumRooftopMetricsInRange,
   summarizeReportKpis,
 } from "@/lib/reports";
@@ -514,6 +515,66 @@ describe("report KPIs", () => {
     expect(formatSignedPercent(12.4)).toBe("+12.4%");
     expect(formatSignedPercent(-3.1)).toBe("-3.1%");
     expect(formatSignedPercent(0)).toBe("0.0%");
+  });
+});
+
+describe("report metric ranking", () => {
+  const currentRows = [
+    {
+      dealershipId: "dealer-a",
+      dealership: "Dealer A",
+      group: "Group",
+      campaign: { name: null, additionalCount: 0 },
+      messages: 100,
+      firstMessage: 90,
+      retried: 10,
+      clicks: 20,
+      firstTime: 10,
+      cerPercent: 10,
+      isLowSample: false,
+      rank: 1,
+    },
+    {
+      dealershipId: "dealer-b",
+      dealership: "Dealer B",
+      group: "Group",
+      campaign: { name: null, additionalCount: 0 },
+      messages: 200,
+      firstMessage: 180,
+      retried: 20,
+      clicks: 15,
+      firstTime: 30,
+      cerPercent: 15,
+      isLowSample: false,
+      rank: 2,
+    },
+  ];
+  const previousRows = [
+    { ...currentRows[0], cerPercent: 5 },
+    { ...currentRows[1], cerPercent: 14 },
+  ];
+
+  it("ranks highest first by messages, clicks, and CER", () => {
+    expect(rankReportRowsByMetric(currentRows, previousRows, "messages")[0].dealershipId)
+      .toBe("dealer-b");
+    expect(rankReportRowsByMetric(currentRows, previousRows, "clicks")[0].dealershipId)
+      .toBe("dealer-a");
+    expect(rankReportRowsByMetric(currentRows, previousRows, "cer")[0].dealershipId)
+      .toBe("dealer-b");
+  });
+
+  it("ranks uplift by CER change from the preceding window", () => {
+    const rankedRows = rankReportRowsByMetric(
+      currentRows,
+      previousRows,
+      "uplift",
+    );
+
+    expect(rankedRows.map((row) => row.dealershipId)).toEqual([
+      "dealer-a",
+      "dealer-b",
+    ]);
+    expect(rankedRows.map((row) => row.rank)).toEqual([1, 2]);
   });
 });
 

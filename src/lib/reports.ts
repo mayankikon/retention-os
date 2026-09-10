@@ -27,6 +27,7 @@ import type {
   ReportDealershipRow,
   ReportKpis,
   ReportPerformanceMode,
+  ReportRankMetric,
   ReportWeeklyScope,
   ReportWeeklySection,
 } from "@/types/reports";
@@ -47,8 +48,15 @@ export const REPORT_PERFORMANCE_MODE_LABELS: Record<
   ReportPerformanceMode,
   string
 > = {
-  weekly: "Weekly performance",
-  monthly: "Monthly performance",
+  weekly: "Weekly",
+  monthly: "Monthly",
+};
+
+export const REPORT_RANK_METRIC_LABELS: Record<ReportRankMetric, string> = {
+  messages: "Messages sent",
+  clicks: "Total clicks",
+  uplift: "Reminder Uplift",
+  cer: "CER %",
 };
 
 export const REPORT_PAGE_SIZE = 10;
@@ -408,6 +416,55 @@ function compareReportRows(
     return right.messages - left.messages;
   }
   return left.dealership.localeCompare(right.dealership);
+}
+
+/**
+ * Re-ranks monthly dealerships by the selected summary metric.
+ * Uplift is each rooftop's CER change from the preceding date window.
+ */
+export function rankReportRowsByMetric(
+  currentRows: ReportDealershipRow[],
+  previousRows: ReportDealershipRow[],
+  metric: ReportRankMetric,
+): ReportDealershipRow[] {
+  const previousRowByDealershipId = new Map(
+    previousRows.map((row) => [row.dealershipId, row]),
+  );
+  const getMetricValue = (row: ReportDealershipRow): number => {
+    if (metric === "messages") return row.messages;
+    if (metric === "clicks") return row.clicks;
+    if (metric === "cer") return row.cerPercent;
+
+    const previousRow = previousRowByDealershipId.get(row.dealershipId);
+    return row.cerPercent - (previousRow?.cerPercent ?? 0);
+  };
+  const compareByMetric = (
+    left: ReportDealershipRow,
+    right: ReportDealershipRow,
+  ): number => {
+    const metricDifference = getMetricValue(right) - getMetricValue(left);
+    if (metricDifference !== 0) return metricDifference;
+    if (right.messages !== left.messages) return right.messages - left.messages;
+    return left.dealership.localeCompare(right.dealership);
+  };
+
+  if (metric !== "cer") {
+    return [...currentRows]
+      .sort(compareByMetric)
+      .map((row, index) => ({ ...row, rank: index + 1 }));
+  }
+
+  const qualifyingRows = currentRows
+    .filter((row) => !row.isLowSample)
+    .sort(compareByMetric);
+  const lowSampleRows = currentRows
+    .filter((row) => row.isLowSample)
+    .sort(compareByMetric);
+
+  return [
+    ...qualifyingRows.map((row, index) => ({ ...row, rank: index + 1 })),
+    ...lowSampleRows.map((row) => ({ ...row, rank: null })),
+  ];
 }
 
 export function summarizeReportKpis(

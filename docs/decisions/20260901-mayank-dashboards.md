@@ -15,7 +15,7 @@ Robert's version splits reporting into Leaderboard, Weekly CER, and Activity Det
 - Add a **Dashboards** nav item on **Post MVP V1.1 / Mayank's version** only (`/dashboards`).
 - Do not use Leaderboard, Weekly CER, Activity Detail, Rooftop, or Smart Service Lead copy on this slice.
 - Top of `/dashboards`: four horizontal KPIs — Messages sent, Total clicks, Uplift, CER %.
-- Top-right: **Weekly performance** / **Monthly performance** toggle plus Export CSV. Toggle labels are uppercase; idle black, selected green.
+- Top-right: **Weekly** / **Monthly** toggle plus Export CSV. Toggle labels are uppercase; idle black, selected green.
 - Weekly mode reuses Robert’s weekly CER weeks as Initial / Reminder 1–3 performance tables.
 - Table columns: Rank, Dealership, Group, Messages, First message, Retried, Clicks, First-time, CER %.
   - "First message" is the Initial send volume (speech "friend message").

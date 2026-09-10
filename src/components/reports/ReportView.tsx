@@ -54,6 +54,7 @@ import {
 import {
   aggregateReportWeeks,
   REPORT_PERFORMANCE_MODE_LABELS,
+  REPORT_RANK_METRIC_LABELS,
   describeReportWeeklyScope,
   filterReportWeeks,
   formatReportCampaignLabel,
@@ -63,6 +64,7 @@ import {
   listReportGroups,
   paginateReportItems,
   rankReportDealerships,
+  rankReportRowsByMetric,
   summarizeReportKpis,
 } from "@/lib/reports";
 import { formatMessageCount } from "@/lib/format";
@@ -76,7 +78,11 @@ import {
   WEEKLY_METRIC_ROWS,
 } from "@/lib/reporting";
 import { cn } from "@/lib/utils";
-import { REPORT_PERFORMANCE_MODES } from "@/types/reports";
+import {
+  REPORT_PERFORMANCE_MODES,
+  REPORT_RANK_METRICS,
+} from "@/types/reports";
+import type { ReportRankMetric } from "@/types/reports";
 import type { WeeklyMessageMetrics } from "@/types/reporting";
 
 const REPORT_HEADERS = [
@@ -108,6 +114,11 @@ const REPORT_HEADERS = [
   { key: "cer", label: "CER %", widthClassName: "min-w-[88px] w-[100px]" },
 ] as const;
 
+const REPORT_METRIC_FILTER_OPTIONS = REPORT_RANK_METRICS.map((metric) => ({
+  value: metric,
+  label: REPORT_RANK_METRIC_LABELS[metric],
+}));
+
 type WeeklyMetricKey = (typeof WEEKLY_METRIC_ROWS)[number]["key"];
 
 function formatWeeklyCsvValue(
@@ -125,6 +136,7 @@ const reportParsers = {
   mode: parseAsStringLiteral(REPORT_PERFORMANCE_MODES).withDefault(
     "monthly",
   ),
+  metric: parseAsStringLiteral(REPORT_RANK_METRICS),
   from: parseAsString.withDefault(""),
   to: parseAsString.withDefault(""),
   page: parseAsInteger.withDefault(1),
@@ -209,6 +221,13 @@ export function ReportView() {
     () => summarizeReportKpis(rows, previousRows),
     [previousRows, rows],
   );
+  const rankedRows = useMemo(
+    () =>
+      filters.metric == null
+        ? rows
+        : rankReportRowsByMetric(rows, previousRows, filters.metric),
+    [filters.metric, previousRows, rows],
+  );
   const weeklySections = useMemo(
     () => aggregateReportWeeks(currentWeeks),
     [currentWeeks],
@@ -228,8 +247,8 @@ export function ReportView() {
     [filters.page, weeklySections],
   );
   const pagedRows = useMemo(
-    () => paginateReportItems(rows, filters.page),
-    [filters.page, rows],
+    () => paginateReportItems(rankedRows, filters.page),
+    [filters.page, rankedRows],
   );
   const currentPage =
     filters.mode === "weekly" ? pagedWeeks : pagedRows;
@@ -265,6 +284,7 @@ export function ReportView() {
     void setFilters({
       group: FILTER_ALL,
       dealer: FILTER_ALL,
+      metric: null,
       from: defaultDateRange.startDate,
       to: defaultDateRange.endDate,
       page: 1,
@@ -308,7 +328,7 @@ export function ReportView() {
         "First-time",
         "CER %",
       ],
-      rows.map((row) => [
+      rankedRows.map((row) => [
         row.rank == null ? "—" : String(row.rank),
         row.dealership,
         row.group,
@@ -357,8 +377,22 @@ export function ReportView() {
             }}
             className="w-[11.5rem] sm:w-[13rem]"
           />
-
-          <div className="ml-auto flex flex-wrap items-center gap-2.5">
+          <div className="ml-auto flex flex-wrap items-center justify-end gap-2.5">
+            {filters.mode === "monthly" ? (
+              <ScopeSelect
+                label="Sort By"
+                triggerLabel="Sort By"
+                value={filters.metric ?? ""}
+                options={REPORT_METRIC_FILTER_OPTIONS}
+                onValueChange={(metric) => {
+                  void setFilters({
+                    metric: metric as ReportRankMetric,
+                    page: 1,
+                  });
+                }}
+                className="w-[11.5rem] sm:w-[13rem]"
+              />
+            ) : null}
             <ReportToggleGroup
               label="Performance mode"
               value={filters.mode}
