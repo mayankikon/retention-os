@@ -1,10 +1,14 @@
 "use client";
 
 import { useMemo } from "react";
+import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { parseAsInteger, parseAsString, parseAsStringLiteral, useQueryStates } from "nuqs";
+import { buttonVariants } from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
+import { ArrowLeft } from "lucide-react";
 import { TitleBar } from "@/components/layout/TitleBar";
 import { ReportDateRangeFilter } from "@/components/reports/ReportDateRangeFilter";
+import { cn } from "@/lib/utils";
 import { REPORTING_ROOFTOPS } from "@/data/reporting.mock";
 import {
   DEFAULT_REPORT_DATE_PRESET,
@@ -39,6 +43,7 @@ export function ReportShell({ children }: ReportShellProps) {
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
       <TitleBar
+        titleLeading={isActivity ? <ReportActivityBackButton /> : undefined}
         title={isActivity ? (dealership?.rooftop ?? "Activity") : "Reports"}
         subtitle={
           isActivity
@@ -54,6 +59,22 @@ export function ReportShell({ children }: ReportShellProps) {
         {children}
       </div>
     </div>
+  );
+}
+
+function ReportActivityBackButton() {
+  return (
+    <Link
+      href="/reports"
+      aria-label="Back to Reports"
+      className={cn(
+        buttonVariants({ variant: "outline" }),
+        "inline-flex shrink-0 items-center gap-1.5",
+      )}
+    >
+      <ArrowLeft className="h-4 w-4" aria-hidden />
+      Back
+    </Link>
   );
 }
 
