@@ -158,6 +158,11 @@ export function ReportActivityView() {
         <DesignSystemTableShellNoTabs
           className="min-w-0"
           cardBorderClassName={DATA_TABLE_SHELL_BORDER_CLASS}
+          pagination={
+            <span className="sr-only">
+              {`All ${rows.length} activity rows`}
+            </span>
+          }
         >
           <Table
             className={DATA_TABLE_CLASS}

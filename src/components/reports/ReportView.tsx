@@ -263,6 +263,10 @@ export function ReportView() {
     ? `/reports/activity?dealership=${weeklyScope.dealershipId}`
     : null;
 
+  const handlePageChange = (page: number) => {
+    void setFilters({ page });
+  };
+
   const handleDateRangeChange = (range: ReportDateRange) => {
     void setFilters({
       from: range.startDate,
@@ -444,6 +448,15 @@ export function ReportView() {
         <DesignSystemTableShellNoTabs
           className="min-w-0"
           cardBorderClassName={DATA_TABLE_SHELL_BORDER_CLASS}
+          pagination={
+            <PaginationBar
+              currentPage={pagedRows.page}
+              totalPages={pagedRows.totalPages}
+              totalItems={pagedRows.totalItems}
+              pageSize={pagedRows.pageSize}
+              onPageChange={handlePageChange}
+            />
+          }
         >
           <Table className={DATA_TABLE_CLASS} aria-label="Dealership performance">
             <TableHeader className={DATA_TABLE_HEADER_CLASS}>
@@ -582,15 +595,14 @@ export function ReportView() {
         </DesignSystemTableShellNoTabs>
       )}
 
-      {currentPage.totalItems > 0 ? (
+      {/* Weekly sections render outside the table shell, so they page below it. */}
+      {filters.mode === "weekly" && pagedWeeks.totalItems > 0 ? (
         <PaginationBar
-          currentPage={currentPage.page}
-          totalPages={currentPage.totalPages}
-          totalItems={currentPage.totalItems}
-          pageSize={currentPage.pageSize}
-          onPageChange={(page) => {
-            void setFilters({ page });
-          }}
+          currentPage={pagedWeeks.page}
+          totalPages={pagedWeeks.totalPages}
+          totalItems={pagedWeeks.totalItems}
+          pageSize={pagedWeeks.pageSize}
+          onPageChange={handlePageChange}
         />
       ) : null}
     </div>
