@@ -43,15 +43,8 @@ export function ReportShell({ children }: ReportShellProps) {
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
       <TitleBar
-        titleLeading={isActivity ? <ReportActivityBackButton /> : undefined}
+        top={isActivity ? <ReportActivityBackButton /> : undefined}
         title={isActivity ? (dealership?.rooftop ?? "Activity") : "Reports"}
-        subtitle={
-          isActivity
-            ? dealership
-              ? "Customers who clicked for this dealership."
-              : "Every customer click row, labeled by dealership."
-            : undefined
-        }
         right={isActivity ? undefined : <ReportDateRangeControl />}
       />
 

@@ -12,6 +12,8 @@ export interface TitleBarBreadcrumbItem {
 
 export interface TitleBarProps {
   breadcrumbs?: TitleBarBreadcrumbItem[];
+  /** Renders above the title row, e.g. a Back control. */
+  top?: React.ReactNode;
   titleLeading?: React.ReactNode;
   title?: React.ReactNode;
   titleTrailing?: React.ReactNode;
@@ -27,6 +29,7 @@ export interface TitleBarProps {
  */
 export function TitleBar({
   breadcrumbs,
+  top,
   titleLeading,
   title,
   titleTrailing,
@@ -37,11 +40,14 @@ export function TitleBar({
 }: TitleBarProps) {
   const hasLeftContent =
     (breadcrumbs != null && breadcrumbs.length > 0) ||
+    top != null ||
     title != null ||
     subtitle != null ||
     titleLeading != null;
   const hasMultiLineContent =
-    (breadcrumbs != null && breadcrumbs.length > 0) || subtitle != null;
+    (breadcrumbs != null && breadcrumbs.length > 0) ||
+    top != null ||
+    subtitle != null;
   const hasAnyContent = hasLeftContent || right != null;
   const hasTitleOrActionsRow =
     title != null || right != null || titleLeading != null;
@@ -61,6 +67,12 @@ export function TitleBar({
       role="banner"
       aria-label="Title bar"
     >
+      {top != null ? (
+        <div className="app-shell-content-px flex min-w-0 items-center">
+          {top}
+        </div>
+      ) : null}
+
       {breadcrumbs != null && breadcrumbs.length > 0 ? (
         <nav
           aria-label="Breadcrumb"

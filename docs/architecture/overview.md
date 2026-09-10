@@ -63,7 +63,7 @@ Web UI for Ikon's Smart Marketing Campaign Manager. Phase 1 delivers the **Campa
 - Custom KPI strip (Messages sent, Total clicks, Reminder Uplift, CER %), black/green Custom / Weekly Snapshot toggle, Group + Dealer scope filters, Sort By dropdown, a date range filter on the Reports title row, and Export CSV. Weekly Snapshot hides the KPI strip and Sort By dropdown.
 - Custom mode ranks dealerships by CER% and names the live campaign covering each rooftop; Weekly Snapshot stacks week sections cumulative across the dealers in scope
 - Low-sample guardrail: dealerships with fewer than 50 messages sent stay visible, get a Low sample badge, and are not ranked
-- `/reports/activity` lists the customers behind a dealership, including **Campaign** (one per customer, dealt round-robin across the dealership's campaigns) and a **Mileage** column (`—` when unknown). A Back button in the title bar returns to `/reports`.
+- `/reports/activity` lists the customers behind a dealership, including **Campaign** (one per customer, dealt round-robin across the dealership's campaigns) and a **Mileage** column (`—` when unknown). A Back button sits above the dealership name and returns to `/reports`.
 - Data is mock (`src/data/reporting.mock.ts`); CSV export is client-side
 - Robert's `/reporting` slice (Leaderboard / Weekly CER / Activity Detail) was removed on 2026-09-03; the remaining surface was renamed Reports the same day — see `docs/decisions/20260903-rename-dashboards-to-reports.md`
 
