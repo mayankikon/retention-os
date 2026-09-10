@@ -87,7 +87,7 @@ export function ReportDateRangeFilter({
             aria-label={`Date range: ${formatReportDateRange(value)}`}
             title={
               disabled
-                ? "Date range applies to monthly performance"
+                ? "Date range applies to custom performance"
                 : undefined
             }
             className={cn(

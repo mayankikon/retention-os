@@ -48,8 +48,8 @@ export const REPORT_PERFORMANCE_MODE_LABELS: Record<
   ReportPerformanceMode,
   string
 > = {
-  weekly: "Weekly",
-  monthly: "Monthly",
+  weekly: "Weekly Snapshot",
+  monthly: "Custom",
 };
 
 export const REPORT_RANK_METRIC_LABELS: Record<ReportRankMetric, string> = {

@@ -27,7 +27,7 @@ export function ReportWeeklyPerformance({
   scope,
 }: ReportWeeklyPerformanceProps) {
   return (
-    <section className="flex flex-col gap-4" aria-label="Weekly performance">
+    <section className="flex flex-col gap-4" aria-label="Weekly snapshot">
       {sections.map((section) => (
         <WeeklySectionCard
           key={section.weekId}
@@ -61,7 +61,7 @@ function WeeklySectionCard({ section, scope }: WeeklySectionCardProps) {
       <div className="overflow-x-auto">
         <table
           className="w-full min-w-[720px] text-sm"
-          aria-label={`Weekly performance for ${section.label}`}
+          aria-label={`Weekly snapshot for ${section.label}`}
         >
           <thead>
             <tr className="bg-[#fafafa] text-left text-muted-foreground">

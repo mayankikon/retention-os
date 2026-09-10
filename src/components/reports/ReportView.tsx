@@ -443,7 +443,7 @@ export function ReportView() {
       {filters.mode === "weekly" ? (
         currentWeeks.length === 0 ? (
           <ReportingEmptyState
-            title="No weekly performance matches these filters"
+            title="No weekly snapshot matches these filters"
             description="Choose another dealer or group, or clear filters to see every week stacked."
           />
         ) : (

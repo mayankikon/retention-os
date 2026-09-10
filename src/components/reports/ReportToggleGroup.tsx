@@ -34,7 +34,7 @@ export function ReportToggleGroup<T extends string>({
             type="button"
             onClick={() => onValueChange(option.id)}
             className={cn(
-              "cursor-pointer rounded-[6px] px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.02em] transition-colors",
+              "cursor-pointer whitespace-nowrap rounded-[6px] px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.02em] transition-colors",
               isActive
                 ? "bg-emerald-600 text-white"
                 : "text-foreground hover:bg-muted",

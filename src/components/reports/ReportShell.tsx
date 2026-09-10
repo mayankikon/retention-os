@@ -81,11 +81,12 @@ function ReportDateRangeControl() {
     });
   };
 
+  if (filters.mode === "weekly") return null;
+
   return (
     <ReportDateRangeFilter
       value={dateRange}
       today={today}
-      disabled={filters.mode === "weekly"}
       onValueChange={handleDateRangeChange}
     />
   );
