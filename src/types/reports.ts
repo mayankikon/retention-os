@@ -48,6 +48,7 @@ export interface ReportCampaignSummary {
 export interface ReportActivityRow extends ActivityDetailRow {
   /** Null when the dealership has no campaign that has sent. */
   campaign: string | null;
+  campaignId: string | null;
 }
 
 export interface ReportDealershipRow {

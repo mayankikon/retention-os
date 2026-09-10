@@ -18,6 +18,7 @@ import {
   formatReportCampaignLabel,
   formatSignedPercent,
   isReportDealershipInGroup,
+  listReportCampaigns,
   listReportDealerships,
   paginateReportItems,
   rankReportDealerships,
@@ -322,6 +323,41 @@ describe("report campaign column", () => {
     expect(new Set(rows.map((row) => row.campaign))).toEqual(
       new Set(["Alpha", "Bravo", "Charlie"]),
     );
+  });
+
+  it("lists only campaigns that have run for the selected dealership", () => {
+    const campaigns = listReportCampaigns(
+      mockCampaigns,
+      "Premier Auto Group",
+    );
+
+    expect(campaigns.map((campaign) => campaign.name)).toEqual([
+      "Payment Due Reminder",
+      "Parts Department Special",
+      "Trade-In Opportunity",
+      "Clearance Event Blast",
+    ]);
+    expect(campaigns.some((campaign) => campaign.status === "draft")).toBe(
+      false,
+    );
+  });
+
+  it("filters a dealership's activity to one campaign", () => {
+    const attributedRows = assignReportActivityCampaigns(
+      ACTIVITY_DETAIL_ROWS,
+      mockCampaigns,
+    );
+    const rows = filterReportActivityRows(
+      attributedRows,
+      "Premier Auto Group",
+      "cmp-015",
+    );
+
+    expect(rows.length).toBeGreaterThan(0);
+    expect(rows.every((row) => row.rooftop === "Premier Auto Group")).toBe(
+      true,
+    );
+    expect(rows.every((row) => row.campaignId === "cmp-015")).toBe(true);
   });
 
   it("keeps a customer's campaign the same whether or not the list is filtered", () => {

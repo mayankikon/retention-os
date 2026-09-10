@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { parseAsString, useQueryState } from "nuqs";
+import { parseAsString, useQueryStates } from "nuqs";
 import {
   Table,
   TableBody,
@@ -43,7 +43,7 @@ import {
   assignReportActivityCampaigns,
   filterReportActivityRows,
   findDealershipById,
-  listReportActivityDealerships,
+  listReportCampaigns,
 } from "@/lib/reports";
 import { FILTER_ALL } from "@/data/lookups";
 import { buildCsv, downloadCsv, formatMileage } from "@/lib/reporting";
@@ -63,32 +63,41 @@ const ACTIVITY_HEADERS = [
 
 export function ReportActivityView() {
   const router = useRouter();
-  const [dealershipId, setDealershipId] = useQueryState(
-    "dealership",
-    parseAsString.withDefault(""),
+  const [filters, setFilters] = useQueryStates({
+    dealership: parseAsString.withDefault(""),
+    campaign: parseAsString.withDefault(FILTER_ALL),
+  });
+  const dealership = findDealershipById(
+    REPORTING_ROOFTOPS,
+    filters.dealership,
   );
-  const dealership = findDealershipById(REPORTING_ROOFTOPS, dealershipId);
+  const campaigns = useMemo(() => getAllCampaigns(), []);
   // Attribute before filtering so a customer keeps the same campaign whether
   // the list is scoped to one dealership or showing every rooftop.
   const attributedRows = useMemo(
-    () => assignReportActivityCampaigns(ACTIVITY_DETAIL_ROWS, getAllCampaigns()),
-    [],
+    () => assignReportActivityCampaigns(ACTIVITY_DETAIL_ROWS, campaigns),
+    [campaigns],
   );
   const rows = useMemo(
-    () => filterReportActivityRows(attributedRows, dealership?.rooftop),
-    [attributedRows, dealership],
+    () =>
+      filterReportActivityRows(
+        attributedRows,
+        dealership?.rooftop,
+        filters.campaign === FILTER_ALL ? undefined : filters.campaign,
+      ),
+    [attributedRows, dealership, filters.campaign],
   );
-  const dealershipOptions = useMemo(
+  const campaignOptions = useMemo(
     () => [
-      { value: FILTER_ALL, label: "All dealers" },
-      ...listReportActivityDealerships(ACTIVITY_DETAIL_ROWS).map((name) => {
-        const match = REPORTING_ROOFTOPS.find(
-          (rooftop) => rooftop.rooftop === name,
-        );
-        return { value: match?.id ?? name, label: name };
-      }),
+      { value: FILTER_ALL, label: "Show All" },
+      ...listReportCampaigns(campaigns, dealership?.rooftop ?? "").map(
+        (campaign) => ({
+          value: campaign.id,
+          label: campaign.name,
+        }),
+      ),
     ],
-    [],
+    [campaigns, dealership],
   );
 
   const handleExport = () => {
@@ -127,13 +136,13 @@ export function ReportActivityView() {
     <div className="flex flex-col gap-6 pb-2">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div className="w-full min-w-[14rem] sm:w-[18rem]">
-          <ReportingFieldLabel>Dealership</ReportingFieldLabel>
+          <ReportingFieldLabel>Campaigns</ReportingFieldLabel>
           <ReportingSelect
-            label="Dealership"
-            value={dealershipId || FILTER_ALL}
-            options={dealershipOptions}
+            label="Campaigns"
+            value={filters.campaign}
+            options={campaignOptions}
             onValueChange={(value) => {
-              void setDealershipId(value === FILTER_ALL ? "" : value);
+              void setFilters({ campaign: value });
             }}
             className="w-full"
           />
@@ -143,12 +152,16 @@ export function ReportActivityView() {
 
       {rows.length === 0 ? (
         <ReportingEmptyState
-          title="No customers for this dealership"
-          description="There is no click activity for this dealership in the current mock set."
-          actionLabel={dealership ? "View all activity" : "Back to Reports"}
+          title="No customers for this campaign"
+          description="There is no click activity for this campaign in the current mock set."
+          actionLabel={
+            filters.campaign !== FILTER_ALL
+              ? "Show all campaigns"
+              : "Back to Reports"
+          }
           onAction={() => {
-            if (dealership) {
-              void setDealershipId("");
+            if (filters.campaign !== FILTER_ALL) {
+              void setFilters({ campaign: FILTER_ALL });
               return;
             }
             router.push("/reports");

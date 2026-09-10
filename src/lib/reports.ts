@@ -134,13 +134,21 @@ export function listReportCampaignNames(
   campaigns: Campaign[],
   dealership: string,
 ): string[] {
+  return listReportCampaigns(campaigns, dealership).map(
+    (campaign) => campaign.name,
+  );
+}
+
+export function listReportCampaigns(
+  campaigns: Campaign[],
+  dealership: string,
+): Campaign[] {
   return campaigns
     .filter((campaign) => {
       if (REPORT_CAMPAIGN_STATUS_RANK[campaign.status] == null) return false;
       return getCampaignDealers(campaign).includes(dealership);
     })
-    .sort(compareReportCampaigns)
-    .map((campaign) => campaign.name);
+    .sort(compareReportCampaigns);
 }
 
 /**
@@ -612,31 +620,39 @@ export function assignReportActivityCampaigns(
   rows: ActivityDetailRow[],
   campaigns: Campaign[],
 ): ReportActivityRow[] {
-  const namesByDealership = new Map<string, string[]>();
+  const campaignsByDealership = new Map<string, Campaign[]>();
   const rowCountByDealership = new Map<string, number>();
 
   return rows.map((row) => {
-    let campaignNames = namesByDealership.get(row.rooftop);
-    if (!campaignNames) {
-      campaignNames = listReportCampaignNames(campaigns, row.rooftop);
-      namesByDealership.set(row.rooftop, campaignNames);
+    let dealershipCampaigns = campaignsByDealership.get(row.rooftop);
+    if (!dealershipCampaigns) {
+      dealershipCampaigns = listReportCampaigns(campaigns, row.rooftop);
+      campaignsByDealership.set(row.rooftop, dealershipCampaigns);
     }
-    if (campaignNames.length === 0) return { ...row, campaign: null };
+    if (dealershipCampaigns.length === 0) {
+      return { ...row, campaign: null, campaignId: null };
+    }
 
     const rowsSoFar = rowCountByDealership.get(row.rooftop) ?? 0;
     rowCountByDealership.set(row.rooftop, rowsSoFar + 1);
+    const campaign =
+      dealershipCampaigns[rowsSoFar % dealershipCampaigns.length];
     return {
       ...row,
-      campaign: campaignNames[rowsSoFar % campaignNames.length] ?? null,
+      campaign: campaign?.name ?? null,
+      campaignId: campaign?.id ?? null,
     };
   });
 }
 
 export function filterReportActivityRows<
-  T extends Pick<ActivityDetailRow, "rooftop">,
->(rows: T[], dealershipName?: string): T[] {
-  if (!dealershipName) return rows;
-  return rows.filter((row) => row.rooftop === dealershipName);
+  T extends Pick<ActivityDetailRow, "rooftop"> & { campaignId?: string | null },
+>(rows: T[], dealershipName?: string, campaignId?: string): T[] {
+  return rows.filter((row) => {
+    if (dealershipName && row.rooftop !== dealershipName) return false;
+    if (campaignId && row.campaignId !== campaignId) return false;
+    return true;
+  });
 }
 
 export function listReportActivityDealerships(
