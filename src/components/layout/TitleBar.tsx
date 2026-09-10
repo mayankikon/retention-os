@@ -113,7 +113,7 @@ export function TitleBar({
       {hasTitleOrActionsRow ? (
         <div
           className={cn(
-            "flex min-w-0 items-center justify-between gap-6",
+            "flex min-w-0 flex-wrap items-center justify-between gap-x-6 gap-y-2",
             !titleRowFullBleedX && "app-shell-content-px",
           )}
         >
@@ -123,7 +123,8 @@ export function TitleBar({
               <h1
                 className={cn(
                   "min-w-0 truncate text-[30px] font-medium leading-tight tracking-[-0.6px] text-foreground",
-                  titleTrailing == null && "flex-1",
+                  titleTrailing == null && right == null && "flex-1",
+                  right != null && titleTrailing == null && "shrink-0",
                 )}
               >
                 {title}

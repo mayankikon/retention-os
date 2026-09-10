@@ -14,8 +14,8 @@ The first weekly stack rendered one card per `WEEKLY_CER_WEEKS` record. Because 
 
 ## Decision
 
-- Weekly mode renders a **single card**. Its sections are weeks, sorted newest first.
-- The card states its scope **once**, under the heading:
+- Weekly mode renders **one card per week**, sorted newest first, separated by vertical spacing. (Originally a single card with week sections; split into cards on 2026-09-10 so each week reads as its own unit. Each card now repeats the column header, which the single-card layout shared.)
+- The stack states its scope **once**, in a plain header above the cards:
   - a selected dealership shows its name as a link to `/reports/activity`;
   - a selected group or the whole portfolio shows `<name> — cumulative (N rooftops)`, where N counts the dealerships that actually reported in the visible weeks.
 - Each week section sums every dealer in scope per message type, and adds a **Total** column across Initial / Reminder 1–3. `CER %` is recomputed from summed sends and clicks rather than averaged across dealers.
@@ -26,7 +26,7 @@ The first weekly stack rendered one card per `WEEKLY_CER_WEEKS` record. Because 
 
 ## Consequences
 
-- Weekly chrome drops from three repeated lines per dealer week to one section row per week.
+- Weekly chrome drops from three repeated lines per dealer week to one card header per week.
 - Group and portfolio scopes now show real cumulative weekly totals, which the previous single-dealer-per-week mock could not express.
 - `aggregateReportWeeks` and `describeReportWeeklyScope` in `src/lib/reports.ts` are the only places that collapse weeks; `ReportWeeklyPerformance` stays presentational.
 - Per-dealer weekly detail is no longer broken out on `/reports`; selecting a single dealer in the Dealer filter scopes the card to that dealership, and activity drill-down stays a click away from the scope line and the monthly ranking.

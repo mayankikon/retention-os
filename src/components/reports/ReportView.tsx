@@ -42,7 +42,6 @@ import {
   getDataTableHeaderThStyle,
   getDataTableInnerCellStyle,
 } from "@/lib/data-table-chrome";
-import { ReportDateRangeFilter } from "@/components/reports/ReportDateRangeFilter";
 import { ReportToggleGroup } from "@/components/reports/ReportToggleGroup";
 import { ReportWeeklyPerformance } from "@/components/reports/ReportWeeklyPerformance";
 import {
@@ -78,7 +77,6 @@ import {
 } from "@/lib/reporting";
 import { cn } from "@/lib/utils";
 import { REPORT_PERFORMANCE_MODES } from "@/types/reports";
-import type { ReportDateRange } from "@/types/reports";
 import type { WeeklyMessageMetrics } from "@/types/reporting";
 
 const REPORT_HEADERS = [
@@ -267,14 +265,6 @@ export function ReportView() {
     void setFilters({ page });
   };
 
-  const handleDateRangeChange = (range: ReportDateRange) => {
-    void setFilters({
-      from: range.startDate,
-      to: range.endDate,
-      page: 1,
-    });
-  };
-
   const handleClearFilters = () => {
     void setFilters({
       group: FILTER_ALL,
@@ -373,12 +363,6 @@ export function ReportView() {
           />
 
           <div className="ml-auto flex flex-wrap items-center gap-2.5">
-            <ReportDateRangeFilter
-              value={dateRange}
-              today={today}
-              disabled={filters.mode === "weekly"}
-              onValueChange={handleDateRangeChange}
-            />
             <ReportToggleGroup
               label="Performance mode"
               value={filters.mode}

@@ -1,13 +1,31 @@
 "use client";
 
+import { useMemo } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
+import { parseAsInteger, parseAsString, parseAsStringLiteral, useQueryStates } from "nuqs";
 import { TitleBar } from "@/components/layout/TitleBar";
+import { ReportDateRangeFilter } from "@/components/reports/ReportDateRangeFilter";
 import { REPORTING_ROOFTOPS } from "@/data/reporting.mock";
+import {
+  DEFAULT_REPORT_DATE_PRESET,
+  normalizeReportDateRange,
+  resolveReportDatePreset,
+  toIsoDate,
+} from "@/lib/report-date-range";
 import { findDealershipById } from "@/lib/reports";
+import { REPORT_PERFORMANCE_MODES } from "@/types/reports";
+import type { ReportDateRange } from "@/types/reports";
 
 interface ReportShellProps {
   children: React.ReactNode;
 }
+
+const reportDateParsers = {
+  mode: parseAsStringLiteral(REPORT_PERFORMANCE_MODES).withDefault("monthly"),
+  from: parseAsString.withDefault(""),
+  to: parseAsString.withDefault(""),
+  page: parseAsInteger.withDefault(1),
+};
 
 export function ReportShell({ children }: ReportShellProps) {
   const pathname = usePathname();
@@ -21,26 +39,54 @@ export function ReportShell({ children }: ReportShellProps) {
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
       <TitleBar
-        breadcrumbs={[
-          { label: "Smart Marketing", href: "/campaigns" },
-          isActivity
-            ? { label: "Reports", href: "/reports" }
-            : { label: "Reports" },
-          ...(isActivity ? [{ label: dealership?.rooftop ?? "Activity" }] : []),
-        ]}
         title={isActivity ? (dealership?.rooftop ?? "Activity") : "Reports"}
         subtitle={
           isActivity
             ? dealership
               ? "Customers who clicked for this dealership."
               : "Every customer click row, labeled by dealership."
-            : "Compare dealership performance, then open a dealership to see the customers behind it."
+            : undefined
         }
+        right={isActivity ? undefined : <ReportDateRangeControl />}
       />
 
       <div className="app-shell-content-px app-shell-content-pb app-shell-scrollbar-dashed flex min-h-0 flex-1 flex-col overflow-y-auto pt-6">
         {children}
       </div>
     </div>
+  );
+}
+
+function ReportDateRangeControl() {
+  const [filters, setFilters] = useQueryStates(reportDateParsers);
+  const today = useMemo(() => toIsoDate(new Date()), []);
+  const defaultDateRange = useMemo(
+    () => resolveReportDatePreset(DEFAULT_REPORT_DATE_PRESET, today),
+    [today],
+  );
+  const dateRange = useMemo(
+    () =>
+      normalizeReportDateRange(
+        { startDate: filters.from, endDate: filters.to },
+        defaultDateRange,
+      ),
+    [defaultDateRange, filters.from, filters.to],
+  );
+
+  const handleDateRangeChange = (range: ReportDateRange) => {
+    void setFilters({
+      from: range.startDate,
+      to: range.endDate,
+      page: 1,
+    });
+  };
+
+  return (
+    <ReportDateRangeFilter
+      value={dateRange}
+      today={today}
+      disabled={filters.mode === "weekly"}
+      onValueChange={handleDateRangeChange}
+    />
   );
 }
