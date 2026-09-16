@@ -15,13 +15,13 @@ Standard Operating Procedure for Campaign Setup in Smart Marketing Campaign Mana
 | General Identification | Step `general` | Name template, dealership time zone |
 | Messaging & Variables | Step `messaging` | Delivery channels (SMS/email), templates, primary promo, dealer URL, optional image |
 | Reminder Sequences | Step `reminders` | Per-reminder enable toggles, optional image or reuse primary image |
-| Standard Configuration | Step `configuration` | Service trigger mode: interval, OEM, or audience query; Mon–Sat + TZ table |
+| Standard Configuration | Step `configuration` | MVP V1.0: interval trigger only; Post MVP V1.1: interval or OEM placeholder pending manufacturer schedule data; Mon–Sat + TZ table |
 | QA & Activation | Step `review` | Test send, optional suppression list upload, Activate |
 
 ## Defaults (from SOP)
 
 - Primary promo and Reminder 1/2 copy: `src/data/campaign-setup.defaults.ts`
-- Service triggers: interval (time + mileage) with optional audience Make/Model/Trim; OEM make/model with optional trim (empty trim = all trims); OEM audience query excludes Make/Model/Trim and offers year, zip, city, purchase date, and odometer (`src/data/service-triggers.ts`, `src/data/audience-attributes.ts`); default interval mode with time preset 180 days and mileage preset 2,000 miles
+- Service triggers: MVP V1.0 shows interval only (time + mileage) with optional audience Make/Model/Trim. Post MVP V1.1 preserves OEM make/model with optional trim (empty trim = all trims) as a placeholder blocked on manufacturer schedule data; its audience query excludes Make/Model/Trim and offers year, zip, city, purchase date, and odometer (`src/data/service-triggers.ts`, `src/data/audience-attributes.ts`). The default interval mode uses 180 days and 2,000 miles.
 - Campaign type: Predefined (only supported type in wizard)
 - Schedule days: Monday–Saturday
 

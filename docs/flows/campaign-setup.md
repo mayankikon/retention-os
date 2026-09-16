@@ -20,7 +20,7 @@ flowchart LR
 | General | `general` | General Identification | Group, multi-select Dealerships (per-dealer timezone), campaign name |
 | Messaging | `messaging` | Messaging & Variables | Delivery channels, templates, primary promo, dealer URL, optional image |
 | Reminders | `reminders` | Reminder Sequences | Enable 1–3 reminders, text + image or reuse primary image |
-| Configuration | `configuration` | Standard Configuration | Service trigger mode (interval, OEM, or audience query), campaign duration (required start date, optional end date), schedule days, required send time + timezone table that recomputes from the selected send time |
+| Configuration | `configuration` | Standard Configuration | MVP V1.0: pre-selected Time+Mileage trigger only. Post MVP V1.1: Time+Mileage or OEM placeholder (blocked on manufacturer schedule data). Includes an audience query, campaign duration (required start date, optional end date), schedule days, and required send time + timezone table |
 | Review | `review` | QA & Activation | Test send, suppression list, Activate, Save Draft |
 
 ## Components

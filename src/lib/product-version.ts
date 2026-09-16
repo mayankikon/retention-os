@@ -64,6 +64,13 @@ export function isEmailChannelAvailable(versionId: ProductVersionId): boolean {
   return versionId !== "mvp_v1_0";
 }
 
+/** OEM service schedules depend on Post-MVP manufacturer data. */
+export function isOemServiceScheduleAvailable(
+  versionId: ProductVersionId,
+): boolean {
+  return versionId !== "mvp_v1_0";
+}
+
 export function getAvailableDeliveryChannelOptions(
   versionId: ProductVersionId,
 ) {
@@ -129,6 +136,19 @@ export function applyProductVersionToDraft(
 
   if (!isMessageTemplateAvailable(versionId, draft.messageTemplateId)) {
     Object.assign(patch, buildMessageTemplatePatch(OIL_CHANGE_TEMPLATE_ID));
+  }
+
+  if (
+    !isOemServiceScheduleAvailable(versionId) &&
+    draft.serviceTriggerMode === "oem"
+  ) {
+    Object.assign(patch, {
+      serviceTriggerMode: "interval",
+      serviceTriggerTypes: ["time", "mileage"],
+      oemMake: "",
+      oemModel: "",
+      oemTrim: "",
+    } satisfies Partial<CampaignSetupDraft>);
   }
 
   return patch;

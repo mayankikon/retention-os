@@ -40,7 +40,7 @@ export const SERVICE_TRIGGER_MODE_OPTIONS: ServiceTriggerModeOption[] = [
     value: "oem",
     label: "OEM-Recommended Service Schedule",
     description:
-      "Use the manufacturer schedule for a specific make and model, then narrow with an audience query",
+      "Post-MVP placeholder: blocked on manufacturer schedule data for each make and model",
   },
 ];
 

@@ -1,11 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { createDefaultSetupDraft } from "@/data/campaign-setup.defaults";
+import type { CampaignSetupDraft } from "@/types/campaign-setup";
 import {
   applyProductVersionToDraft,
   canSelectProductVersion,
   getAvailableDeliveryChannelOptions,
   getAvailableMessageTemplates,
   isEmailChannelAvailable,
+  isOemServiceScheduleAvailable,
 } from "@/lib/product-version";
 
 describe("product version feature gates", () => {
@@ -46,11 +48,16 @@ describe("product version feature gates", () => {
     );
   });
 
+  it("keeps OEM service schedules available only after MVP V1.0", () => {
+    expect(isOemServiceScheduleAvailable("mvp_v1_0")).toBe(false);
+    expect(isOemServiceScheduleAvailable("post_mvp_v1_1")).toBe(true);
+  });
+
   it("strips email and resets unavailable templates when applying MVP V1.0", () => {
-    const draft = {
+    const draft: CampaignSetupDraft = {
       ...createDefaultSetupDraft(),
-      deliveryChannels: ["sms", "email"] as const,
-      messageTemplateId: "service_reminder" as const,
+      deliveryChannels: ["sms", "email"],
+      messageTemplateId: "service_reminder",
       primaryPromoText: "custom service copy",
     };
 
@@ -61,11 +68,32 @@ describe("product version feature gates", () => {
     expect(patch.primaryPromoText).toContain("oil change");
   });
 
-  it("does not change a compliant Post MVP V1.1 draft when applying that version", () => {
-    const draft = {
+  it("resets an OEM service trigger when applying MVP V1.0", () => {
+    const draft: CampaignSetupDraft = {
       ...createDefaultSetupDraft(),
-      deliveryChannels: ["sms", "email"] as const,
-      messageTemplateId: "service_reminder" as const,
+      serviceTriggerMode: "oem",
+      serviceTriggerTypes: ["oem"],
+      oemMake: "Toyota",
+      oemModel: "RAV4",
+      oemTrim: "XLE",
+    };
+
+    const patch = applyProductVersionToDraft(draft, "mvp_v1_0");
+
+    expect(patch).toMatchObject({
+      serviceTriggerMode: "interval",
+      serviceTriggerTypes: ["time", "mileage"],
+      oemMake: "",
+      oemModel: "",
+      oemTrim: "",
+    });
+  });
+
+  it("does not change a compliant Post MVP V1.1 draft when applying that version", () => {
+    const draft: CampaignSetupDraft = {
+      ...createDefaultSetupDraft(),
+      deliveryChannels: ["sms", "email"],
+      messageTemplateId: "service_reminder",
     };
 
     expect(applyProductVersionToDraft(draft, "post_mvp_v1_1")).toEqual({});

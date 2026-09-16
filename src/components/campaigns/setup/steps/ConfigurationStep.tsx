@@ -13,6 +13,7 @@ import {
 import { AudienceFilters } from "@/components/campaigns/setup/AudienceFilters";
 import { FormField } from "@/components/campaigns/setup/FormField";
 import { SendTimeField } from "@/components/campaigns/setup/SendTimeField";
+import { useProductVersion } from "@/contexts/product-version-context";
 import { getTimeZoneLabel } from "@/data/campaign-setup.defaults";
 import {
   getOemMakes,
@@ -25,6 +26,7 @@ import {
 } from "@/data/service-triggers";
 import { toDateInputValue } from "@/lib/campaign-window";
 import { CONFIGURATION_DAY_LABELS } from "@/lib/format-schedule";
+import { isOemServiceScheduleAvailable } from "@/lib/product-version";
 import { getScheduleTimeZoneTable } from "@/lib/schedule-time-zones";
 import { formatSendTimeLabel } from "@/lib/send-time";
 import {
@@ -50,7 +52,14 @@ export function ConfigurationStep({
   errors,
   onChange,
 }: ConfigurationStepProps) {
-  const serviceTriggerMode = getServiceTriggerMode(draft);
+  const { versionId } = useProductVersion();
+  const isOemScheduleAvailable = isOemServiceScheduleAvailable(versionId);
+  const serviceTriggerMode = isOemScheduleAvailable
+    ? getServiceTriggerMode(draft)
+    : "interval";
+  const serviceTriggerModeOptions = isOemScheduleAvailable
+    ? SERVICE_TRIGGER_MODE_OPTIONS
+    : SERVICE_TRIGGER_MODE_OPTIONS.filter((option) => option.value === "interval");
   const oemModels = draft.oemMake ? getOemModelsForMake(draft.oemMake) : [];
   const oemTrims =
     draft.oemMake && draft.oemModel
@@ -96,12 +105,16 @@ export function ConfigurationStep({
       <FormField
         label="Service Triggers"
         error={serviceTriggerError}
-        hint="Choose time and mileage intervals or an OEM schedule, then optionally narrow the audience."
+        hint={
+          isOemScheduleAvailable
+            ? "Choose time and mileage intervals or an OEM schedule, then optionally narrow the audience."
+            : "Trigger outreach when either the time interval or mileage interval is reached, then narrow with an audience query."
+        }
         required
       >
         <fieldset className="space-y-3">
           <legend className="sr-only">Service trigger mode</legend>
-          {SERVICE_TRIGGER_MODE_OPTIONS.map((option) => {
+          {serviceTriggerModeOptions.map((option) => {
             const isSelected = serviceTriggerMode === option.value;
 
             return (
@@ -112,22 +125,33 @@ export function ConfigurationStep({
                   isSelected && "border-primary bg-primary/5",
                 )}
               >
-                <label className="flex cursor-pointer items-start gap-3">
-                  <input
-                    type="radio"
-                    name="serviceTriggerMode"
-                    checked={isSelected}
-                    onChange={() => handleServiceTriggerModeChange(option.value)}
-                    className="mt-1 h-4 w-4 shrink-0 accent-brand-primary"
-                    aria-label={option.label}
-                  />
+                {isOemScheduleAvailable ? (
+                  <label className="flex cursor-pointer items-start gap-3">
+                    <input
+                      type="radio"
+                      name="serviceTriggerMode"
+                      checked={isSelected}
+                      onChange={() =>
+                        handleServiceTriggerModeChange(option.value)
+                      }
+                      className="mt-1 h-4 w-4 shrink-0 accent-brand-primary"
+                      aria-label={option.label}
+                    />
+                    <span>
+                      <span className="font-medium">{option.label}</span>
+                      <span className="block text-xs text-muted-foreground">
+                        {option.description}
+                      </span>
+                    </span>
+                  </label>
+                ) : (
                   <span>
-                    <span className="font-medium">{option.label}</span>
+                    <span className="block font-medium">{option.label}</span>
                     <span className="block text-xs text-muted-foreground">
                       {option.description}
                     </span>
                   </span>
-                </label>
+                )}
 
                 {isSelected && option.value === "interval" ? (
                   <div className="mt-3 space-y-4 pl-7">
