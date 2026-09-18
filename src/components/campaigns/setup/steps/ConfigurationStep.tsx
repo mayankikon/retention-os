@@ -108,7 +108,7 @@ export function ConfigurationStep({
         hint={
           isOemScheduleAvailable
             ? "Choose time and mileage intervals or an OEM schedule, then optionally narrow the audience."
-            : "Trigger outreach when either the time interval or mileage interval is reached, then narrow with an audience query."
+            : undefined
         }
         required
       >
