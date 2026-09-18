@@ -28,7 +28,7 @@ Web UI for Ikon's Smart Marketing Campaign Manager. Phase 1 delivers the **Campa
 - Default list excludes archived rows; set Status filter to Archived to view them
 - Data refresh indicator (hourly cadence)
 - Empty states: no data, no search results, filtered zero
-- Success banner after activate / schedule / save draft / archive
+- Success toast (bottom-right) on the campaign list after activate / save draft / archive
 
 ### Campaign setup (Phase 2)
 
@@ -37,7 +37,7 @@ Web UI for Ikon's Smart Marketing Campaign Manager. Phase 1 delivers the **Campa
 - General: Group → multi-select Dealerships with per-dealer timezone (fallback when unknown)
 - Configuration: MVP V1.0 uses the pre-selected Time+Mileage trigger only; Post MVP V1.1 preserves the OEM trigger placeholder pending manufacturer schedule data. Both support a nested audience query, campaign duration (required start date, optional end date), schedule days, and required send time plus a timezone table that recomputes each zone's manager time from the selected send time
 - Review: audience reach card; Activate / Save Draft; timing comes from Configuration start/end dates and send time; Audience suppression hidden on MVP V1.0
-- Activate always moves Draft → Active. A future start date gates sends without adding a Scheduled status. Edit-mode Save Draft returns to campaign detail.
+- Activate always moves Draft → Active, then returns to the campaign list with a success toast and the new row in the table. Only missing required setup fields block it, and the wizard opens the first step that holds them. A future start date gates sends without adding a Scheduled status. Edit-mode Save Draft returns to campaign detail.
 - New Campaign Setup leave guard uses unfinished-draft language with Keep editing, Discard draft, and Save draft actions.
 - SOP-default SMS templates, timezone schedule reference table, test send (mock)
 

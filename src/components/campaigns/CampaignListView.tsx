@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Check, X } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 import { parseAsInteger, parseAsString, useQueryStates } from "nuqs";
 import { DesignSystemTableShellNoTabs } from "@ikontechnologies-arlington/nxtg-design-shiftpackage";
 import { CampaignFilters } from "@/components/campaigns/CampaignFilters";
@@ -10,6 +9,7 @@ import { CampaignTable } from "@/components/campaigns/CampaignTable";
 import { DealershipScopeBar } from "@/components/campaigns/DealershipScopeBar";
 import { EmptyState } from "@/components/campaigns/EmptyState";
 import { PaginationBar } from "@/components/campaigns/PaginationBar";
+import { AppToast } from "@/components/layout/AppToast";
 import { FILTER_ALL } from "@/data/lookups";
 import { DATA_TABLE_SHELL_BORDER_CLASS } from "@/lib/data-table-chrome";
 import {
@@ -50,6 +50,7 @@ export function CampaignListView() {
   const campaigns = useCampaigns();
   const [filters, setFilters] = useQueryStates(listParsers);
   const [flash, setFlash] = useState<CampaignFlashMessage | null>(null);
+  const dismissFlash = useCallback(() => setFlash(null), []);
 
   useEffect(() => {
     // Strict Mode runs mount effects twice; the second pass finds an empty
@@ -98,23 +99,7 @@ export function CampaignListView() {
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
       {flash ? (
-        <div
-          className="app-shell-content-px mt-[var(--spacing-16,16px)] flex shrink-0 items-start justify-between gap-3 rounded-lg border border-border bg-emerald-50 px-4 py-3 text-sm text-emerald-900"
-          role="status"
-        >
-          <div className="flex items-start gap-2">
-            <Check className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
-            <p>{flashCopy(flash)}</p>
-          </div>
-          <button
-            type="button"
-            onClick={() => setFlash(null)}
-            className="rounded-sm p-1 hover:bg-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            aria-label="Dismiss"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
+        <AppToast message={flashCopy(flash)} onDismiss={dismissFlash} />
       ) : null}
 
       <CampaignListHeader />

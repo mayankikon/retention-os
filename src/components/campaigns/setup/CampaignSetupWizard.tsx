@@ -35,6 +35,7 @@ import {
   isStepSelectable,
 } from "@/lib/campaign-setup-resume";
 import {
+  findFirstInvalidSetupStep,
   validateAllStepsBeforeActivate,
   validateSetupStep,
 } from "@/lib/campaign-setup-validation";
@@ -175,25 +176,19 @@ export function CampaignSetupWizard({
     setErrors({});
   }, [draft]);
 
+  // A test send stays recommended on Review, but only missing setup fields can
+  // block activation — and the wizard moves to the step that holds them.
   const validateLaunch = useCallback(() => {
     const preflight = validateAllStepsBeforeActivate(draft);
-    if (!preflight.isValid) {
-      setErrors(preflight.errors);
-      return false;
-    }
+    if (preflight.isValid) return true;
 
-    if (!isTestSent) {
-      const testResult = validateSetupStep("review", draft, {
-        requireTestSend: true,
-      });
-      if (!testResult.isValid) {
-        setErrors(testResult.errors);
-        return false;
-      }
+    setErrors(preflight.errors);
+    const firstInvalidStep = findFirstInvalidSetupStep(draft);
+    if (firstInvalidStep) {
+      void setStep(firstInvalidStep);
     }
-
-    return true;
-  }, [draft, isTestSent]);
+    return false;
+  }, [draft, setStep]);
 
   const finishCreateAndReturnHome = useCallback(
     (

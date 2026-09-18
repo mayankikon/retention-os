@@ -16,7 +16,7 @@ Standard Operating Procedure for Campaign Setup in Smart Marketing Campaign Mana
 | Messaging & Variables | Step `messaging` | Delivery channels (SMS/email), templates, primary promo, dealer URL, optional image |
 | Reminder Sequences | Step `reminders` | Per-reminder enable toggles, optional image or reuse primary image |
 | Standard Configuration | Step `configuration` | MVP V1.0: interval trigger only; Post MVP V1.1: interval or OEM placeholder pending manufacturer schedule data; Mon–Sat + TZ table |
-| QA & Activation | Step `review` | Test send, optional suppression list upload, Activate |
+| QA & Activation | Step `review` | Test send (recommended, does not block Activate), optional suppression list upload, Activate |
 
 ## Defaults (from SOP)
 

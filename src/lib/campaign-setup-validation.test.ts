@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { createDefaultSetupDraft } from "@/data/campaign-setup.defaults";
 import {
+  findFirstInvalidSetupStep,
   validateAllStepsBeforeActivate,
   validateAudienceStep,
   validateConfigurationStep,
@@ -194,6 +195,31 @@ describe("validateAudienceStep", () => {
 describe("validateAllStepsBeforeActivate", () => {
   it("passes for a complete draft", () => {
     expect(validateAllStepsBeforeActivate(validDraft()).isValid).toBe(true);
+  });
+
+  it("still passes when no campaign test has been sent", () => {
+    const draft = { ...validDraft(), testPhoneNumber: "" };
+    expect(validateAllStepsBeforeActivate(draft).isValid).toBe(true);
+  });
+});
+
+describe("findFirstInvalidSetupStep", () => {
+  it("returns null when every step before activation is complete", () => {
+    expect(findFirstInvalidSetupStep(validDraft())).toBeNull();
+  });
+
+  it("returns the earliest incomplete step", () => {
+    const draft = {
+      ...validDraft(),
+      campaignName: "",
+      sendTimeLocal: null,
+    };
+    expect(findFirstInvalidSetupStep(draft)).toBe("general");
+  });
+
+  it("points at configuration when only scheduling is incomplete", () => {
+    const draft = { ...validDraft(), sendTimeLocal: null };
+    expect(findFirstInvalidSetupStep(draft)).toBe("configuration");
   });
 });
 

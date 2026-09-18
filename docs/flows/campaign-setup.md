@@ -21,7 +21,7 @@ flowchart LR
 | Messaging | `messaging` | Messaging & Variables | Delivery channels, templates, primary promo, dealer URL, optional image |
 | Reminders | `reminders` | Reminder Sequences | Enable 1–3 reminders, text + image or reuse primary image |
 | Configuration | `configuration` | Standard Configuration | MVP V1.0: pre-selected Time+Mileage trigger only. Post MVP V1.1: Time+Mileage or OEM placeholder (blocked on manufacturer schedule data). Includes an audience query, campaign duration (required start date, optional end date), schedule days, and required send time + timezone table |
-| Review | `review` | QA & Activation | Test send, suppression list, Activate, Save Draft |
+| Review | `review` | QA & Activation | Test send (recommended, non-blocking), suppression list, Activate, Save Draft |
 
 ## Components
 
@@ -43,6 +43,8 @@ flowchart LR
 - General requires group + ≥1 dealership; missing dealer TZ needs a row-level fallback.
 - Configuration requires `sendTimeLocal` as `HH:mm` (24-hour). The picker offers whole hours only (minutes always `:00`).
 - Configuration requires `campaignStartDate`. `campaignEndDate` is optional; when set, the end date must land on or after the start date (`validateCampaignWindow`).
+- Activate re-runs General → Configuration through `validateAllStepsBeforeActivate`. On failure the wizard opens the step returned by `findFirstInvalidSetupStep` so the blocking fields are visible instead of erroring off-screen on Review.
+- The Review test send is recommended, not required: it never blocks Activate.
 
 ## State
 
@@ -65,6 +67,7 @@ Configuration is the only place that collects campaign timing. Review has a sing
 - `campaignStartDate` is required; the campaign starts at the beginning of that local day.
 - End date is optional; blank means no fixed end. When set, `createCampaignFromDraft` resolves fields into `startsAt` / `endsAt` instants via `resolveCampaignWindow(draft, now)`; the end date always runs through 23:59:59.999 local.
 - Activate moves the campaign to `active`. When the start date is in the future, sends wait for the start-date gate; no `scheduled` status is introduced.
+- After a successful Activate the wizard stores a flash message, returns to `/campaigns`, and the list shows the new campaign row plus a bottom-right toast ("<name> is now active.").
 
 ## Campaign statuses (list / filters)
 

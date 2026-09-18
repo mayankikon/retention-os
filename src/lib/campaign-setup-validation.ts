@@ -153,19 +153,19 @@ export function validateSetupStep(
   }
 }
 
+const STEPS_REQUIRED_BEFORE_ACTIVATE: SetupStepId[] = [
+  "general",
+  "messaging",
+  "reminders",
+  "configuration",
+];
+
 export function validateAllStepsBeforeActivate(
   draft: CampaignSetupDraft,
 ): StepValidationResult {
-  const steps: SetupStepId[] = [
-    "general",
-    "messaging",
-    "reminders",
-    "configuration",
-  ];
-
   const mergedErrors: Record<string, string> = {};
 
-  for (const stepId of steps) {
+  for (const stepId of STEPS_REQUIRED_BEFORE_ACTIVATE) {
     const result = validateSetupStep(stepId, draft);
     Object.assign(mergedErrors, result.errors);
   }
@@ -174,4 +174,20 @@ export function validateAllStepsBeforeActivate(
     isValid: Object.keys(mergedErrors).length === 0,
     errors: mergedErrors,
   };
+}
+
+/**
+ * First step that still blocks activation, so the wizard can send the user to
+ * the fields at fault instead of failing silently on Review.
+ */
+export function findFirstInvalidSetupStep(
+  draft: CampaignSetupDraft,
+): SetupStepId | null {
+  for (const stepId of STEPS_REQUIRED_BEFORE_ACTIVATE) {
+    if (!validateSetupStep(stepId, draft).isValid) {
+      return stepId;
+    }
+  }
+
+  return null;
 }
