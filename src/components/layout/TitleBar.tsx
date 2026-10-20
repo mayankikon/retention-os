@@ -134,7 +134,7 @@ export function TitleBar({
             {title != null ? (
               <h1
                 className={cn(
-                  "min-w-0 truncate text-[30px] font-medium leading-tight tracking-[-0.6px] text-foreground",
+                  "min-w-0 truncate text-[30px] font-medium leading-tight tracking-[-0.6px] text-foreground toolbox:text-[32px] toolbox:font-semibold toolbox:tracking-normal",
                   titleTrailing == null && right == null && "flex-1",
                   right != null && titleTrailing == null && "shrink-0",
                 )}

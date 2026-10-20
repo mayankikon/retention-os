@@ -98,11 +98,11 @@ export function MessagingStep({ draft, errors, onChange }: MessagingStepProps) {
 
   return (
     <div className="space-y-6">
-      <p className="text-sm text-muted-foreground">
-        {isMvpV10Version
-          ? "MVP V1.0 includes Oil Change Campaign messaging over SMS only."
-          : "Oil Change Campaign is selected by default. Pick another template or choose Custom to write your own primary promo and reminders."}
-      </p>
+      {isMvpV10Version ? (
+        <p className="text-sm text-muted-foreground">
+          MVP V1.0 includes Oil Change Campaign messaging over SMS only.
+        </p>
+      ) : null}
 
       <FormField
         label="Delivery Channels"
@@ -110,7 +110,7 @@ export function MessagingStep({ draft, errors, onChange }: MessagingStepProps) {
         hint={
           isMvpV10Version
             ? "MVP V1.0 supports SMS only. Email is available in Post MVP V1.1+."
-            : "Select one or more channels. The preview updates for SMS and email."
+            : undefined
         }
         required
       >
@@ -151,7 +151,7 @@ export function MessagingStep({ draft, errors, onChange }: MessagingStepProps) {
         hint={
           isMvpV10Version
             ? "MVP V1.0 includes the Oil Change Campaign template only."
-            : "Published templates from Templates apply copy to messaging and reminders. Custom clears the fields so you can write from scratch."
+            : undefined
         }
       >
         <div

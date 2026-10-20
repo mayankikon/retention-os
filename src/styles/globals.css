@@ -9,6 +9,8 @@
 @source "../../node_modules/@ikontechnologies-arlington/nxtg-design-shiftpackage/dist";
 
 @custom-variant dark (&:is(.dark *));
+/* Toolbox (Smart Marketing 2026) UI style — see `src/lib/ui-style.ts`. */
+@custom-variant toolbox (&:is([data-ui-style="toolbox"] *));
 
 /*
  * Bridge Shift theme primitives → semantic tokens.
@@ -107,6 +109,9 @@
   --radius-sm: 0.25rem;
   --radius-md: 0.375rem;
   --radius-lg: 0.5rem;
+
+  --font-app: var(--font-saira);
+  --app-font-weight-semibold: 500;
 }
 
 .dark {
@@ -191,10 +196,10 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  --font-sans: var(--font-saira);
-  --font-mono: var(--font-saira);
+  --font-sans: var(--font-app);
+  --font-mono: var(--font-app);
 
-  --font-weight-semibold: 500;
+  --font-weight-semibold: var(--app-font-weight-semibold);
 
   --radius-sm: var(--radius-sm);
   --radius-md: var(--radius-md);
@@ -277,6 +282,92 @@ body {
   input,
   textarea,
   select {
-    font-family: var(--font-saira), sans-serif;
+    font-family: var(--font-app), sans-serif;
   }
+}
+
+/*
+ * Toolbox UI style (Figma: Smart Marketing 2026 › General Settings).
+ * Toggled from the sidebar footer; `UiStyleProvider` sets `data-ui-style` on
+ * <html>. Kept unlayered so it wins over Shift's layered utilities.
+ */
+:root[data-ui-style="toolbox"] {
+  --font-app: var(--font-barlow);
+  --app-font-weight-semibold: 600;
+  --font-weight-medium: 600;
+
+  --theme-background-button-primary-default: rgb(26 147 117);
+  --theme-background-button-primary-hover: rgb(22 126 100);
+  --theme-background-button-pressed: rgb(18 101 80);
+  --theme-text-interactive: rgb(26 147 117);
+  --theme-icon-interactive: rgb(26 147 117);
+  --theme-stroke-accent: rgb(26 147 117);
+
+  --toolbox-sidebar-bg: rgb(26 147 117);
+  --toolbox-sidebar-border: rgb(18 101 80);
+  --toolbox-sidebar-fg: rgb(255 255 255);
+  --toolbox-sidebar-overlay: rgb(24 27 30 / 0.15);
+
+  --app-shell-main-column-inset-right: 0px;
+  /*
+   * `ToolboxSidebar` is a fixed 248px; `!important` beats the inline width the
+   * (hidden) Shift Sidebar writes onto <html> for dialog centering.
+   */
+  --app-shell-sidebar-width: 248px !important;
+}
+
+:root[data-ui-style="toolbox"]:not(.dark) {
+  --theme-background-page: rgb(244 244 244);
+  --theme-background-shell: rgb(244 244 244);
+  --theme-background-container: rgb(255 255 255);
+  --theme-background-default: rgb(238 238 238);
+  --theme-background-accent: rgb(232 245 241);
+  --theme-background-button-secondary-default: rgb(255 255 255);
+  --theme-text-primary: rgb(17 17 17);
+  --theme-text-secondary: rgb(102 102 102);
+  --theme-text-tertiary: rgb(113 113 113);
+  --theme-stroke-default: rgb(220 220 220);
+  --theme-stroke-hairline: rgb(220 220 220);
+  --theme-stroke-soft: rgb(220 220 220);
+  --theme-stroke-hover: rgb(186 186 186);
+  --border: rgb(220 220 220);
+}
+
+/* Version select + theme switch in `ToolboxSidebar`, on the green panel. */
+.toolbox-sidebar-controls {
+  --foreground: var(--toolbox-sidebar-fg);
+  --muted-foreground: rgb(241 255 250 / 0.8);
+  --card: var(--toolbox-sidebar-overlay);
+  --border: rgb(255 255 255 / 0.2);
+  --input: rgb(255 255 255 / 0.35);
+  --input-hover: rgb(255 255 255 / 0.5);
+  --primary: var(--toolbox-sidebar-border);
+  --primary-hover: var(--toolbox-sidebar-border);
+  --theme-background-input-hover: rgb(24 27 30 / 0.25);
+}
+
+.toolbox-sidebar-controls [data-slot="select-trigger"] {
+  color: var(--toolbox-sidebar-fg);
+}
+
+/* Main column: flat page canvas instead of the grooved floating panel. */
+[data-ui-style="toolbox"] .app-shell-main-column {
+  padding: 0;
+}
+
+[data-ui-style="toolbox"] .app-shell-main-panel {
+  border-radius: 0;
+  box-shadow: none;
+  background: var(--background);
+}
+
+/*
+ * Primary CTAs, plus every action in a wizard footer (Cancel / Back /
+ * Continue), use the Figma button label: Barlow Bold, uppercase, 10% tracking.
+ */
+[data-ui-style="toolbox"] [data-slot="button"].bg-primary,
+[data-ui-style="toolbox"] .wizard-footer :is([data-slot="button"], a) {
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }

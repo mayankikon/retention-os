@@ -125,12 +125,6 @@ export function MessagePreviewPanel({
           highlightedId={highlightedId}
         />
       )}
-
-      {messages.length > 0 && enabledChannels.length > 0 ? (
-        <p className="mt-3 text-center text-[11px] text-muted-foreground">
-          Highlighted message matches your current step.
-        </p>
-      ) : null}
     </aside>
   );
 }

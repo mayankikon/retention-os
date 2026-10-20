@@ -139,7 +139,7 @@ export function TemplateWizard({ mode, initialTemplate }: TemplateWizardProps) {
           {step === "review" ? <ReviewStep draft={draft} /> : null}
         </div>
 
-        <div className="mt-auto flex flex-col-reverse gap-3 border-t border-border px-6 py-6 sm:flex-row sm:justify-between">
+        <div className="wizard-footer mt-auto flex flex-col-reverse gap-3 border-t border-border px-6 py-6 sm:flex-row sm:justify-between">
           <Link href={
                 mode === "edit" && initialTemplate
                   ? `/templates/${initialTemplate.id}`
@@ -223,32 +223,36 @@ function DetailsStep({
   );
 }
 
-function ContentStep({
-  draft,
-  errors,
-  onChange,
+/** Message textarea with an "Add variables" picker that inserts at the cursor. */
+function VariableTextarea({
+  id,
+  value,
+  onValueChange,
+  rows,
+  invalid,
 }: {
-  draft: TemplateDraft;
-  errors: Record<string, string>;
-  onChange: (patch: Partial<TemplateDraft>) => void;
+  id: string;
+  value: string;
+  onValueChange: (value: string) => void;
+  rows: number;
+  invalid: boolean;
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [isVariableDialogOpen, setIsVariableDialogOpen] = useState(false);
 
   const handleInsertVariable = (token: string) => {
     const textarea = textareaRef.current;
-    const selectionStart =
-      textarea?.selectionStart ?? draft.primaryPromoText.length;
+    const selectionStart = textarea?.selectionStart ?? value.length;
     const selectionEnd = textarea?.selectionEnd ?? selectionStart;
 
-    const { value, cursorPosition } = insertTextAtCursor(
-      draft.primaryPromoText,
+    const { value: nextValue, cursorPosition } = insertTextAtCursor(
+      value,
       selectionStart,
       selectionEnd,
       token,
     );
 
-    onChange({ primaryPromoText: value });
+    onValueChange(nextValue);
 
     requestAnimationFrame(() => {
       if (!textarea) return;
@@ -258,6 +262,43 @@ function ContentStep({
   };
 
   return (
+    <div className="space-y-2">
+      <Textarea
+        ref={textareaRef}
+        id={id}
+        value={value}
+        onChange={(e) => onValueChange(e.target.value)}
+        rows={rows}
+        aria-invalid={invalid}
+      />
+      <Button
+        type="button"
+        variant="secondary"
+        size="sm"
+        onClick={() => setIsVariableDialogOpen(true)}
+      >
+        <Braces className="mr-2 h-4 w-4" />
+        Add variables
+      </Button>
+      <AddMessageVariableDialog
+        open={isVariableDialogOpen}
+        onOpenChange={setIsVariableDialogOpen}
+        onSelectVariable={handleInsertVariable}
+      />
+    </div>
+  );
+}
+
+function ContentStep({
+  draft,
+  errors,
+  onChange,
+}: {
+  draft: TemplateDraft;
+  errors: Record<string, string>;
+  onChange: (patch: Partial<TemplateDraft>) => void;
+}) {
+  return (
     <div className="space-y-6">
       <FormField
         label="Primary Promo Text"
@@ -265,31 +306,14 @@ function ContentStep({
         required
         error={errors.primaryPromoText}
       >
-        <div className="space-y-2">
-          <Textarea
-            ref={textareaRef}
-            id="primaryPromoText"
-            value={draft.primaryPromoText}
-            onChange={(e) => onChange({ primaryPromoText: e.target.value })}
-            rows={5}
-            aria-invalid={Boolean(errors.primaryPromoText)}
-          />
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            onClick={() => setIsVariableDialogOpen(true)}
-          >
-            <Braces className="mr-2 h-4 w-4" />
-            Add variables
-          </Button>
-        </div>
+        <VariableTextarea
+          id="primaryPromoText"
+          value={draft.primaryPromoText}
+          onValueChange={(primaryPromoText) => onChange({ primaryPromoText })}
+          rows={5}
+          invalid={Boolean(errors.primaryPromoText)}
+        />
       </FormField>
-      <AddMessageVariableDialog
-        open={isVariableDialogOpen}
-        onOpenChange={setIsVariableDialogOpen}
-        onSelectVariable={handleInsertVariable}
-      />
       <FormField label="Dealer URL" htmlFor="dealerUrl" hint="Optional.">
         <Input
           id="dealerUrl"
@@ -384,14 +408,12 @@ function RemindersStep({
                   required
                   error={errors[field.textKey]}
                 >
-                  <Textarea
+                  <VariableTextarea
                     id={field.textKey}
                     value={draft[field.textKey]}
-                    onChange={(e) =>
-                      onChange({ [field.textKey]: e.target.value })
-                    }
+                    onValueChange={(text) => onChange({ [field.textKey]: text })}
                     rows={3}
-                    aria-invalid={Boolean(errors[field.textKey])}
+                    invalid={Boolean(errors[field.textKey])}
                   />
                 </FormField>
                 <OptionalImageUpload

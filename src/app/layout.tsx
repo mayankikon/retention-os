@@ -1,16 +1,26 @@
 import type { Metadata } from "next";
-import { Saira } from "next/font/google";
+import { Barlow, Saira } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { DesignSystemProviders } from "@/components/providers/design-system-providers";
 import { CampaignSetupLeaveGuardProvider } from "@/contexts/campaign-setup-leave-guard";
 import { ProductVersionProvider } from "@/contexts/product-version-context";
 import { SessionProvider } from "@/contexts/session-context";
+import { UiStyleProvider } from "@/contexts/ui-style-context";
+import { UI_STYLE_BOOTSTRAP_SCRIPT } from "@/lib/ui-style";
 import "@/styles/globals.css";
 
 const saira = Saira({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-saira",
+});
+
+/** Toolbox (Smart Marketing 2026) style typeface; see `data-ui-style`. */
+const barlow = Barlow({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+  variable: "--font-barlow",
 });
 
 export const metadata: Metadata = {
@@ -28,19 +38,24 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${saira.variable} h-full antialiased`}
+      className={`${saira.variable} ${barlow.variable} h-full antialiased`}
     >
-      <body className={`${saira.className} min-h-full flex flex-col font-sans`}>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: UI_STYLE_BOOTSTRAP_SCRIPT }} />
+      </head>
+      <body className="min-h-full flex flex-col font-sans">
         <DesignSystemProviders>
-          <NuqsAdapter>
-            <SessionProvider>
-              <ProductVersionProvider>
-                <CampaignSetupLeaveGuardProvider>
-                  {children}
-                </CampaignSetupLeaveGuardProvider>
-              </ProductVersionProvider>
-            </SessionProvider>
-          </NuqsAdapter>
+          <UiStyleProvider>
+            <NuqsAdapter>
+              <SessionProvider>
+                <ProductVersionProvider>
+                  <CampaignSetupLeaveGuardProvider>
+                    {children}
+                  </CampaignSetupLeaveGuardProvider>
+                </ProductVersionProvider>
+              </SessionProvider>
+            </NuqsAdapter>
+          </UiStyleProvider>
         </DesignSystemProviders>
       </body>
     </html>

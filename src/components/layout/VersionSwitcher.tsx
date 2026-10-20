@@ -1,5 +1,6 @@
 "use client";
 
+import { useId } from "react";
 import {
   Select,
   SelectContent,
@@ -17,11 +18,13 @@ import {
 /** Compact version control for the Shift Sidebar footer panel. */
 export function VersionSwitcher() {
   const { versionId, setVersionId } = useProductVersion();
+  // Rendered in both the Shift sidebar and the Toolbox user menu.
+  const selectId = useId();
 
   return (
     <>
       <label
-        htmlFor="product-version"
+        htmlFor={selectId}
         className="mb-2 block text-xs font-medium uppercase tracking-wide text-muted-foreground"
       >
         Version
@@ -38,7 +41,7 @@ export function VersionSwitcher() {
         }))}
       >
         <SelectTrigger
-          id="product-version"
+          id={selectId}
           className="control-hover-stroke h-9 w-full"
           aria-label="Product version"
         >

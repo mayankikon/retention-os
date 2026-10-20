@@ -5,10 +5,17 @@ import { cn } from "@/lib/utils";
  * wordmark is inline `<text>` so it inherits Saira and theme color instead of
  * shipping a raster asset. `textLength` pins the tracking to the mark width.
  */
-export function ToolboxRetentionOsLogo({ className }: { className?: string }) {
+export function ToolboxRetentionOsLogo({
+  className,
+  showProductName = true,
+}: {
+  className?: string;
+  /** `false` renders the bare TOOLBOX mark (Toolbox UI style sidebar). */
+  showProductName?: boolean;
+}) {
   return (
     <svg
-      viewBox="0 0 113 58"
+      viewBox={showProductName ? "0 0 113 58" : "0 0 113 42"}
       role="img"
       aria-label="Toolbox Retention OS"
       className={cn("h-auto w-[104px] text-primary", className)}
@@ -44,18 +51,20 @@ export function ToolboxRetentionOsLogo({ className }: { className?: string }) {
         clipRule="evenodd"
         d="M3.37527 9.54962C2.61572 9.54962 2 10.1648 2 10.9237V39.626C2 40.3848 2.61571 41 3.37526 41H109.118C109.877 41 110.493 40.3848 110.493 39.626V10.9237C110.493 10.1648 109.877 9.54962 109.118 9.54962H3.37527ZM4.1393 38.8626V11.687H108.354V38.8626H4.1393Z"
       />
-      <text
-        x="56.5"
-        y="54"
-        textAnchor="middle"
-        textLength="86"
-        lengthAdjust="spacing"
-        fontFamily="inherit"
-        fontSize="11"
-        fontWeight="600"
-      >
-        RETENTION OS
-      </text>
+      {showProductName ? (
+        <text
+          x="56.5"
+          y="54"
+          textAnchor="middle"
+          textLength="86"
+          lengthAdjust="spacing"
+          fontFamily="inherit"
+          fontSize="11"
+          fontWeight="600"
+        >
+          RETENTION OS
+        </text>
+      ) : null}
     </svg>
   );
 }

@@ -82,8 +82,19 @@ export function GeneralStep({ draft, errors, onChange }: GeneralStepProps) {
     });
   };
 
-  const handleSelectAll = () => {
-    applyScopePatch({ subfleets: [...dealersInGroup] });
+  const selectedInGroupCount = dealersInGroup.filter((dealer) =>
+    draft.subfleets.includes(dealer),
+  ).length;
+  const isAllSelected =
+    dealersInGroup.length > 0 && selectedInGroupCount === dealersInGroup.length;
+
+  const handleSelectAllChange = (checked: boolean) => {
+    if (checked) {
+      applyScopePatch({ subfleets: [...dealersInGroup] });
+      return;
+    }
+    // Clearing every dealership also drops their timezone fallbacks.
+    applyScopePatch({ subfleets: [], timezoneOverrides: {} });
   };
 
   const handleTimezoneFallback = (dealer: string, timeZone: SetupTimeZone) => {
@@ -100,7 +111,6 @@ export function GeneralStep({ draft, errors, onChange }: GeneralStepProps) {
       <FormField
         label="Group"
         htmlFor="groupId"
-        hint="Select the dealer group, then choose one or more dealerships."
         error={errors.groupId}
         required
       >
@@ -128,11 +138,7 @@ export function GeneralStep({ draft, errors, onChange }: GeneralStepProps) {
       <FormField
         label="Dealerships"
         error={errors.dealership}
-        hint={
-          draft.groupId
-            ? `${draft.subfleets.length} selected. Campaign runs only for the selected dealerships.`
-            : "Choose a group to load dealerships."
-        }
+        hint={draft.groupId ? undefined : "Choose a group to load dealerships."}
         required
       >
         {!draft.groupId ? (
@@ -146,15 +152,17 @@ export function GeneralStep({ draft, errors, onChange }: GeneralStepProps) {
           </p>
         ) : (
           <div className="space-y-3">
-            <div className="flex justify-end">
-              <button
-                type="button"
-                className="text-sm font-medium text-primary hover:underline"
-                onClick={handleSelectAll}
-              >
-                Select all in group
-              </button>
-            </div>
+            {/* px-[13px] lines this checkbox up with the dealership cards' (p-3 + border). */}
+            <label className="flex w-fit cursor-pointer items-center gap-3 px-[13px]">
+              <Checkbox
+                checked={isAllSelected}
+                indeterminate={selectedInGroupCount > 0 && !isAllSelected}
+                onCheckedChange={handleSelectAllChange}
+              />
+              <span className="text-sm font-semibold tracking-[0.1em] text-foreground">
+                Select All
+              </span>
+            </label>
             <ul className="space-y-2">
               {dealersInGroup.map((dealer) => {
                 const isSelected = draft.subfleets.includes(dealer);

@@ -12,6 +12,7 @@ import {
 
 import { useRef } from "react";
 import { Plus, X } from "lucide-react";
+import { AudienceReachCard } from "@/components/campaigns/setup/AudienceReachCard";
 import { FormField } from "@/components/campaigns/setup/FormField";
 import {
   AUDIENCE_ATTRIBUTE_META,
@@ -22,7 +23,6 @@ import {
   serializeDateRange,
 } from "@/data/audience-attributes";
 import {
-  estimateAudienceReach,
   getSelectedMakeFromRules,
   getSelectedModelFromRules,
   syncModelRulesAfterMakeChange,
@@ -53,7 +53,6 @@ export function AudienceFilters({
 }: AudienceFiltersProps) {
   const nextId = useRef(0);
   const rules = draft.audienceFilters;
-  const reach = estimateAudienceReach(rules);
   const selectedMake = getSelectedMakeFromRules(rules);
   const selectedModel = getSelectedModelFromRules(rules);
   const attributeOptions = allowedAttributes
@@ -200,13 +199,8 @@ export function AudienceFilters({
           <Plus className="mr-1.5 h-4 w-4" />
           Add Filter
         </Button>
-        <p className="text-sm text-muted-foreground">
-          {rules.length > 0 ? "AND · " : ""}Matches{" "}
-          <span className="font-medium text-foreground">
-            ~{reach.toLocaleString("en-US")}
-          </span>{" "}
-          Vehicles
-        </p>
+        {/* Embedded callers show the reach card beside their own heading. */}
+        {embedded ? null : <AudienceReachCard rules={rules} />}
       </div>
     </div>
   );

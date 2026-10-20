@@ -10,9 +10,13 @@ import {
   type SidebarProductConfig,
 } from "@ikontechnologies-arlington/nxtg-design-shiftpackage";
 import { ToolboxRetentionOsLogo } from "@/components/layout/ToolboxRetentionOsLogo";
+import { ToolboxSidebar } from "@/components/layout/ToolboxSidebar";
+import { ToolboxTopBar } from "@/components/layout/ToolboxTopBar";
+import { UiStyleToggle } from "@/components/layout/UiStyleToggle";
 import { VersionSwitcher } from "@/components/layout/VersionSwitcher";
 import {
   SMART_MARKETING_NAV_ITEMS,
+  SMART_MARKETING_OVERVIEW_NAV_ITEM,
   isSmartMarketingNavItemActive,
 } from "@/components/layout/app-navigation";
 import { useOptionalCampaignSetupLeaveGuard } from "@/contexts/campaign-setup-leave-guard";
@@ -57,8 +61,10 @@ export function AppShell({
     [navItems, pathname, isSetupActive],
   );
 
+  const toolboxNavItems = [SMART_MARKETING_OVERVIEW_NAV_ITEM, ...navItems];
+
   const handleNavItemClick = (label: string) => {
-    const item = navItems.find((navItem) => navItem.label === label);
+    const item = toolboxNavItems.find((navItem) => navItem.label === label);
     if (!item) return;
     if (leaveGuard?.isSetupActive) {
       leaveGuard.requestNavigation(item.href);
@@ -67,7 +73,12 @@ export function AppShell({
 
   return (
     <div className="flex h-svh min-h-0 overflow-hidden bg-shell font-sans dark:bg-background">
+      {/*
+        Both shells render; `data-ui-style` on <html> (set before paint) picks
+        one via the `toolbox:` variant, so reloads never flash the other style.
+      */}
       <Sidebar
+        className="toolbox:hidden"
         homeHref="/campaigns"
         // Full Toolbox / Retention OS lockup only while expanded; the collapsed
         // rail falls back to Shift's condensed mark, which fits the icon column.
@@ -90,15 +101,32 @@ export function AppShell({
           secondaryText: user.role,
           initials: user.initials,
         }}
-        userFooterPanel={<VersionSwitcher />}
+        userFooterPanel={
+          <>
+            <VersionSwitcher />
+            <UiStyleToggle />
+          </>
+        }
+      />
+      <ToolboxSidebar
+        navItems={toolboxNavItems.map((item) => ({
+          label: item.label,
+          href: isSetupActive ? undefined : item.href,
+          isActive: isSmartMarketingNavItemActive(item.href, pathname),
+        }))}
+        onNavItemClick={handleNavItemClick}
       />
 
-      <AppGroovedMainColumn panelClassName="min-h-0">
+      <AppGroovedMainColumn
+        className="app-shell-main-column"
+        panelClassName="min-h-0"
+      >
         {/*
           Match new-toolbox workspace shell: main column is overflow-hidden;
           each page owns scroll (list pages pin the table; wizards/detail scroll).
           No max-width — content fills the grooved panel edge-to-edge.
         */}
+        <ToolboxTopBar />
         <main
           className={cn(
             "relative flex min-h-0 flex-1 flex-col overflow-hidden",

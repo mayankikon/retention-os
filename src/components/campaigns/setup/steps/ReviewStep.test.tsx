@@ -48,10 +48,7 @@ function renderReviewStep(startDate: string | null) {
       errors={{}}
       onChange={vi.fn()}
       onTestSend={vi.fn()}
-      onActivateNow={vi.fn()}
-      onSaveDraft={vi.fn()}
       isTestSent
-      isActivating={false}
     />,
   );
 }
@@ -59,25 +56,31 @@ function renderReviewStep(startDate: string | null) {
 describe("ReviewStep", () => {
   afterEach(() => cleanup());
 
-  it("keeps the launch button labeled Activate for today and future start dates", () => {
-    renderReviewStep(shiftLocalDate(0));
-
-    expect(screen.getByRole("button", { name: "Activate" })).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: "Save Draft" }),
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByRole("button", { name: "Schedule" }),
-    ).not.toBeInTheDocument();
-    expect(screen.getByText("Customers Targeted")).toBeInTheDocument();
-    expect(screen.queryByText("Roughly Reachable")).not.toBeInTheDocument();
-
-    cleanup();
+  it("shows the targeted customer estimate", () => {
     renderReviewStep(shiftLocalDate(1));
 
-    expect(screen.getByRole("button", { name: "Activate" })).toBeInTheDocument();
+    expect(screen.getByText("Customers Targeted")).toBeInTheDocument();
+    expect(screen.queryByText("Roughly Reachable")).not.toBeInTheDocument();
+  });
+
+  it("leaves launch actions to the wizard footer", () => {
+    renderReviewStep(shiftLocalDate(0));
+
+    // Activate / Save Draft live in CampaignSetupWizard's footer now.
     expect(
-      screen.queryByRole("button", { name: "Schedule" }),
+      screen.queryByRole("button", { name: "Activate" }),
     ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Save Draft" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("omits the empty-filters note and timing copy", () => {
+    renderReviewStep(shiftLocalDate(0));
+
+    expect(
+      screen.queryByText(/No audience filters applied/),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText(/Timing comes from/)).not.toBeInTheDocument();
   });
 });

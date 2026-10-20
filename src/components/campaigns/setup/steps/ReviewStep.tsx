@@ -21,10 +21,7 @@ interface ReviewStepProps {
   errors: Record<string, string>;
   onChange: (patch: Partial<CampaignSetupDraft>) => void;
   onTestSend: () => void;
-  onActivateNow: () => void;
-  onSaveDraft: () => void;
   isTestSent: boolean;
-  isActivating: boolean;
 }
 
 export function ReviewStep({
@@ -32,10 +29,7 @@ export function ReviewStep({
   errors,
   onChange,
   onTestSend,
-  onActivateNow,
-  onSaveDraft,
   isTestSent,
-  isActivating,
 }: ReviewStepProps) {
   const { versionId } = useProductVersion();
   const isMvpV10Version = versionId === "mvp_v1_0";
@@ -51,7 +45,6 @@ export function ReviewStep({
 
   const audienceSummary = summarizeAudienceFilters(draft.audienceFilters);
   const customersTargeted = estimateAudienceReach(draft.audienceFilters);
-  const canLaunch = !isActivating;
 
   return (
     <div className="space-y-6">
@@ -84,12 +77,7 @@ export function ReviewStep({
                   <li key={line}>{line}</li>
                 ))}
               </ul>
-            ) : (
-              <p className="mt-4 text-sm text-muted-foreground">
-                No audience filters applied — using the full dealership pool for
-                this trigger.
-              </p>
-            )}
+            ) : null}
           </div>
         </div>
       </section>
@@ -121,7 +109,6 @@ export function ReviewStep({
       <FormField
         label="Test Mobile Number"
         htmlFor="testPhone"
-        hint="Send Campaign Test — sample SMS to your device."
         error={errors.testPhoneNumber}
       >
         <div className="flex gap-2">
@@ -162,32 +149,6 @@ export function ReviewStep({
           Send a test before activating to meet SOP requirements.
         </p>
       ) : null}
-
-      <div className="space-y-4 border-t border-border pt-6">
-        <p className="text-sm text-muted-foreground">
-          Timing comes from the start date, optional end date, and send time set
-          in Configuration. Activate moves the campaign to Active; a future
-          start date remains Active and waits until that date before eligible
-          sends begin.
-        </p>
-        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-          <Button
-            type="button"
-            onClick={onActivateNow}
-            disabled={!canLaunch}
-          >
-            {isActivating ? "Activating…" : "Activate"}
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onSaveDraft}
-            disabled={isActivating}
-          >
-            Save Draft
-          </Button>
-        </div>
-      </div>
     </div>
   );
 }

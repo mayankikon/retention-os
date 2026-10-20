@@ -11,6 +11,7 @@ import {
 } from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
 
 import { AudienceFilters } from "@/components/campaigns/setup/AudienceFilters";
+import { AudienceReachCard } from "@/components/campaigns/setup/AudienceReachCard";
 import { FormField } from "@/components/campaigns/setup/FormField";
 import { SendTimeField } from "@/components/campaigns/setup/SendTimeField";
 import { useProductVersion } from "@/contexts/product-version-context";
@@ -34,6 +35,7 @@ import {
   setServiceTriggerMode,
 } from "@/lib/service-triggers";
 import type {
+  AudienceFilterRule,
   CampaignSetupDraft,
   ScheduleDay,
   ServiceTriggerMode,
@@ -105,11 +107,6 @@ export function ConfigurationStep({
       <FormField
         label="Service Triggers"
         error={serviceTriggerError}
-        hint={
-          isOemScheduleAvailable
-            ? "Choose time and mileage intervals or an OEM schedule, then optionally narrow the audience."
-            : undefined
-        }
         required
       >
         <fieldset className="space-y-3">
@@ -216,9 +213,7 @@ export function ConfigurationStep({
                     </FormField>
 
                     <div className="border-t border-border pt-4">
-                      <p className="mb-3 text-sm font-medium text-foreground">
-                        Audience Query
-                      </p>
+                      <AudienceQueryHeader rules={draft.audienceFilters} />
                       <AudienceFilters
                         draft={draft}
                         errors={errors}
@@ -355,9 +350,7 @@ export function ConfigurationStep({
                     ) : null}
 
                     <div className="border-t border-border pt-4">
-                      <p className="mb-3 text-sm font-medium text-foreground">
-                        Audience Query
-                      </p>
+                      <AudienceQueryHeader rules={draft.audienceFilters} />
                       {draft.oemMake && draft.oemModel ? (
                         <p className="mb-3 text-xs text-muted-foreground">
                           Vehicle Scope: {draft.oemMake} {draft.oemModel}
@@ -384,7 +377,6 @@ export function ConfigurationStep({
 
       <FormField
         label="Campaign Duration"
-        hint="How long the campaign runs. Sends stop after the end date when set."
         required
       >
         <div className="space-y-4 rounded-[var(--radius-sm)] border border-border bg-card p-3">
@@ -431,7 +423,6 @@ export function ConfigurationStep({
       <FormField
         label="Define Schedule"
         error={errors.scheduleDays ?? errors.sendTimeLocal}
-        hint="Always Monday–Saturday. Send time uses the primary dealership time zone from General."
         required
       >
         <div className="mb-3 flex flex-wrap gap-2">
@@ -513,6 +504,16 @@ export function ConfigurationStep({
           </table>
         </div>
       </FormField>
+    </div>
+  );
+}
+
+/** "Audience Query" label with the estimated reach callout on its right. */
+function AudienceQueryHeader({ rules }: { rules: AudienceFilterRule[] }) {
+  return (
+    <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
+      <p className="text-sm font-medium text-foreground">Audience Query</p>
+      <AudienceReachCard rules={rules} />
     </div>
   );
 }

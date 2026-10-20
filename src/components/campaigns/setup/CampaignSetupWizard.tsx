@@ -358,10 +358,7 @@ export function CampaignSetupWizard({
             errors={errors}
             onChange={updateDraft}
             onTestSend={handleTestSend}
-            onActivateNow={handleActivateNow}
-            onSaveDraft={handleSaveDraftFromReview}
             isTestSent={isTestSent}
-            isActivating={isActivating}
           />
         );
       default:
@@ -373,10 +370,7 @@ export function CampaignSetupWizard({
     errors,
     updateDraft,
     isTestSent,
-    isActivating,
     handleTestSend,
-    handleActivateNow,
-    handleSaveDraftFromReview,
   ]);
 
   return (
@@ -392,7 +386,7 @@ export function CampaignSetupWizard({
       <div className="flex h-full min-h-0 flex-col">
         <div className="flex-1 p-6">{stepContent}</div>
 
-        <div className="mt-auto flex flex-col-reverse gap-3 border-t border-border px-6 py-6 sm:flex-row sm:justify-between">
+        <div className="wizard-footer mt-auto flex flex-col-reverse gap-3 border-t border-border px-6 py-6 sm:flex-row sm:justify-between">
           <Button type="button" variant="ghost" onClick={handleCancel}>
             Cancel
           </Button>
@@ -406,7 +400,26 @@ export function CampaignSetupWizard({
               <Button type="button" onClick={handleNext}>
                 Continue
               </Button>
-            ) : null}
+            ) : (
+              // Review step: same slots as the template wizard's last step.
+              <>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleSaveDraftFromReview}
+                  disabled={isActivating}
+                >
+                  Save Draft
+                </Button>
+                <Button
+                  type="button"
+                  onClick={handleActivateNow}
+                  disabled={isActivating}
+                >
+                  {isActivating ? "Activating…" : "Activate"}
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </div>
