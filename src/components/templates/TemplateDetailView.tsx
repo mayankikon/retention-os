@@ -14,14 +14,12 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Archive, Pencil, RotateCcw, Trash2 } from "lucide-react";
+import { TitleBar } from "@/components/layout/TitleBar";
 import { TemplateStatusBadge } from "@/components/templates/TemplateStatusBadge";
 import { useCurrentUser } from "@/contexts/session-context";
 import { useTemplate } from "@/hooks/use-templates";
 import { formatTimestamp } from "@/lib/dates";
-import {
-  deleteTemplate,
-  setTemplateStatus,
-} from "@/lib/template-store";
+import { deleteTemplate, setTemplateStatus } from "@/lib/template-store";
 import {
   canHardDeleteTemplate,
   getCampaignsUsingTemplate,
@@ -44,7 +42,10 @@ export function TemplateDetailView({ templateId }: TemplateDetailViewProps) {
     return (
       <div className="space-y-4">
         <h1 className="text-2xl font-semibold">Template not found</h1>
-        <Link href="/templates" className={buttonVariants({ variant: "outline" })}>
+        <Link
+          href="/templates"
+          className={buttonVariants({ variant: "outline" })}
+        >
           Back to Templates
         </Link>
       </div>
@@ -80,173 +81,183 @@ export function TemplateDetailView({ templateId }: TemplateDetailViewProps) {
   };
 
   return (
-    <div className="app-shell-scrollbar-dashed app-shell-content-px app-shell-content-pt app-shell-content-pb min-h-0 flex-1 space-y-8 overflow-y-auto">
-      <header className="flex flex-col gap-4 border-b border-border pb-6 sm:flex-row sm:items-start sm:justify-between">
-        <div className="space-y-2">
-          <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-              {template.heading}
-            </h1>
-            <TemplateStatusBadge status={template.status} />
+    <div className="app-shell-scrollbar-dashed flex min-h-0 flex-1 flex-col overflow-y-auto">
+      <TitleBar
+        breadcrumbs={[
+          { label: "Templates", href: "/templates" },
+          { label: template.heading },
+        ]}
+        title={template.heading}
+        titleTrailing={<TemplateStatusBadge status={template.status} />}
+        subtitle={
+          <>
+            {template.message}
+            <span className="mt-1 block text-xs">
+              Created by {template.createdBy.name} ·{" "}
+              {formatTimestamp(template.createdAt)}
+              {" · "}
+              Last updated by {template.updatedBy.name} ·{" "}
+              {formatTimestamp(template.updatedAt)}
+            </span>
+          </>
+        }
+        right={
+          <div className="flex flex-wrap gap-2">
+            <Link
+              href={`/templates/${template.id}/edit`}
+              className={`${buttonVariants({ variant: "outline" })} inline-flex items-center gap-2`}
+            >
+              <Pencil className="h-4 w-4" aria-hidden />
+              Edit
+            </Link>
+            {template.status !== "published" ? (
+              <Button type="button" onClick={handlePublish}>
+                Publish
+              </Button>
+            ) : null}
+            {template.status === "archived" ? (
+              <Button type="button" variant="outline" onClick={handleRestore}>
+                <RotateCcw className="h-4 w-4" aria-hidden />
+                Restore to draft
+              </Button>
+            ) : (
+              <Button type="button" variant="outline" onClick={handleArchive}>
+                <Archive className="h-4 w-4" aria-hidden />
+                Archive
+              </Button>
+            )}
+            <Button
+              type="button"
+              variant="outline"
+              disabled={!canDelete}
+              onClick={handleDelete}
+              title={
+                canDelete
+                  ? "Permanently delete"
+                  : "Cannot delete while campaigns use this template — archive instead"
+              }
+            >
+              <Trash2 className="h-4 w-4" aria-hidden />
+              Delete
+            </Button>
           </div>
-          <p className="text-sm text-muted-foreground">{template.message}</p>
-          <p className="text-xs text-muted-foreground">
-            Created by {template.createdBy.name} ·{" "}
-            {formatTimestamp(template.createdAt)}
-            {" · "}
-            Last updated by {template.updatedBy.name} ·{" "}
-            {formatTimestamp(template.updatedAt)}
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Link
-            href={`/templates/${template.id}/edit`}
-            className={`${buttonVariants({ variant: "outline" })} inline-flex items-center gap-2`}
-          >
-            <Pencil className="h-4 w-4" aria-hidden />
-            Edit
-          </Link>
-          {template.status !== "published" ? (
-            <Button type="button" onClick={handlePublish}>
-              Publish
-            </Button>
-          ) : null}
-          {template.status === "archived" ? (
-            <Button type="button" variant="outline" onClick={handleRestore}>
-              <RotateCcw className="h-4 w-4" aria-hidden />
-              Restore to draft
-            </Button>
+        }
+      />
+
+      <div className="app-shell-content-px app-shell-content-pb space-y-8 pt-6">
+        <section className="space-y-3">
+          <h2 className="text-lg font-semibold text-foreground">Content</h2>
+          <div className="rounded-lg border border-border bg-card p-5 shadow-sm space-y-4 text-sm">
+            <ContentBlock
+              label="Primary Promo Text"
+              value={template.primaryPromoText}
+            />
+            <ContentBlock
+              label="Dealer URL"
+              value={template.dealerUrl || "—"}
+            />
+            <ContentBlock
+              label="Campaign Image"
+              value={template.campaignImageFileName || "None"}
+            />
+            <ContentBlock
+              label="Reminder 1"
+              value={
+                template.reminder1Enabled ? template.reminder1Text : "Disabled"
+              }
+            />
+            <ContentBlock
+              label="Reminder 2"
+              value={
+                template.reminder2Enabled ? template.reminder2Text : "Disabled"
+              }
+            />
+            <ContentBlock
+              label="Reminder 3"
+              value={
+                template.reminder3Enabled ? template.reminder3Text : "Disabled"
+              }
+            />
+          </div>
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="text-lg font-semibold text-foreground">
+            Where it&apos;s used ({usageCount})
+          </h2>
+          {usage.length === 0 ? (
+            <p className="rounded-lg border border-dashed border-border bg-card px-4 py-8 text-sm text-muted-foreground">
+              No campaigns are currently using this template.
+            </p>
           ) : (
-            <Button type="button" variant="outline" onClick={handleArchive}>
-              <Archive className="h-4 w-4" aria-hidden />
-              Archive
-            </Button>
+            <div className="overflow-x-auto rounded-lg border border-border bg-card shadow-sm">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Campaign</TableHead>
+                    <TableHead>Dealer</TableHead>
+                    <TableHead>Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {usage.map((campaign) => (
+                    <TableRow key={campaign.id}>
+                      <TableCell>
+                        <Link
+                          href={`/campaigns/${campaign.id}`}
+                          className="font-medium text-brand-primary hover:underline"
+                        >
+                          {campaign.name}
+                        </Link>
+                      </TableCell>
+                      <TableCell>{campaign.dealer}</TableCell>
+                      <TableCell className="capitalize">
+                        {campaign.status}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           )}
-          <Button
-            type="button"
-            variant="outline"
-            disabled={!canDelete}
-            onClick={handleDelete}
-            title={
-              canDelete
-                ? "Permanently delete"
-                : "Cannot delete while campaigns use this template — archive instead"
-            }
-          >
-            <Trash2 className="h-4 w-4" aria-hidden />
-            Delete
-          </Button>
-        </div>
-      </header>
+        </section>
 
-      <section className="space-y-3">
-        <h2 className="text-lg font-semibold text-foreground">Content</h2>
-        <div className="rounded-lg border border-border bg-card p-5 shadow-sm space-y-4 text-sm">
-          <ContentBlock label="Primary Promo Text" value={template.primaryPromoText} />
-          <ContentBlock label="Dealer URL" value={template.dealerUrl || "—"} />
-          <ContentBlock
-            label="Campaign Image"
-            value={template.campaignImageFileName || "None"}
-          />
-          <ContentBlock
-            label="Reminder 1"
-            value={
-              template.reminder1Enabled
-                ? template.reminder1Text
-                : "Disabled"
-            }
-          />
-          <ContentBlock
-            label="Reminder 2"
-            value={
-              template.reminder2Enabled
-                ? template.reminder2Text
-                : "Disabled"
-            }
-          />
-          <ContentBlock
-            label="Reminder 3"
-            value={
-              template.reminder3Enabled
-                ? template.reminder3Text
-                : "Disabled"
-            }
-          />
-        </div>
-      </section>
-
-      <section className="space-y-3">
-        <h2 className="text-lg font-semibold text-foreground">
-          Where it&apos;s used ({usageCount})
-        </h2>
-        {usage.length === 0 ? (
-          <p className="rounded-lg border border-dashed border-border bg-card px-4 py-8 text-sm text-muted-foreground">
-            No campaigns are currently using this template.
-          </p>
-        ) : (
+        <section className="space-y-3">
+          <h2 className="text-lg font-semibold text-foreground">
+            Version history
+          </h2>
           <div className="overflow-x-auto rounded-lg border border-border bg-card shadow-sm">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Campaign</TableHead>
-                  <TableHead>Dealer</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>When</TableHead>
+                  <TableHead>Who</TableHead>
+                  <TableHead>Action</TableHead>
+                  <TableHead>Summary</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {usage.map((campaign) => (
-                  <TableRow key={campaign.id}>
-                    <TableCell>
-                      <Link
-                        href={`/campaigns/${campaign.id}`}
-                        className="font-medium text-brand-primary hover:underline"
-                      >
-                        {campaign.name}
-                      </Link>
+                {template.auditEvents.map((event) => (
+                  <TableRow key={event.id}>
+                    <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
+                      {formatTimestamp(event.at)}
                     </TableCell>
-                    <TableCell>{campaign.dealer}</TableCell>
-                    <TableCell className="capitalize">{campaign.status}</TableCell>
+                    <TableCell className="text-sm">
+                      {event.actor.name}
+                    </TableCell>
+                    <TableCell className="text-sm capitalize">
+                      {event.action.replaceAll("_", " ")}
+                    </TableCell>
+                    <TableCell className="text-sm text-foreground">
+                      {event.summary}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           </div>
-        )}
-      </section>
-
-      <section className="space-y-3">
-        <h2 className="text-lg font-semibold text-foreground">
-          Version history
-        </h2>
-        <div className="overflow-x-auto rounded-lg border border-border bg-card shadow-sm">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>When</TableHead>
-                <TableHead>Who</TableHead>
-                <TableHead>Action</TableHead>
-                <TableHead>Summary</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {template.auditEvents.map((event) => (
-                <TableRow key={event.id}>
-                  <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
-                    {formatTimestamp(event.at)}
-                  </TableCell>
-                  <TableCell className="text-sm">{event.actor.name}</TableCell>
-                  <TableCell className="text-sm capitalize">
-                    {event.action.replaceAll("_", " ")}
-                  </TableCell>
-                  <TableCell className="text-sm text-foreground">
-                    {event.summary}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      </section>
+        </section>
+      </div>
     </div>
   );
 }
