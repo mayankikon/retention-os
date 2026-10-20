@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import {
   ChartNoAxesCombined,
@@ -7,7 +8,6 @@ import {
   CircleUserRound,
   ClipboardList,
   List,
-  MapPinCheckInside,
   Megaphone,
   TabletSmartphone,
   UsersRound,
@@ -127,8 +127,14 @@ export function ToolboxSidebar({ navItems, onNavItemClick }: ToolboxSidebarProps
         className="flex h-16 w-[232px] shrink-0 items-center gap-2 rounded-md bg-[var(--toolbox-sidebar-overlay)] py-2 pr-3 pl-2"
         aria-disabled="true"
       >
-        <span className="flex size-9 shrink-0 items-center justify-center rounded-md border border-[#dcdcdc] bg-white text-[var(--toolbox-sidebar-bg)]">
-          <MapPinCheckInside className="size-5" aria-hidden />
+        <span className="relative size-9 shrink-0 overflow-hidden rounded-md border border-[#dcdcdc] bg-white">
+          <Image
+            src="/brand/ikon-account-logo.png"
+            alt="Ikon"
+            fill
+            sizes="36px"
+            className="object-contain"
+          />
         </span>
         <span className="min-w-0 flex-1 truncate text-[14px] font-semibold leading-[19px]">
           Ikon Employee View
