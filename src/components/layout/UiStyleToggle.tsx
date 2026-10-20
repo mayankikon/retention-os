@@ -5,7 +5,10 @@ import { Switch } from "@ikontechnologies-arlington/nxtg-design-shiftpackage/pri
 import { useUiStyle } from "@/contexts/ui-style-context";
 import type { UiStyleId } from "@/lib/ui-style";
 
-/** Switch between the Shift and Toolbox (Figma 2026) styles. */
+/**
+ * Switch between the Shift and Toolbox (Figma 2026) styles. Users see the
+ * Toolbox style as "Current NextGen theme".
+ */
 export function UiStyleToggle({
   onUiStyleChange,
 }: {
@@ -21,7 +24,7 @@ export function UiStyleToggle({
         htmlFor={switchId}
         className="cursor-pointer text-xs font-medium uppercase tracking-wide text-muted-foreground"
       >
-        Toolbox theme
+        Current NextGen theme
       </label>
       <Switch
         id={switchId}
