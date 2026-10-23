@@ -3,13 +3,15 @@
 import {
   Checkbox,
   Label,
-  Textarea,
 } from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
 
 import { FormField } from "@/components/campaigns/setup/FormField";
-import { OptionalImageUpload } from "@/components/campaigns/setup/OptionalImageUpload";
+import {
+  ImagePreviewCard,
+  OptionalImageUpload,
+} from "@/components/campaigns/setup/OptionalImageUpload";
+import { VariableTextarea } from "@/components/campaigns/setup/VariableTextarea";
 import { useProductVersion } from "@/contexts/product-version-context";
-import { getReminderImagePreviewUrl } from "@/lib/reminder-setup";
 import type { CampaignSetupDraft } from "@/types/campaign-setup";
 import { CUSTOM_TEMPLATE_ID } from "@/types/template";
 import { cn } from "@/lib/utils";
@@ -18,6 +20,8 @@ interface RemindersStepProps {
   draft: CampaignSetupDraft;
   errors: Record<string, string>;
   onChange: (patch: Partial<CampaignSetupDraft>) => void;
+  /** Jumps to the Messaging step's Campaign Image field. */
+  onUploadCampaignImage?: () => void;
 }
 
 interface ReminderFieldConfig {
@@ -100,7 +104,12 @@ const REMINDER_FIELDS: ReminderFieldConfig[] = [
   },
 ];
 
-export function RemindersStep({ draft, errors, onChange }: RemindersStepProps) {
+export function RemindersStep({
+  draft,
+  errors,
+  onChange,
+  onUploadCampaignImage,
+}: RemindersStepProps) {
   return (
     <div className="space-y-6">
       <p className="text-sm text-muted-foreground">
@@ -117,6 +126,7 @@ export function RemindersStep({ draft, errors, onChange }: RemindersStepProps) {
             draft={draft}
             errors={errors}
             onChange={onChange}
+            onUploadCampaignImage={onUploadCampaignImage}
           />
         ))}
       </div>
@@ -129,11 +139,13 @@ function ReminderTemplateField({
   draft,
   errors,
   onChange,
+  onUploadCampaignImage,
 }: {
   field: ReminderFieldConfig;
   draft: CampaignSetupDraft;
   errors: Record<string, string>;
   onChange: (patch: Partial<CampaignSetupDraft>) => void;
+  onUploadCampaignImage?: () => void;
 }) {
   const { versionId } = useProductVersion();
   const isMvpV10Version = versionId === "mvp_v1_0";
@@ -142,8 +154,10 @@ function ReminderTemplateField({
   const textError = isEnabled && field.textErrorKey
     ? errors[field.textErrorKey]
     : undefined;
+  const hasPrimaryImage = Boolean(draft.campaignImagePreviewUrl);
+  const isUsingPrimaryImage = hasPrimaryImage && draft[field.usePrimaryImageKey];
   const hasCustomImage = Boolean(draft[field.previewKey]);
-  const resolvedPreview = getReminderImagePreviewUrl(draft, field.index);
+  const usePrimaryId = `${field.imageHtmlFor}UsePrimary`;
 
   return (
     <div
@@ -176,72 +190,104 @@ function ReminderTemplateField({
             error={textError}
             required
           >
-            <Textarea
+            <VariableTextarea
               id={field.textareaId}
               value={textValue}
-              onChange={(e) =>
+              onValueChange={(text) =>
                 onChange({
-                  [field.textKey]: e.target.value,
+                  [field.textKey]: text,
                   ...(isMvpV10Version
                     ? {}
                     : { messageTemplateId: CUSTOM_TEMPLATE_ID }),
                 })
               }
               rows={field.rows}
-              aria-invalid={Boolean(textError)}
+              invalid={Boolean(textError)}
             />
           </FormField>
 
-          <OptionalImageUpload
-            label={`${field.label} Image`}
-            htmlFor={field.imageHtmlFor}
-            hint="Optional. Upload a custom image for this reminder."
-            fileName={hasCustomImage ? draft[field.fileNameKey] : null}
-            previewUrl={hasCustomImage ? draft[field.previewKey] : null}
-            onChange={(fileName, previewUrl) =>
-              onChange({
-                [field.fileNameKey]: fileName,
-                [field.previewKey]: previewUrl,
-              })
-            }
-          />
-
-          {!hasCustomImage ? (
-            <label className="flex items-start gap-3 text-sm">
-              <Checkbox
-                id={`${field.imageHtmlFor}UsePrimary`}
-                checked={draft[field.usePrimaryImageKey]}
-                onCheckedChange={(checked) =>
-                  onChange({
-                    [field.usePrimaryImageKey]: checked,
-                  })
-                }
-                className="mt-0.5"
-                disabled={!draft.campaignImagePreviewUrl}
-              />
-              <span>
-                <Label
-                  htmlFor={`${field.imageHtmlFor}UsePrimary`}
-                  className="cursor-pointer font-medium text-foreground"
-                >
-                  Use primary campaign image
-                </Label>
-                <span className="mt-1 block text-muted-foreground">
-                  {draft.campaignImagePreviewUrl
-                    ? "Reuses the image from the Messaging step when no reminder image is uploaded."
-                    : "Upload a campaign image on the Messaging step to enable this option."}
-                </span>
-              </span>
-            </label>
-          ) : null}
-
-          {resolvedPreview && !hasCustomImage && draft[field.usePrimaryImageKey] ? (
-            <img
-              src={resolvedPreview}
-              alt={`${field.label} preview using primary image`}
-              className="max-h-32 rounded-md border border-border object-contain"
+          {isUsingPrimaryImage ? (
+            <FormField
+              label={`${field.label} Image`}
+              hint={
+                hasCustomImage
+                  ? "Your custom reminder image is kept. Uncheck the box below to use it again."
+                  : undefined
+              }
+            >
+              <ImagePreviewCard
+                src={draft.campaignImagePreviewUrl ?? ""}
+                alt={`${field.label} uses the primary campaign image`}
+              >
+                <p className="min-w-0 text-sm">
+                  <span className="block font-medium text-foreground">
+                    Using primary campaign image
+                  </span>
+                  <span className="block truncate text-muted-foreground">
+                    {draft.campaignImageFileName ?? "Campaign image"}
+                  </span>
+                </p>
+              </ImagePreviewCard>
+            </FormField>
+          ) : (
+            <OptionalImageUpload
+              label={`${field.label} Image`}
+              htmlFor={field.imageHtmlFor}
+              hint="Optional. Upload a custom image for this reminder."
+              fileName={draft[field.fileNameKey]}
+              previewUrl={draft[field.previewKey]}
+              onChange={(fileName, previewUrl) =>
+                onChange({
+                  [field.fileNameKey]: fileName,
+                  [field.previewKey]: previewUrl,
+                  // An uploaded reminder image is an explicit choice, so stop
+                  // defaulting to the primary image once one exists.
+                  ...(previewUrl ? { [field.usePrimaryImageKey]: false } : {}),
+                })
+              }
             />
-          ) : null}
+          )}
+
+          <div className="flex items-start gap-3 text-sm">
+            <Checkbox
+              id={usePrimaryId}
+              checked={isUsingPrimaryImage}
+              onCheckedChange={(checked) =>
+                onChange({ [field.usePrimaryImageKey]: checked })
+              }
+              className="mt-0.5"
+              disabled={!hasPrimaryImage}
+            />
+            <span>
+              <Label
+                htmlFor={usePrimaryId}
+                className={cn(
+                  "font-medium",
+                  hasPrimaryImage
+                    ? "cursor-pointer text-foreground"
+                    : "cursor-not-allowed text-muted-foreground",
+                )}
+              >
+                Use primary campaign image
+              </Label>
+              {!hasPrimaryImage ? (
+                <span className="mt-1 block text-muted-foreground">
+                  {onUploadCampaignImage ? (
+                    <button
+                      type="button"
+                      onClick={onUploadCampaignImage}
+                      className="font-medium text-primary underline underline-offset-4 hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    >
+                      Upload a campaign image
+                    </button>
+                  ) : (
+                    "Upload a campaign image"
+                  )}{" "}
+                  on the Messaging step to enable this option.
+                </span>
+              ) : null}
+            </span>
+          </div>
         </>
       ) : null}
     </div>

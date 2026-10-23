@@ -54,7 +54,9 @@ export const MILEAGE_SERVICE_TRIGGER_OPTIONS: ServiceTriggerPresetOption[] = [
   { value: "2000_miles", label: "2,000 Miles" },
   { value: "5000_miles", label: "5,000 Miles" },
   { value: "10000_miles", label: "10,000 Miles" },
+  { value: "30000_miles", label: "30,000 Miles" },
   { value: "60000_miles", label: "60,000 Miles" },
+  { value: "90000_miles", label: "90,000 Miles" },
 ];
 
 export const OEM_SERVICE_SCHEDULES: OemServiceSchedule[] = [

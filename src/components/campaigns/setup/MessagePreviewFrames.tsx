@@ -324,7 +324,7 @@ function PreviewImage({
           isActive && "ring-2 ring-brand-primary",
         )}
       >
-        <img src={src} alt={alt} className="max-h-36 w-full object-cover" />
+        <img src={src} alt={alt} className="block h-auto w-full" />
       </div>
     </div>
   );

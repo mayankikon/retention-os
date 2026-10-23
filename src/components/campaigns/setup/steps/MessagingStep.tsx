@@ -1,24 +1,20 @@
 "use client";
 
 import {
-  Button,
   Checkbox,
   Input,
-  Textarea,
 } from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
 
-import { useMemo, useRef, useState } from "react";
-import { Braces } from "lucide-react";
-import { AddMessageVariableDialog } from "@/components/campaigns/setup/AddMessageVariableDialog";
+import { useMemo } from "react";
 import { FormField } from "@/components/campaigns/setup/FormField";
 import { OptionalImageUpload } from "@/components/campaigns/setup/OptionalImageUpload";
+import { VariableTextarea } from "@/components/campaigns/setup/VariableTextarea";
 import {
   buildMessageTemplatePatch,
   type CampaignMessageTemplate,
 } from "@/data/campaign-message-templates";
 import { useProductVersion } from "@/contexts/product-version-context";
 import { useTemplates } from "@/hooks/use-templates";
-import { insertTextAtCursor } from "@/lib/insert-text-at-cursor";
 import { toggleDeliveryChannel } from "@/lib/delivery-channels";
 import {
   getAvailableDeliveryChannelOptions,
@@ -51,8 +47,6 @@ const CUSTOM_PICKER_ITEM: CampaignMessageTemplate = {
 export function MessagingStep({ draft, errors, onChange }: MessagingStepProps) {
   const { versionId } = useProductVersion();
   const templates = useTemplates();
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [isVariableDialogOpen, setIsVariableDialogOpen] = useState(false);
   const deliveryChannelOptions = getAvailableDeliveryChannelOptions(versionId);
   const isMvpV10Version = versionId === "mvp_v1_0";
   const messageTemplates = useMemo(() => {
@@ -61,27 +55,6 @@ export function MessagingStep({ draft, errors, onChange }: MessagingStepProps) {
     return [...published, CUSTOM_PICKER_ITEM];
     // templates length/ids ensure picker refreshes after localStorage updates
   }, [versionId, isMvpV10Version, templates]);
-
-  const handleInsertVariable = (token: string) => {
-    const textarea = textareaRef.current;
-    const selectionStart = textarea?.selectionStart ?? draft.primaryPromoText.length;
-    const selectionEnd = textarea?.selectionEnd ?? selectionStart;
-
-    const { value, cursorPosition } = insertTextAtCursor(
-      draft.primaryPromoText,
-      selectionStart,
-      selectionEnd,
-      token,
-    );
-
-    onChange({ primaryPromoText: value });
-
-    requestAnimationFrame(() => {
-      if (!textarea) return;
-      textarea.focus();
-      textarea.setSelectionRange(cursorPosition, cursorPosition);
-    });
-  };
 
   const handleSelectTemplate = (templateId: CampaignMessageTemplateId) => {
     onChange(buildMessageTemplatePatch(templateId));
@@ -188,39 +161,21 @@ export function MessagingStep({ draft, errors, onChange }: MessagingStepProps) {
         error={errors.primaryPromoText}
         required
       >
-        <div className="space-y-2">
-          <Textarea
-            ref={textareaRef}
-            id="primaryPromoText"
-            value={draft.primaryPromoText}
-            onChange={(e) =>
-              onChange({
-                primaryPromoText: e.target.value,
-                ...(isMvpV10Version
-                  ? {}
-                  : { messageTemplateId: CUSTOM_TEMPLATE_ID }),
-              })
-            }
-            rows={5}
-            aria-invalid={Boolean(errors.primaryPromoText)}
-          />
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            onClick={() => setIsVariableDialogOpen(true)}
-          >
-            <Braces className="mr-2 h-4 w-4" />
-            Add variables
-          </Button>
-        </div>
+        <VariableTextarea
+          id="primaryPromoText"
+          value={draft.primaryPromoText}
+          onValueChange={(primaryPromoText) =>
+            onChange({
+              primaryPromoText,
+              ...(isMvpV10Version
+                ? {}
+                : { messageTemplateId: CUSTOM_TEMPLATE_ID }),
+            })
+          }
+          rows={5}
+          invalid={Boolean(errors.primaryPromoText)}
+        />
       </FormField>
-
-      <AddMessageVariableDialog
-        open={isVariableDialogOpen}
-        onOpenChange={setIsVariableDialogOpen}
-        onSelectVariable={handleInsertVariable}
-      />
 
       <FormField
         label="Dealer URL"

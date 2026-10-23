@@ -9,16 +9,14 @@ import {
   buttonVariants,
 } from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
 
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Braces } from "lucide-react";
-import { AddMessageVariableDialog } from "@/components/campaigns/setup/AddMessageVariableDialog";
 import { FormField } from "@/components/campaigns/setup/FormField";
 import { OptionalImageUpload } from "@/components/campaigns/setup/OptionalImageUpload";
+import { VariableTextarea } from "@/components/campaigns/setup/VariableTextarea";
 import { TemplateWizardStepper } from "@/components/templates/TemplateWizardStepper";
 import { useCurrentUser } from "@/contexts/session-context";
-import { insertTextAtCursor } from "@/lib/insert-text-at-cursor";
 import {
   createEmptyTemplateDraft,
   createTemplate,
@@ -224,71 +222,6 @@ function DetailsStep({
 }
 
 /** Message textarea with an "Add variables" picker that inserts at the cursor. */
-function VariableTextarea({
-  id,
-  value,
-  onValueChange,
-  rows,
-  invalid,
-}: {
-  id: string;
-  value: string;
-  onValueChange: (value: string) => void;
-  rows: number;
-  invalid: boolean;
-}) {
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [isVariableDialogOpen, setIsVariableDialogOpen] = useState(false);
-
-  const handleInsertVariable = (token: string) => {
-    const textarea = textareaRef.current;
-    const selectionStart = textarea?.selectionStart ?? value.length;
-    const selectionEnd = textarea?.selectionEnd ?? selectionStart;
-
-    const { value: nextValue, cursorPosition } = insertTextAtCursor(
-      value,
-      selectionStart,
-      selectionEnd,
-      token,
-    );
-
-    onValueChange(nextValue);
-
-    requestAnimationFrame(() => {
-      if (!textarea) return;
-      textarea.focus();
-      textarea.setSelectionRange(cursorPosition, cursorPosition);
-    });
-  };
-
-  return (
-    <div className="space-y-2">
-      <Textarea
-        ref={textareaRef}
-        id={id}
-        value={value}
-        onChange={(e) => onValueChange(e.target.value)}
-        rows={rows}
-        aria-invalid={invalid}
-      />
-      <Button
-        type="button"
-        variant="secondary"
-        size="sm"
-        onClick={() => setIsVariableDialogOpen(true)}
-      >
-        <Braces className="mr-2 h-4 w-4" />
-        Add variables
-      </Button>
-      <AddMessageVariableDialog
-        open={isVariableDialogOpen}
-        onOpenChange={setIsVariableDialogOpen}
-        onSelectVariable={handleInsertVariable}
-      />
-    </div>
-  );
-}
-
 function ContentStep({
   draft,
   errors,

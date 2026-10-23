@@ -35,15 +35,14 @@ export function hasAnyReminderEnabled(draft: CampaignSetupDraft): boolean {
   );
 }
 
+/**
+ * The image a reminder sends. "Use primary campaign image" wins while a primary
+ * image exists; a custom reminder image is kept and used again once unchecked.
+ */
 export function getReminderImagePreviewUrl(
   draft: CampaignSetupDraft,
   reminderIndex: ReminderIndex,
 ): string | null {
-  const customPreview = draft[REMINDER_IMAGE_PREVIEW_KEYS[reminderIndex]];
-  if (customPreview) {
-    return customPreview;
-  }
-
   if (
     draft[REMINDER_USE_PRIMARY_IMAGE_KEYS[reminderIndex]] &&
     draft.campaignImagePreviewUrl
@@ -51,7 +50,7 @@ export function getReminderImagePreviewUrl(
     return draft.campaignImagePreviewUrl;
   }
 
-  return null;
+  return draft[REMINDER_IMAGE_PREVIEW_KEYS[reminderIndex]] ?? null;
 }
 
 export function getEnabledReminderIndices(

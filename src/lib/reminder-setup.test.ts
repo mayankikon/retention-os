@@ -14,10 +14,32 @@ describe("reminder setup", () => {
     expect(getReminderImagePreviewUrl(draft, 1)).toBe("blob:primary");
   });
 
-  it("prefers a custom reminder image over the primary image", () => {
+  it("uses the primary image over a kept custom image while the box is checked", () => {
     const draft = {
       ...createDefaultSetupDraft(),
       campaignImagePreviewUrl: "blob:primary",
+      reminder1ImagePreviewUrl: "blob:custom",
+      reminder1UsePrimaryImage: true,
+    };
+
+    expect(getReminderImagePreviewUrl(draft, 1)).toBe("blob:primary");
+  });
+
+  it("uses the kept custom image once the box is unchecked", () => {
+    const draft = {
+      ...createDefaultSetupDraft(),
+      campaignImagePreviewUrl: "blob:primary",
+      reminder1ImagePreviewUrl: "blob:custom",
+      reminder1UsePrimaryImage: false,
+    };
+
+    expect(getReminderImagePreviewUrl(draft, 1)).toBe("blob:custom");
+  });
+
+  it("uses the custom image when no primary image is uploaded", () => {
+    const draft = {
+      ...createDefaultSetupDraft(),
+      campaignImagePreviewUrl: null,
       reminder1ImagePreviewUrl: "blob:custom",
       reminder1UsePrimaryImage: true,
     };

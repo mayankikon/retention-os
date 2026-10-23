@@ -159,6 +159,24 @@ export function CampaignSetupWizard({
     goToStep(nextStep);
   };
 
+  const handleUploadCampaignImage = useCallback(() => {
+    goToStep("messaging");
+    // The step change is async (URL state), so wait for Campaign Image to render.
+    let attempts = 0;
+    const revealCampaignImage = () => {
+      const field = [...document.querySelectorAll('label[for="campaignImage"]')]
+        .find((label) => label.getClientRects().length > 0)
+        ?.parentElement;
+      if (!field) {
+        if (++attempts < 20) window.setTimeout(revealCampaignImage, 50);
+        return;
+      }
+      field.scrollIntoView({ behavior: "smooth", block: "center" });
+      field.querySelector<HTMLButtonElement>("button")?.focus({ preventScroll: true });
+    };
+    window.setTimeout(revealCampaignImage, 0);
+  }, [goToStep]);
+
   const handleBack = () => {
     if (isFirstStep) return;
     goToStep(SETUP_STEPS[currentIndex - 1]);
@@ -341,7 +359,12 @@ export function CampaignSetupWizard({
         );
       case "reminders":
         return (
-          <RemindersStep draft={draft} errors={errors} onChange={updateDraft} />
+          <RemindersStep
+            draft={draft}
+            errors={errors}
+            onChange={updateDraft}
+            onUploadCampaignImage={handleUploadCampaignImage}
+          />
         );
       case "configuration":
         return (
@@ -369,6 +392,7 @@ export function CampaignSetupWizard({
     draft,
     errors,
     updateDraft,
+    handleUploadCampaignImage,
     isTestSent,
     handleTestSend,
   ]);

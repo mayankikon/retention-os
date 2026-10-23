@@ -74,44 +74,34 @@ export function OptionalImageUpload({
       />
 
       {hasImage ? (
-        <div className="overflow-hidden rounded-lg border border-border bg-muted/30">
-          <div className="flex items-center justify-center bg-muted/50 p-4">
-            <img
-              src={previewUrl ?? undefined}
-              alt={`${label} preview`}
-              className="max-h-64 w-full object-contain"
-            />
-          </div>
+        <ImagePreviewCard src={previewUrl ?? ""} alt={`${label} preview`}>
+          <p className="min-w-0 text-sm text-muted-foreground">
+            <span className="sr-only">Selected file:</span>
+            <span className="truncate font-medium text-foreground">
+              {fileName ?? "Uploaded image"}
+            </span>
+          </p>
 
-          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-4 py-3">
-            <p className="min-w-0 text-sm text-muted-foreground">
-              <span className="sr-only">Selected file:</span>
-              <span className="truncate font-medium text-foreground">
-                {fileName ?? "Uploaded image"}
-              </span>
-            </p>
-
-            <div className="flex shrink-0 gap-2">
-              <Button
-                type="button"
-                variant="secondary"
-                size="sm"
-                onClick={handleBrowseClick}
-              >
-                <Upload className="h-4 w-4" />
-                Change image
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleRemove}
-              >
-                Remove
-              </Button>
-            </div>
+          <div className="flex shrink-0 gap-2">
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={handleBrowseClick}
+            >
+              <Upload className="h-4 w-4" />
+              Change image
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleRemove}
+            >
+              Remove
+            </Button>
           </div>
-        </div>
+        </ImagePreviewCard>
       ) : (
         <button
           type="button"
@@ -131,5 +121,31 @@ export function OptionalImageUpload({
         </button>
       )}
     </FormField>
+  );
+}
+
+/**
+ * Image preview used for every campaign and reminder image, so each one keeps
+ * its own aspect ratio at the same scale (fit, never cropped).
+ */
+export function ImagePreviewCard({
+  src,
+  alt,
+  children,
+}: {
+  src: string;
+  alt: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="overflow-hidden rounded-lg border border-border bg-muted/30">
+      <div className="flex items-center justify-center bg-muted/50 p-4">
+        <img src={src} alt={alt} className="max-h-64 w-full object-contain" />
+      </div>
+
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-4 py-3">
+        {children}
+      </div>
+    </div>
   );
 }
