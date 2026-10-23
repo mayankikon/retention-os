@@ -12,6 +12,11 @@ import {
 
 import { FormField } from "@/components/campaigns/setup/FormField";
 import {
+  OptionCardText,
+  optionCardClassName,
+  optionCardNestedClassName,
+} from "@/components/campaigns/setup/OptionCard";
+import {
   getTimeZoneLabel,
   TIME_ZONE_OPTIONS,
 } from "@/data/campaign-setup.defaults";
@@ -26,7 +31,6 @@ import type {
   CampaignSetupDraft,
   SetupTimeZone,
 } from "@/types/campaign-setup";
-import { cn } from "@/lib/utils";
 
 interface GeneralStepProps {
   draft: CampaignSetupDraft;
@@ -122,7 +126,11 @@ export function GeneralStep({ draft, errors, onChange }: GeneralStepProps) {
           }}
           items={groupSelectOptions}
         >
-          <SelectTrigger id="groupId" aria-invalid={Boolean(errors.groupId)}>
+          <SelectTrigger
+            id="groupId"
+            className="w-full"
+            aria-invalid={Boolean(errors.groupId)}
+          >
             <SelectValue placeholder="Select group" />
           </SelectTrigger>
           <SelectContent>
@@ -138,7 +146,6 @@ export function GeneralStep({ draft, errors, onChange }: GeneralStepProps) {
       <FormField
         label="Dealerships"
         error={errors.dealership}
-        hint={draft.groupId ? undefined : "Choose a group to load dealerships."}
         required
       >
         {!draft.groupId ? (
@@ -152,8 +159,8 @@ export function GeneralStep({ draft, errors, onChange }: GeneralStepProps) {
           </p>
         ) : (
           <div className="space-y-3">
-            {/* px-[13px] lines this checkbox up with the dealership cards' (p-3 + border). */}
-            <label className="flex w-fit cursor-pointer items-center gap-3 px-[13px]">
+            {/* px-[17px] lines this checkbox up with the dealership cards' (p-4 + border). */}
+            <label className="flex w-fit cursor-pointer items-center gap-3 px-[17px]">
               <Checkbox
                 checked={isAllSelected}
                 indeterminate={selectedInGroupCount > 0 && !isAllSelected}
@@ -175,10 +182,9 @@ export function GeneralStep({ draft, errors, onChange }: GeneralStepProps) {
                 return (
                   <li
                     key={dealer}
-                    className={cn(
-                      "rounded-[var(--radius-sm)] border border-border bg-card p-3",
-                      isSelected && "border-primary bg-primary/5",
-                    )}
+                    className={optionCardClassName(isSelected, {
+                      interactive: true,
+                    })}
                   >
                     <label className="flex cursor-pointer items-start gap-3">
                       <Checkbox
@@ -189,23 +195,18 @@ export function GeneralStep({ draft, errors, onChange }: GeneralStepProps) {
                         className="mt-0.5"
                         aria-label={dealer}
                       />
-                      <span className="min-w-0 flex-1">
-                        <span className="block font-medium">{dealer}</span>
-                        {knownTimeZone ? (
-                          <span className="mt-1 block text-xs text-muted-foreground">
-                            Timezone: {getTimeZoneLabel(knownTimeZone)}
-                          </span>
-                        ) : (
-                          <span className="mt-1 block text-xs text-muted-foreground">
-                            Timezone unknown — set a fallback for this
-                            dealership.
-                          </span>
-                        )}
-                      </span>
+                      <OptionCardText
+                        title={dealer}
+                        description={
+                          knownTimeZone
+                            ? `Timezone: ${getTimeZoneLabel(knownTimeZone)}`
+                            : "Timezone unknown — set a fallback for this dealership."
+                        }
+                      />
                     </label>
 
                     {isSelected && !knownTimeZone ? (
-                      <div className="mt-3 pl-7">
+                      <div className={optionCardNestedClassName(true)}>
                         <FormField
                           label="Timezone fallback"
                           htmlFor={`tz-fallback-${dealer}`}
@@ -229,6 +230,7 @@ export function GeneralStep({ draft, errors, onChange }: GeneralStepProps) {
                           >
                             <SelectTrigger
                               id={`tz-fallback-${dealer}`}
+                              className="w-full"
                               aria-invalid={Boolean(
                                 errors[`timezone.${dealer}`],
                               )}

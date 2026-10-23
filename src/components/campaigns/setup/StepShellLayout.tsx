@@ -2,6 +2,7 @@
 
 import { TitleBar } from "@/components/layout/TitleBar";
 import { StepperHeader } from "@/components/campaigns/setup/StepperHeader";
+import { AudienceReachCard } from "@/components/campaigns/setup/AudienceReachCard";
 import { MessagePreviewPanel } from "@/components/campaigns/setup/MessagePreviewPanel";
 import { useCampaignSetupLeaveGuard } from "@/contexts/campaign-setup-leave-guard";
 import type { CampaignSetupDraft, SetupStepId } from "@/types/campaign-setup";
@@ -59,7 +60,10 @@ export function StepShellLayout({
           <div className="surface-stroke-sharp flex h-full min-w-0 flex-col overflow-hidden rounded-[var(--radius-sm)] bg-card">
             {children}
           </div>
-          <div className="min-w-0">
+          <div className="min-w-0 space-y-6 lg:sticky lg:top-8 lg:self-start">
+            {currentStepId === "configuration" ? (
+              <AudienceReachCard rules={draft.audienceFilters} />
+            ) : null}
             <MessagePreviewPanel draft={draft} currentStepId={currentStepId} />
           </div>
         </div>

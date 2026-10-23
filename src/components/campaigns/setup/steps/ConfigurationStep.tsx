@@ -11,8 +11,13 @@ import {
 } from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
 
 import { AudienceFilters } from "@/components/campaigns/setup/AudienceFilters";
-import { AudienceReachCard } from "@/components/campaigns/setup/AudienceReachCard";
 import { FormField } from "@/components/campaigns/setup/FormField";
+import {
+  OptionCardText,
+  SECTION_CARD_CLASS,
+  optionCardClassName,
+  optionCardNestedClassName,
+} from "@/components/campaigns/setup/OptionCard";
 import { SendTimeField } from "@/components/campaigns/setup/SendTimeField";
 import { useProductVersion } from "@/contexts/product-version-context";
 import { getTimeZoneLabel } from "@/data/campaign-setup.defaults";
@@ -35,7 +40,6 @@ import {
   setServiceTriggerMode,
 } from "@/lib/service-triggers";
 import type {
-  AudienceFilterRule,
   CampaignSetupDraft,
   ScheduleDay,
   ServiceTriggerMode,
@@ -117,10 +121,7 @@ export function ConfigurationStep({
             return (
               <div
                 key={option.value}
-                className={cn(
-                  "rounded-[var(--radius-sm)] border border-border bg-card p-3",
-                  isSelected && "border-primary bg-primary/5",
-                )}
+                className={optionCardClassName(isSelected)}
               >
                 {isOemScheduleAvailable ? (
                   <label className="flex cursor-pointer items-start gap-3">
@@ -134,86 +135,96 @@ export function ConfigurationStep({
                       className="mt-1 h-4 w-4 shrink-0 accent-brand-primary"
                       aria-label={option.label}
                     />
-                    <span>
-                      <span className="font-medium">{option.label}</span>
-                      <span className="block text-xs text-muted-foreground">
-                        {option.description}
-                      </span>
-                    </span>
+                    <OptionCardText
+                      title={option.label}
+                      description={option.description}
+                    />
                   </label>
                 ) : (
-                  <span>
-                    <span className="block font-medium">{option.label}</span>
-                    <span className="block text-xs text-muted-foreground">
-                      {option.description}
-                    </span>
-                  </span>
+                  <OptionCardText
+                    title={option.label}
+                    description={option.description}
+                  />
                 )}
 
                 {isSelected && option.value === "interval" ? (
-                  <div className="mt-3 space-y-4 pl-7">
-                    <FormField
-                      label="Time Interval"
-                      htmlFor="timeServiceTriggerPreset"
-                      error={errors.timeServiceTriggerPreset}
-                      required
-                    >
-                      <Select
-                        value={draft.timeServiceTriggerPreset || null}
-                        onValueChange={(value) => {
-                          if (value == null) return;
-                          onChange({ timeServiceTriggerPreset: value });
-                        }}
-                        items={TIME_SERVICE_TRIGGER_OPTIONS}
+                  <div
+                    className={optionCardNestedClassName(
+                      isOemScheduleAvailable,
+                    )}
+                  >
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <FormField
+                        label="Time Interval"
+                        htmlFor="timeServiceTriggerPreset"
+                        error={errors.timeServiceTriggerPreset}
+                        required
                       >
-                        <SelectTrigger
-                          id="timeServiceTriggerPreset"
-                          aria-label="Time Interval"
+                        <Select
+                          value={draft.timeServiceTriggerPreset || null}
+                          onValueChange={(value) => {
+                            if (value == null) return;
+                            onChange({ timeServiceTriggerPreset: value });
+                          }}
+                          items={TIME_SERVICE_TRIGGER_OPTIONS}
                         >
-                          <SelectValue placeholder="Select time interval" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {TIME_SERVICE_TRIGGER_OPTIONS.map((preset) => (
-                            <SelectItem key={preset.value} value={preset.value}>
-                              {preset.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </FormField>
+                          <SelectTrigger
+                            id="timeServiceTriggerPreset"
+                            className="w-full"
+                            aria-label="Time Interval"
+                          >
+                            <SelectValue placeholder="Select time interval" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {TIME_SERVICE_TRIGGER_OPTIONS.map((preset) => (
+                              <SelectItem
+                                key={preset.value}
+                                value={preset.value}
+                              >
+                                {preset.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FormField>
 
-                    <FormField
-                      label="Mileage Interval"
-                      htmlFor="mileageServiceTriggerPreset"
-                      error={errors.mileageServiceTriggerPreset}
-                      required
-                    >
-                      <Select
-                        value={draft.mileageServiceTriggerPreset || null}
-                        onValueChange={(value) => {
-                          if (value == null) return;
-                          onChange({ mileageServiceTriggerPreset: value });
-                        }}
-                        items={MILEAGE_SERVICE_TRIGGER_OPTIONS}
+                      <FormField
+                        label="Mileage Interval"
+                        htmlFor="mileageServiceTriggerPreset"
+                        error={errors.mileageServiceTriggerPreset}
+                        required
                       >
-                        <SelectTrigger
-                          id="mileageServiceTriggerPreset"
-                          aria-label="Mileage Interval"
+                        <Select
+                          value={draft.mileageServiceTriggerPreset || null}
+                          onValueChange={(value) => {
+                            if (value == null) return;
+                            onChange({ mileageServiceTriggerPreset: value });
+                          }}
+                          items={MILEAGE_SERVICE_TRIGGER_OPTIONS}
                         >
-                          <SelectValue placeholder="Select mileage interval" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {MILEAGE_SERVICE_TRIGGER_OPTIONS.map((preset) => (
-                            <SelectItem key={preset.value} value={preset.value}>
-                              {preset.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </FormField>
+                          <SelectTrigger
+                            id="mileageServiceTriggerPreset"
+                            className="w-full"
+                            aria-label="Mileage Interval"
+                          >
+                            <SelectValue placeholder="Select mileage interval" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {MILEAGE_SERVICE_TRIGGER_OPTIONS.map((preset) => (
+                              <SelectItem
+                                key={preset.value}
+                                value={preset.value}
+                              >
+                                {preset.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FormField>
+                    </div>
 
                     <div className="border-t border-border pt-4">
-                      <AudienceQueryHeader rules={draft.audienceFilters} />
+                      <AudienceQueryHeader />
                       <AudienceFilters
                         draft={draft}
                         errors={errors}
@@ -225,7 +236,11 @@ export function ConfigurationStep({
                 ) : null}
 
                 {isSelected && option.value === "oem" ? (
-                  <div className="mt-3 space-y-4 pl-7">
+                  <div
+                    className={optionCardNestedClassName(
+                      isOemScheduleAvailable,
+                    )}
+                  >
                     <div className="grid gap-4 sm:grid-cols-3">
                       <FormField
                         label="Make"
@@ -332,7 +347,12 @@ export function ConfigurationStep({
                     </div>
 
                     {oemSchedule ? (
-                      <div className="rounded-md border border-border bg-background p-3 text-sm">
+                      <div
+                        className={cn(
+                          SECTION_CARD_CLASS,
+                          "bg-background text-sm",
+                        )}
+                      >
                         <p className="font-medium text-foreground">
                           {oemSchedule.make} {oemSchedule.model} OEM Schedule
                         </p>
@@ -350,7 +370,7 @@ export function ConfigurationStep({
                     ) : null}
 
                     <div className="border-t border-border pt-4">
-                      <AudienceQueryHeader rules={draft.audienceFilters} />
+                      <AudienceQueryHeader />
                       {draft.oemMake && draft.oemModel ? (
                         <p className="mb-3 text-xs text-muted-foreground">
                           Vehicle Scope: {draft.oemMake} {draft.oemModel}
@@ -379,7 +399,7 @@ export function ConfigurationStep({
         label="Campaign Duration"
         required
       >
-        <div className="space-y-4 rounded-[var(--radius-sm)] border border-border bg-card p-3">
+        <div className={SECTION_CARD_CLASS}>
           <div className="grid gap-4 sm:grid-cols-2">
             <FormField
               label="Start Date"
@@ -425,95 +445,102 @@ export function ConfigurationStep({
         error={errors.scheduleDays ?? errors.sendTimeLocal}
         required
       >
-        <div className="mb-3 flex flex-wrap gap-2">
-          {SCHEDULE_DAYS.map((day) => (
-            <label
-              key={day}
-              className="flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 text-sm"
-            >
-              <Checkbox
-                checked={draft.scheduleDays.includes(day)}
-                onCheckedChange={(checked) => toggleDay(day, checked)}
-              />
-              {CONFIGURATION_DAY_LABELS[day]}
-            </label>
-          ))}
-        </div>
-
-        <p className="mb-3 text-sm text-muted-foreground">
-          Time zone:{" "}
-          <span className="font-medium text-foreground">
-            {getTimeZoneLabel(draft.timeZone)}
-          </span>
-          <span className="text-muted-foreground">
-            {" "}
-            (primary dealership from the General step)
-          </span>
-        </p>
-
-        <FormField
-          label="Send Time"
-          htmlFor="sendTimeLocal"
-          hint={
-            draft.sendTimeLocal
-              ? `Sends at ${formatSendTimeLabel(draft.sendTimeLocal)} local time in each dealership's zone.`
-              : "Pick a local clock time to pin an exact send hour for each dealership."
-          }
-          error={errors.sendTimeLocal}
-          required
-        >
-          <SendTimeField
-            id="sendTimeLocal"
-            value={draft.sendTimeLocal}
-            onChange={(sendTimeLocal) => onChange({ sendTimeLocal })}
-            hasError={Boolean(errors.sendTimeLocal)}
-          />
-        </FormField>
-
-        <div className="mt-4 overflow-x-auto rounded-md border border-border">
-          <table className="w-full text-xs">
-            <caption className="px-3 py-2 text-left text-xs text-muted-foreground">
-              {scheduleTimeZones.isPinnedToSendTime
-                ? `Each dealership sends at ${formatSendTimeLabel(draft.sendTimeLocal)} local time. Manager column shows when that lands on your clock.`
-                : "Choose a send time to pin the local send hour for every dealership."}
-            </caption>
-            <thead>
-              <tr className="border-b bg-muted/50 text-left">
-                <th className="px-3 py-2 font-medium">Time zone</th>
-                <th className="px-3 py-2 font-medium">SMS sent (local)</th>
-                <th className="px-3 py-2 font-medium">
-                  Manager time ({scheduleTimeZones.managerTimeZone})
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {scheduleTimeZones.rows.map((row) => (
-                <tr
-                  key={row.timeZone}
+        <div className={cn(SECTION_CARD_CLASS, "space-y-4")}>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+            {SCHEDULE_DAYS.map((day) => {
+              const isSelected = draft.scheduleDays.includes(day);
+              return (
+                <label
+                  key={day}
                   className={cn(
-                    "border-b last:border-0",
-                    row.isManagerZone && "bg-muted/40",
+                    "flex cursor-pointer items-center gap-1.5 rounded-[var(--radius-sm)] border border-border bg-card px-2.5 py-1.5 text-sm transition-colors",
+                    isSelected
+                      ? "border-primary bg-primary/5"
+                      : "hover:bg-muted/40",
                   )}
                 >
-                  <td className="px-3 py-2">{row.timeZone}</td>
-                  <td className="px-3 py-2">{row.smsWindow}</td>
-                  <td className="px-3 py-2">{row.managerTime}</td>
+                  <Checkbox
+                    checked={isSelected}
+                    onCheckedChange={(checked) => toggleDay(day, checked)}
+                  />
+                  {CONFIGURATION_DAY_LABELS[day]}
+                </label>
+              );
+            })}
+          </div>
+
+          <p className="text-sm text-muted-foreground">
+            Time zone:{" "}
+            <span className="font-medium text-foreground">
+              {getTimeZoneLabel(draft.timeZone)}
+            </span>
+            <span className="text-muted-foreground">
+              {" "}
+              (primary dealership from the General step)
+            </span>
+          </p>
+
+          <FormField
+            label="Send Time"
+            htmlFor="sendTimeLocal"
+            hint={
+              draft.sendTimeLocal
+                ? `Sends at ${formatSendTimeLabel(draft.sendTimeLocal)} local time in each dealership's zone.`
+                : "Pick a local clock time to pin an exact send hour for each dealership."
+            }
+            error={errors.sendTimeLocal}
+            required
+          >
+            <SendTimeField
+              id="sendTimeLocal"
+              value={draft.sendTimeLocal}
+              onChange={(sendTimeLocal) => onChange({ sendTimeLocal })}
+              hasError={Boolean(errors.sendTimeLocal)}
+            />
+          </FormField>
+
+          <div className="overflow-x-auto rounded-[var(--radius-sm)] border border-border">
+            <table className="w-full text-xs">
+              <caption className="px-3 py-2 text-left text-xs text-muted-foreground">
+                {scheduleTimeZones.isPinnedToSendTime
+                  ? `Each dealership sends at ${formatSendTimeLabel(draft.sendTimeLocal)} local time. Manager column shows when that lands on your clock.`
+                  : "Choose a send time to pin the local send hour for every dealership."}
+              </caption>
+              <thead>
+                <tr className="border-b bg-muted/50 text-left">
+                  <th className="px-3 py-2 font-medium">Time zone</th>
+                  <th className="px-3 py-2 font-medium">SMS sent (local)</th>
+                  <th className="px-3 py-2 font-medium">
+                    Manager time ({scheduleTimeZones.managerTimeZone})
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {scheduleTimeZones.rows.map((row) => (
+                  <tr
+                    key={row.timeZone}
+                    className={cn(
+                      "border-b last:border-0",
+                      row.isManagerZone && "bg-muted/40",
+                    )}
+                  >
+                    <td className="px-3 py-2">{row.timeZone}</td>
+                    <td className="px-3 py-2">{row.smsWindow}</td>
+                    <td className="px-3 py-2">{row.managerTime}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </FormField>
     </div>
   );
 }
 
-/** "Audience Query" label with the estimated reach callout on its right. */
-function AudienceQueryHeader({ rules }: { rules: AudienceFilterRule[] }) {
+/** "Audience Query" label; the estimated reach sits above the message preview. */
+function AudienceQueryHeader() {
   return (
-    <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
-      <p className="text-sm font-medium text-foreground">Audience Query</p>
-      <AudienceReachCard rules={rules} />
-    </div>
+    <p className="mb-3 text-sm font-medium text-foreground">Audience Query</p>
   );
 }

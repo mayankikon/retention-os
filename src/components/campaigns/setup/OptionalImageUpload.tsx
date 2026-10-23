@@ -107,7 +107,7 @@ export function OptionalImageUpload({
           type="button"
           onClick={handleBrowseClick}
           className={cn(
-            "flex w-full flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-border bg-muted/20 px-4 py-8 text-center transition-colors hover:border-brand-primary hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+            "flex w-full flex-col items-center justify-center gap-2 rounded-[var(--radius-sm)] border border-dashed border-border bg-muted/20 px-4 py-8 text-center transition-colors hover:border-brand-primary hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
             error && "border-red-500",
           )}
         >
@@ -138,7 +138,7 @@ export function ImagePreviewCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="overflow-hidden rounded-lg border border-border bg-muted/30">
+    <div className="overflow-hidden rounded-[var(--radius-sm)] border border-border bg-muted/30">
       <div className="flex items-center justify-center bg-muted/50 p-4">
         <img src={src} alt={alt} className="max-h-64 w-full object-contain" />
       </div>

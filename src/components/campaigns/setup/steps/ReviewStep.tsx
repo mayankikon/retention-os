@@ -6,14 +6,14 @@ import {
 } from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
 
 import { useState } from "react";
-import { AlertCircle, Send, Users } from "lucide-react";
+import { AlertCircle, CheckCircle2, Send, Users } from "lucide-react";
+import { AudienceReachCard } from "@/components/campaigns/setup/AudienceReachCard";
 import { FormField } from "@/components/campaigns/setup/FormField";
+import { SECTION_CARD_CLASS } from "@/components/campaigns/setup/OptionCard";
 import { SuppressionListUpload } from "@/components/campaigns/setup/SuppressionListUpload";
 import { useProductVersion } from "@/contexts/product-version-context";
-import {
-  estimateAudienceReach,
-  summarizeAudienceFilters,
-} from "@/lib/audience-filters";
+import { summarizeAudienceFilters } from "@/lib/audience-filters";
+import { cn } from "@/lib/utils";
 import type { CampaignSetupDraft } from "@/types/campaign-setup";
 
 interface ReviewStepProps {
@@ -44,48 +44,44 @@ export function ReviewStep({
   };
 
   const audienceSummary = summarizeAudienceFilters(draft.audienceFilters);
-  const customersTargeted = estimateAudienceReach(draft.audienceFilters);
 
   return (
     <div className="space-y-6">
-      <section className="surface-stroke-sharp rounded-[var(--radius-sm)] bg-card p-5">
-        <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-brand-primary/10 text-brand-primary">
-            <Users className="h-5 w-5" aria-hidden />
-          </div>
-          <div className="min-w-0 flex-1">
-            <h3 className="text-sm font-semibold text-foreground">
-              Audience Summary
-            </h3>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Estimated customers for this campaign after your trigger and
-              audience filters.
-            </p>
-
-            <div className="mt-4 max-w-xs rounded-md border border-border bg-muted/20 px-4 py-3">
-              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                Customers Targeted
-              </p>
-              <p className="mt-1 text-2xl font-semibold tabular-nums text-foreground">
-                ~{customersTargeted.toLocaleString("en-US")}
-              </p>
-            </div>
-
-            {audienceSummary.length > 0 ? (
-              <ul className="mt-4 space-y-1 text-sm text-muted-foreground">
-                {audienceSummary.map((line) => (
-                  <li key={line}>{line}</li>
-                ))}
-              </ul>
-            ) : null}
-          </div>
+      <section className={cn(SECTION_CARD_CLASS, "space-y-4")}>
+        <div>
+          <h3 className="text-sm font-medium text-foreground">
+            Audience Summary
+          </h3>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Estimated customers for this campaign after your trigger and
+            audience filters.
+          </p>
         </div>
+
+        <AudienceReachCard
+          rules={draft.audienceFilters}
+          label="Customers Targeted"
+          unit="customers"
+          showFilterSummary={false}
+          icon={Users}
+          className="w-fit"
+        />
+
+        {audienceSummary.length > 0 ? (
+          <ul className="space-y-1 text-sm text-muted-foreground">
+            {audienceSummary.map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ul>
+        ) : null}
       </section>
 
       {!isMvpV10Version ? (
-        <section className="space-y-4 rounded-md border border-border p-4">
+        <section className={cn(SECTION_CARD_CLASS, "space-y-4")}>
           <div>
-            <h3 className="text-sm font-semibold">Audience Suppression</h3>
+            <h3 className="text-sm font-medium text-foreground">
+              Audience Suppression
+            </h3>
             <p className="mt-1 text-sm text-muted-foreground">
               Exclude opted-out customers and numbers on your do-not-contact list
               before launch.
@@ -137,7 +133,8 @@ export function ReviewStep({
       </FormField>
 
       {(isTestSent || testStatus === "sent") && (
-        <p className="text-sm text-[var(--status-active-fg)]">
+        <p className="flex items-start gap-2 text-sm text-[var(--status-active-fg)]">
+          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
           Test message queued. Confirm variables and image on your device before
           activating.
         </p>
@@ -145,7 +142,7 @@ export function ReviewStep({
 
       {!isTestSent && testStatus !== "sent" ? (
         <p className="flex items-start gap-2 text-sm text-amber-800">
-          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
           Send a test before activating to meet SOP requirements.
         </p>
       ) : null}

@@ -63,7 +63,7 @@ export function MessagePreviewPanel({
 
   return (
     <aside
-      className="w-full min-w-0 lg:sticky lg:top-8"
+      className="w-full min-w-0"
       aria-label="Customer Message Preview"
     >
       <div className="mb-3">

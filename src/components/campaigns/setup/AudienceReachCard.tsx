@@ -1,6 +1,6 @@
 "use client";
 
-import { CarFront } from "lucide-react";
+import { CarFront, type LucideIcon } from "lucide-react";
 import {
   estimateAudienceReach,
   summarizeAudienceFilters,
@@ -9,14 +9,23 @@ import { cn } from "@/lib/utils";
 import type { AudienceFilterRule } from "@/types/campaign-setup";
 
 /**
- * Estimated reach callout for the Audience Query header. Uses theme tokens
- * only, so it reads correctly in both the Shift and Toolbox UI styles.
+ * Estimated reach callout for the Audience Query header (and the Review
+ * step's Customers Targeted). Uses theme tokens only, so it reads correctly
+ * in both the Shift and Toolbox UI styles.
  */
 export function AudienceReachCard({
   rules,
+  label = "Estimated Reach",
+  unit = "vehicles",
+  showFilterSummary = true,
+  icon: Icon = CarFront,
   className,
 }: {
   rules: AudienceFilterRule[];
+  label?: string;
+  unit?: string;
+  showFilterSummary?: boolean;
+  icon?: LucideIcon;
   className?: string;
 }) {
   const reach = estimateAudienceReach(rules);
@@ -28,30 +37,30 @@ export function AudienceReachCard({
       role="status"
       aria-live="polite"
       className={cn(
-        "flex items-center gap-3 rounded-lg border border-brand-primary/30 bg-brand-primary/5 py-2.5 pr-4 pl-3",
+        "flex items-center gap-3 rounded-[var(--radius-sm)] border border-border bg-card py-2.5 pr-4 pl-3",
         className,
       )}
     >
       <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-brand-primary/10 text-brand-primary">
-        <CarFront className="size-5" aria-hidden />
+        <Icon className="size-5" aria-hidden />
       </span>
       <div className="min-w-0">
         <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-          Estimated Reach
+          {label}
         </p>
         <p className="text-lg font-semibold leading-tight tabular-nums text-foreground">
           ~{reach.toLocaleString("en-US")}{" "}
           <span className="text-sm font-normal text-muted-foreground">
-            vehicles
+            {unit}
           </span>
         </p>
-        <p className="text-xs text-muted-foreground">
-          {appliedFilterCount === 0
-            ? "No filters applied"
-            : appliedFilterCount === 1
+        {showFilterSummary && appliedFilterCount > 0 ? (
+          <p className="text-xs text-muted-foreground">
+            {appliedFilterCount === 1
               ? "Matching 1 filter"
               : `Matching all ${appliedFilterCount} filters (AND)`}
-        </p>
+          </p>
+        ) : null}
       </div>
     </div>
   );

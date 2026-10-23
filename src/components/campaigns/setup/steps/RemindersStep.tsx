@@ -1,11 +1,18 @@
 "use client";
 
 import {
+  Button,
   Checkbox,
   Label,
 } from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
 
+import { useRef } from "react";
+import { Upload } from "lucide-react";
 import { FormField } from "@/components/campaigns/setup/FormField";
+import {
+  optionCardClassName,
+  optionCardNestedClassName,
+} from "@/components/campaigns/setup/OptionCard";
 import {
   ImagePreviewCard,
   OptionalImageUpload,
@@ -158,14 +165,38 @@ function ReminderTemplateField({
   const isUsingPrimaryImage = hasPrimaryImage && draft[field.usePrimaryImageKey];
   const hasCustomImage = Boolean(draft[field.previewKey]);
   const usePrimaryId = `${field.imageHtmlFor}UsePrimary`;
+  const replaceInputRef = useRef<HTMLInputElement>(null);
+
+  // Change image / Remove on the primary preview only affect this reminder;
+  // the primary campaign image and other reminders are untouched.
+  const discardCustomImage = () => {
+    const previous = draft[field.previewKey];
+    if (previous?.startsWith("blob:")) URL.revokeObjectURL(previous);
+  };
+
+  const handleReplaceWithCustom = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    discardCustomImage();
+    onChange({
+      [field.fileNameKey]: file.name,
+      [field.previewKey]: URL.createObjectURL(file),
+      [field.usePrimaryImageKey]: false,
+    });
+  };
+
+  const handleRemoveImage = () => {
+    discardCustomImage();
+    onChange({
+      [field.fileNameKey]: null,
+      [field.previewKey]: null,
+      [field.usePrimaryImageKey]: false,
+    });
+  };
 
   return (
-    <div
-      className={cn(
-        "space-y-4 rounded-[var(--radius-sm)] border border-border bg-card p-4",
-        isEnabled && "border-primary bg-primary/5",
-      )}
-    >
+    <div className={optionCardClassName(isEnabled)}>
       <label className="flex items-center gap-3">
         <Checkbox
           id={`${field.textareaId}Enabled`}
@@ -176,14 +207,14 @@ function ReminderTemplateField({
         />
         <Label
           htmlFor={`${field.textareaId}Enabled`}
-          className="cursor-pointer font-medium"
+          className="cursor-pointer text-sm font-medium"
         >
           Send {field.label.toLowerCase()}
         </Label>
       </label>
 
       {isEnabled ? (
-        <>
+        <div className={optionCardNestedClassName(true)}>
           <FormField
             label={`${field.label} Text`}
             htmlFor={field.textareaId}
@@ -227,6 +258,34 @@ function ReminderTemplateField({
                     {draft.campaignImageFileName ?? "Campaign image"}
                   </span>
                 </p>
+
+                <div className="flex shrink-0 gap-2">
+                  <input
+                    ref={replaceInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleReplaceWithCustom}
+                    className="sr-only"
+                    aria-label={`Upload a custom ${field.label.toLowerCase()} image`}
+                  />
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => replaceInputRef.current?.click()}
+                  >
+                    <Upload className="h-4 w-4" />
+                    Change image
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleRemoveImage}
+                  >
+                    Remove
+                  </Button>
+                </div>
               </ImagePreviewCard>
             </FormField>
           ) : (
@@ -288,7 +347,7 @@ function ReminderTemplateField({
               ) : null}
             </span>
           </div>
-        </>
+        </div>
       ) : null}
     </div>
   );

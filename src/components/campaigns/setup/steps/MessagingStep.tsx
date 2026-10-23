@@ -7,6 +7,10 @@ import {
 
 import { useMemo } from "react";
 import { FormField } from "@/components/campaigns/setup/FormField";
+import {
+  OptionCardText,
+  optionCardClassName,
+} from "@/components/campaigns/setup/OptionCard";
 import { OptionalImageUpload } from "@/components/campaigns/setup/OptionalImageUpload";
 import { VariableTextarea } from "@/components/campaigns/setup/VariableTextarea";
 import {
@@ -71,12 +75,6 @@ export function MessagingStep({ draft, errors, onChange }: MessagingStepProps) {
 
   return (
     <div className="space-y-6">
-      {isMvpV10Version ? (
-        <p className="text-sm text-muted-foreground">
-          MVP V1.0 includes Oil Change Campaign messaging over SMS only.
-        </p>
-      ) : null}
-
       <FormField
         label="Delivery Channels"
         error={errors.deliveryChannels}
@@ -95,8 +93,8 @@ export function MessagingStep({ draft, errors, onChange }: MessagingStepProps) {
               <label
                 key={option.value}
                 className={cn(
-                  "flex cursor-pointer items-start gap-3 rounded-[var(--radius-sm)] border border-border bg-card p-3",
-                  isEnabled && "border-primary bg-primary/5",
+                  optionCardClassName(isEnabled, { interactive: true }),
+                  "flex cursor-pointer items-start gap-3",
                 )}
               >
                 <Checkbox
@@ -107,12 +105,10 @@ export function MessagingStep({ draft, errors, onChange }: MessagingStepProps) {
                   className="mt-0.5"
                   aria-label={option.label}
                 />
-                <span>
-                  <span className="font-medium">{option.label}</span>
-                  <span className="block text-xs text-muted-foreground">
-                    {option.description}
-                  </span>
-                </span>
+                <OptionCardText
+                  title={option.label}
+                  description={option.description}
+                />
               </label>
             );
           })}
@@ -141,15 +137,16 @@ export function MessagingStep({ draft, errors, onChange }: MessagingStepProps) {
               type="button"
               onClick={() => handleSelectTemplate(template.id)}
               className={cn(
-                "rounded-[var(--radius-sm)] border border-border bg-card p-3 text-left transition-colors hover:bg-muted/50",
-                draft.messageTemplateId === template.id &&
-                  "border-primary bg-primary/5",
+                optionCardClassName(draft.messageTemplateId === template.id, {
+                  interactive: true,
+                }),
+                "flex text-left",
               )}
             >
-              <span className="block text-sm font-medium">{template.label}</span>
-              <span className="mt-1 block text-xs text-muted-foreground">
-                {template.description}
-              </span>
+              <OptionCardText
+                title={template.label}
+                description={template.description}
+              />
             </button>
           ))}
         </div>
