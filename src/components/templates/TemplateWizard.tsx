@@ -13,8 +13,14 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormField } from "@/components/campaigns/setup/FormField";
+import {
+  SECTION_CARD_CLASS,
+  optionCardClassName,
+  optionCardNestedClassName,
+} from "@/components/campaigns/setup/OptionCard";
 import { OptionalImageUpload } from "@/components/campaigns/setup/OptionalImageUpload";
 import { VariableTextarea } from "@/components/campaigns/setup/VariableTextarea";
+import { TitleBar } from "@/components/layout/TitleBar";
 import { TemplateWizardStepper } from "@/components/templates/TemplateWizardStepper";
 import { useCurrentUser } from "@/contexts/session-context";
 import {
@@ -107,68 +113,80 @@ export function TemplateWizard({ mode, initialTemplate }: TemplateWizardProps) {
     router.push(`/templates/${created.id}`);
   };
 
-  return (
-    <div className="app-shell-scrollbar-dashed app-shell-content-px app-shell-content-pt app-shell-content-pb min-h-0 flex-1 space-y-8 overflow-y-auto">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-          {mode === "create" ? "Create Template" : "Edit Template"}
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Define reusable messaging for campaign setup.
-        </p>
-      </div>
+  const isEditMode = mode === "edit" && initialTemplate;
+  const breadcrumbs = [
+    { label: "Templates", href: "/templates" },
+    ...(isEditMode
+      ? [
+          {
+            label: initialTemplate.heading,
+            href: `/templates/${initialTemplate.id}`,
+          },
+        ]
+      : []),
+    { label: isEditMode ? "Edit Template" : "New Template" },
+  ];
 
-      <TemplateWizardStepper
-        currentStepId={step}
-        completedSteps={completedSteps}
+  return (
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+      <TitleBar
+        breadcrumbs={breadcrumbs}
+        title={isEditMode ? "Edit Template" : "Create Template"}
       />
 
-      <div className="flex min-h-[28rem] flex-col rounded-lg border border-border bg-card shadow-sm">
-        <div className="flex-1 space-y-6 p-6">
-          {step === "details" ? (
-            <DetailsStep draft={draft} errors={errors} onChange={updateDraft} />
-          ) : null}
-          {step === "content" ? (
-            <ContentStep draft={draft} errors={errors} onChange={updateDraft} />
-          ) : null}
-          {step === "reminders" ? (
-            <RemindersStep draft={draft} errors={errors} onChange={updateDraft} />
-          ) : null}
-          {step === "review" ? <ReviewStep draft={draft} /> : null}
-        </div>
+      <div className="app-shell-scrollbar-dashed app-shell-content-px app-shell-content-pb min-h-0 flex-1 space-y-8 overflow-y-auto pt-6">
+        <TemplateWizardStepper
+          currentStepId={step}
+          completedSteps={completedSteps}
+        />
 
-        <div className="wizard-footer mt-auto flex flex-col-reverse gap-3 border-t border-border px-6 py-6 sm:flex-row sm:justify-between">
-          <Link href={
-                mode === "edit" && initialTemplate
-                  ? `/templates/${initialTemplate.id}`
-                  : "/templates"
-              } className={buttonVariants({ variant: "ghost" })}>
-          Cancel
-        </Link>
-          <div className="flex flex-wrap gap-2">
-            {!isFirstStep ? (
-              <Button type="button" variant="outline" onClick={handleBack}>
-                Back
-              </Button>
+        <div className="surface-stroke-sharp flex min-h-[28rem] min-w-0 flex-col overflow-hidden rounded-[var(--radius-sm)] bg-card">
+          <div className="flex-1 space-y-6 p-6">
+            {step === "details" ? (
+              <DetailsStep draft={draft} errors={errors} onChange={updateDraft} />
             ) : null}
-            {!isLastStep ? (
-              <Button type="button" onClick={handleNext}>
-                Continue
-              </Button>
-            ) : (
-              <>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => persist("draft")}
-                >
-                  Save Draft
+            {step === "content" ? (
+              <ContentStep draft={draft} errors={errors} onChange={updateDraft} />
+            ) : null}
+            {step === "reminders" ? (
+              <RemindersStep draft={draft} errors={errors} onChange={updateDraft} />
+            ) : null}
+            {step === "review" ? <ReviewStep draft={draft} /> : null}
+          </div>
+
+          <div className="wizard-footer mt-auto flex flex-col-reverse gap-3 border-t border-border px-6 py-6 sm:flex-row sm:justify-between">
+            <Link href={
+                  mode === "edit" && initialTemplate
+                    ? `/templates/${initialTemplate.id}`
+                    : "/templates"
+                } className={buttonVariants({ variant: "ghost" })}>
+            Cancel
+          </Link>
+            <div className="flex flex-wrap gap-2">
+              {!isFirstStep ? (
+                <Button type="button" variant="outline" onClick={handleBack}>
+                  Back
                 </Button>
-                <Button type="button" onClick={() => persist("published")}>
-                  {mode === "edit" ? "Save & Publish" : "Publish"}
+              ) : null}
+              {!isLastStep ? (
+                <Button type="button" onClick={handleNext}>
+                  Continue
                 </Button>
-              </>
-            )}
+              ) : (
+                <>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => persist("draft")}
+                  >
+                    Save Draft
+                  </Button>
+                  <Button type="button" onClick={() => persist("published")}>
+                    {mode === "edit" ? "Save & Publish" : "Publish"}
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -316,27 +334,28 @@ function RemindersStep({
       </p>
       {fields.map((field) => {
         const isEnabled = draft[field.enabledKey];
+        const checkboxId = `${field.enabledKey}Toggle`;
         return (
-          <div
-            key={field.enabledKey}
-            className={cn(
-              "space-y-4 rounded-md border border-border p-4",
-              isEnabled && "border-brand-primary/40 bg-muted/20",
-            )}
-          >
+          <div key={field.enabledKey} className={optionCardClassName(isEnabled)}>
             <label className="flex items-center gap-3">
               <Checkbox
+                id={checkboxId}
                 checked={isEnabled}
                 onCheckedChange={(checked) =>
                   onChange({ [field.enabledKey]: checked })
                 }
               />
-              <Label className="cursor-pointer font-medium">{field.label}</Label>
+              <Label
+                htmlFor={checkboxId}
+                className="cursor-pointer text-sm font-medium"
+              >
+                Send {field.label.toLowerCase()}
+              </Label>
             </label>
             {isEnabled ? (
-              <>
+              <div className={optionCardNestedClassName(true)}>
                 <FormField
-                  label={`${field.label} text`}
+                  label={`${field.label} Text`}
                   htmlFor={field.textKey}
                   required
                   error={errors[field.textKey]}
@@ -350,9 +369,9 @@ function RemindersStep({
                   />
                 </FormField>
                 <OptionalImageUpload
-                  label={`${field.label} image`}
+                  label={`${field.label} Image`}
                   htmlFor={`${field.textKey}-image`}
-                  hint="Optional."
+                  hint="Optional. Upload a custom image for this reminder."
                   fileName={draft[field.fileKey]}
                   previewUrl={draft[field.previewKey]}
                   onChange={(fileName, previewUrl) =>
@@ -362,7 +381,7 @@ function RemindersStep({
                     })
                   }
                 />
-              </>
+              </div>
             ) : null}
           </div>
         );
@@ -373,7 +392,7 @@ function RemindersStep({
 
 function ReviewStep({ draft }: { draft: TemplateDraft }) {
   return (
-    <div className="space-y-4 text-sm">
+    <div className={cn(SECTION_CARD_CLASS, "space-y-4 text-sm")}>
       <div>
         <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
           Heading

@@ -25,37 +25,40 @@ export function TemplateWizardStepper({
           const isPast = index < currentIndex;
 
           return (
-            <li
-              key={step.id}
-              className={cn(
-                "flex flex-1 items-center gap-2 rounded-md p-2 text-sm",
-                isCurrent && "border border-border bg-muted font-medium",
-                !isCurrent && !isComplete && !isPast && "text-muted-foreground",
-              )}
-            >
-              <span
+            <li key={step.id} className="flex flex-1">
+              <div
+                aria-current={isCurrent ? "step" : undefined}
                 className={cn(
-                  "flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-xs font-semibold",
-                  isComplete || isPast
-                    ? "border-brand-primary bg-brand-primary text-white"
-                    : isCurrent
-                      ? "border-brand-primary text-brand-primary"
-                      : "border-border text-muted-foreground",
+                  "flex w-full items-center gap-2 rounded-md border border-border bg-card p-2 text-sm",
+                  isCurrent &&
+                    "border-brand-primary bg-brand-primary/5 font-medium",
+                  !isCurrent && !isComplete && !isPast && "text-muted-foreground",
                 )}
-                aria-hidden
               >
-                {isComplete || isPast ? (
-                  <Check className="h-4 w-4" />
-                ) : (
-                  index + 1
-                )}
-              </span>
-              <span className="min-w-0">
-                <span className="block truncate">{step.label}</span>
-                <span className="block truncate text-xs text-muted-foreground">
-                  {step.description}
+                <span
+                  className={cn(
+                    "flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-xs font-semibold",
+                    isComplete || isPast
+                      ? "border-brand-primary bg-brand-primary text-white"
+                      : isCurrent
+                        ? "border-brand-primary text-brand-primary"
+                        : "border-border text-muted-foreground",
+                  )}
+                  aria-hidden
+                >
+                  {isComplete || isPast ? (
+                    <Check className="h-4 w-4" />
+                  ) : (
+                    index + 1
+                  )}
                 </span>
-              </span>
+                <span className="hidden min-w-0 lg:block">
+                  <span className="block truncate">{step.label}</span>
+                  <span className="block truncate text-xs font-normal text-muted-foreground">
+                    {step.description}
+                  </span>
+                </span>
+              </div>
             </li>
           );
         })}
