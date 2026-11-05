@@ -78,11 +78,6 @@ export function MessagingStep({ draft, errors, onChange }: MessagingStepProps) {
       <FormField
         label="Delivery Channels"
         error={errors.deliveryChannels}
-        hint={
-          isMvpV10Version
-            ? "MVP V1.0 supports SMS only. Email is available in Post MVP V1.1+."
-            : undefined
-        }
         required
       >
         <div className="space-y-2">
@@ -117,11 +112,6 @@ export function MessagingStep({ draft, errors, onChange }: MessagingStepProps) {
 
       <FormField
         label="Message Template"
-        hint={
-          isMvpV10Version
-            ? "MVP V1.0 includes the Oil Change Campaign template only."
-            : undefined
-        }
       >
         <div
           className={cn(

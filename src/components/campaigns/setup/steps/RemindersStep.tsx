@@ -6,9 +6,13 @@ import {
   Label,
 } from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Upload } from "lucide-react";
 import { FormField } from "@/components/campaigns/setup/FormField";
+import {
+  CAMPAIGN_IMAGE_ACCEPT,
+  validateCampaignImageFile,
+} from "@/lib/campaign-image";
 import {
   optionCardClassName,
   optionCardNestedClassName,
@@ -166,6 +170,7 @@ function ReminderTemplateField({
   const hasCustomImage = Boolean(draft[field.previewKey]);
   const usePrimaryId = `${field.imageHtmlFor}UsePrimary`;
   const replaceInputRef = useRef<HTMLInputElement>(null);
+  const [replaceError, setReplaceError] = useState<string | null>(null);
 
   // Change image / Remove on the primary preview only affect this reminder;
   // the primary campaign image and other reminders are untouched.
@@ -178,6 +183,9 @@ function ReminderTemplateField({
     const file = event.target.files?.[0];
     event.target.value = "";
     if (!file) return;
+    const validationError = validateCampaignImageFile(file);
+    setReplaceError(validationError);
+    if (validationError) return;
     discardCustomImage();
     onChange({
       [field.fileNameKey]: file.name,
@@ -245,6 +253,7 @@ function ReminderTemplateField({
                   ? "Your custom reminder image is kept. Uncheck the box below to use it again."
                   : undefined
               }
+              error={replaceError ?? undefined}
             >
               <ImagePreviewCard
                 src={draft.campaignImagePreviewUrl ?? ""}
@@ -263,7 +272,7 @@ function ReminderTemplateField({
                   <input
                     ref={replaceInputRef}
                     type="file"
-                    accept="image/*"
+                    accept={CAMPAIGN_IMAGE_ACCEPT}
                     onChange={handleReplaceWithCustom}
                     className="sr-only"
                     aria-label={`Upload a custom ${field.label.toLowerCase()} image`}

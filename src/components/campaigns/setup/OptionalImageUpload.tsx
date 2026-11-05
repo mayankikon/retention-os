@@ -4,9 +4,14 @@ import {
   Button,
 } from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { ImagePlus, Upload } from "lucide-react";
 import { FormField } from "@/components/campaigns/setup/FormField";
+import {
+  CAMPAIGN_IMAGE_ACCEPT,
+  CAMPAIGN_IMAGE_TYPES_LABEL,
+  validateCampaignImageFile,
+} from "@/lib/campaign-image";
 import { cn } from "@/lib/utils";
 
 interface OptionalImageUploadProps {
@@ -35,7 +40,9 @@ export function OptionalImageUpload({
   onChange,
 }: OptionalImageUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
   const hasImage = Boolean(previewUrl);
+  const shownError = error ?? fileError ?? undefined;
 
   const handleBrowseClick = () => {
     inputRef.current?.click();
@@ -49,6 +56,11 @@ export function OptionalImageUpload({
       return;
     }
 
+    // Rejected files leave the current image (if any) in place.
+    const validationError = validateCampaignImageFile(file);
+    setFileError(validationError);
+    if (validationError) return;
+
     revokePreviewUrl(previewUrl);
     onChange(file.name, URL.createObjectURL(file));
   };
@@ -58,16 +70,17 @@ export function OptionalImageUpload({
     if (inputRef.current) {
       inputRef.current.value = "";
     }
+    setFileError(null);
     onChange(null, null);
   };
 
   return (
-    <FormField label={label} htmlFor={htmlFor} hint={hint} error={error}>
+    <FormField label={label} htmlFor={htmlFor} hint={hint} error={shownError}>
       <input
         ref={inputRef}
         id={htmlFor}
         type="file"
-        accept="image/*"
+        accept={CAMPAIGN_IMAGE_ACCEPT}
         onChange={handleImageChange}
         className="sr-only"
         aria-label={`Upload ${label.toLowerCase()}`}
@@ -108,7 +121,7 @@ export function OptionalImageUpload({
           onClick={handleBrowseClick}
           className={cn(
             "flex w-full flex-col items-center justify-center gap-2 rounded-[var(--radius-sm)] border border-dashed border-border bg-muted/20 px-4 py-8 text-center transition-colors hover:border-brand-primary hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-            error && "border-red-500",
+            shownError && "border-red-500",
           )}
         >
           <ImagePlus className="h-8 w-8 text-muted-foreground" aria-hidden />
@@ -116,7 +129,7 @@ export function OptionalImageUpload({
             Choose an image
           </span>
           <span className="text-xs text-muted-foreground">
-            PNG, JPG, or WebP
+            {CAMPAIGN_IMAGE_TYPES_LABEL}
           </span>
         </button>
       )}
