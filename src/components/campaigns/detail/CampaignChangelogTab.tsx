@@ -16,6 +16,7 @@ const ACTION_LABELS: Record<CampaignChangelogEntry["action"], string> = {
   paused: "Paused",
   completed: "Completed",
   archived: "Archived",
+  reminder_toggled: "Reminder",
 };
 
 interface CampaignChangelogTabProps {

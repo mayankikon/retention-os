@@ -4,6 +4,7 @@ import {
   applyCampaignLiveCopy,
   getCampaignLiveCopy,
   hasSameMessageVariables,
+  validateCampaignLiveCopy,
 } from "@/lib/campaign-live-copy";
 import type { Campaign } from "@/types/campaign";
 
@@ -32,8 +33,9 @@ function buildCampaign(status: Campaign["status"] = "active"): Campaign {
 }
 
 describe("campaign live copy", () => {
-  it("extracts only the initial message and enabled reminder bodies", () => {
-    const copy = getCampaignLiveCopy(buildCampaign());
+  it("extracts the initial message and every reminder with its on/off state", () => {
+    const campaign = buildCampaign();
+    const copy = getCampaignLiveCopy(campaign);
 
     expect(copy.initialMessage).toBe("Hi [@FN@], service your [@MOD@].");
     expect(copy.reminders).toEqual([
@@ -41,8 +43,91 @@ describe("campaign live copy", () => {
         id: "reminder1",
         label: "Reminder 1",
         body: "Reminder for [@FN@] and [@MOD@].",
+        enabled: true,
+      },
+      {
+        id: "reminder2",
+        label: "Reminder 2",
+        body: campaign.setupDraft!.reminder2Text,
+        enabled: false,
+      },
+      {
+        id: "reminder3",
+        label: "Reminder 3",
+        body: campaign.setupDraft!.reminder3Text,
+        enabled: false,
       },
     ]);
+  });
+
+  it("treats reminders missing from older saved copy as off", () => {
+    const copy = getCampaignLiveCopy({
+      ...buildCampaign(),
+      liveCopy: {
+        initialMessage: "Saved [@FN@] [@MOD@].",
+        reminders: [
+          { id: "reminder1", label: "Reminder 1", body: "Saved reminder." },
+        ] as never,
+      },
+    });
+
+    expect(copy.reminders.map((reminder) => reminder.enabled)).toEqual([
+      true,
+      false,
+      false,
+    ]);
+  });
+
+  it("requires reminder text only while the reminder is on", () => {
+    const original = getCampaignLiveCopy(buildCampaign());
+    const cleared = original.reminders.map((reminder) => ({
+      ...reminder,
+      body: "",
+    }));
+
+    expect(
+      validateCampaignLiveCopy(original, { ...original, reminders: cleared }),
+    ).toEqual({ reminder1: "Reminder 1 text is required while it's turned on." });
+    expect(
+      validateCampaignLiveCopy(original, {
+        ...original,
+        reminders: cleared.map((reminder) => ({ ...reminder, enabled: false })),
+      }),
+    ).toEqual({});
+    expect(
+      validateCampaignLiveCopy(original, { ...original, initialMessage: " " }),
+    ).toHaveProperty("initialMessage");
+  });
+
+  it("turns a reminder off, keeps its text, and logs the change", () => {
+    const campaign = buildCampaign();
+    const original = getCampaignLiveCopy(campaign);
+    const at = "2026-08-22T09:00:00.000Z";
+    const updated = applyCampaignLiveCopy(
+      campaign,
+      {
+        ...original,
+        reminders: original.reminders.map((reminder) =>
+          reminder.id === "reminder1" ? { ...reminder, enabled: false } : reminder,
+        ),
+      },
+      at,
+    );
+
+    expect(updated.status).toBe("active");
+    expect(updated.setupDraft?.reminder1Enabled).toBe(false);
+    expect(updated.setupDraft?.reminder1Text).toBe(
+      "Reminder for [@FN@] and [@MOD@].",
+    );
+    expect(updated.reminderToggleEvents).toEqual([
+      { reminderId: "reminder1", label: "Reminder 1", enabled: false, at },
+    ]);
+    expect(updated.copyUpdatedAt).toBeUndefined();
+    expect(updated.lastUpdatedAt).toBe(at);
+    expect(getCampaignLiveCopy(updated).reminders[0]).toMatchObject({
+      enabled: false,
+      body: "Reminder for [@FN@] and [@MOD@].",
+    });
   });
 
   it("preserves the exact personalization variable sequence", () => {
@@ -76,6 +161,7 @@ describe("campaign live copy", () => {
             id: "reminder1",
             label: "Reminder 1",
             body: "A quick reminder for [@FN@] and [@MOD@].",
+            enabled: true,
           },
         ],
       },

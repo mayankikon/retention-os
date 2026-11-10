@@ -68,6 +68,22 @@ vi.mock(
     }: ComponentProps<"label"> & { for?: string }) => (
       <label htmlFor={htmlFor ?? props.for}>{children}</label>
     ),
+    Checkbox: ({
+      checked,
+      onCheckedChange,
+      id,
+    }: {
+      checked?: boolean;
+      onCheckedChange?: (checked: boolean) => void;
+      id?: string;
+    }) => (
+      <input
+        type="checkbox"
+        id={id}
+        checked={checked}
+        onChange={(event) => onCheckedChange?.(event.target.checked)}
+      />
+    ),
     Textarea: (props: ComponentProps<"textarea">) => <textarea {...props} />,
     buttonVariants: () => "button",
   }),
@@ -82,14 +98,48 @@ describe("CampaignLiveCopyEditor", () => {
 
   afterEach(() => cleanup());
 
-  it("shows only initial and enabled reminder message bodies", () => {
+  it("shows a send checkbox per reminder and collapses turned-off ones", () => {
     render(<CampaignLiveCopyEditor campaignId="cmp-live" />);
 
     expect(screen.getByLabelText(/^Initial message/)).toBeInTheDocument();
-    expect(screen.getByLabelText(/^Reminder 1/)).toBeInTheDocument();
+    expect(screen.getByLabelText("Send reminder 1")).toBeChecked();
+    expect(screen.getByLabelText(/^Reminder 1 Text/)).toBeInTheDocument();
+    expect(screen.getByLabelText("Send reminder 2")).not.toBeChecked();
+    expect(screen.queryByLabelText(/^Reminder 2 Text/)).not.toBeInTheDocument();
+    expect(screen.getAllByText(/Won't send to new recipients/)).toHaveLength(2);
     expect(screen.queryByLabelText("Campaign name")).not.toBeInTheDocument();
-    expect(screen.queryByLabelText("Reminder 2")).not.toBeInTheDocument();
     expect(screen.getByText(/variables are locked/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Unchecked reminders stop sending after you save/),
+    ).toBeInTheDocument();
+  });
+
+  it("saves a reminder turned off without requiring its text", async () => {
+    const user = userEvent.setup();
+    render(<CampaignLiveCopyEditor campaignId="cmp-live" />);
+
+    fireEvent.change(screen.getByLabelText(/^Reminder 1 Text/), {
+      target: { value: "" },
+    });
+    await user.click(screen.getByRole("button", { name: "Save changes" }));
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "Reminder 1 text is required while it's turned on.",
+    );
+    expect(upsertCampaignMock).not.toHaveBeenCalled();
+
+    await user.click(screen.getByLabelText("Send reminder 1"));
+    await user.click(screen.getByRole("button", { name: "Save changes" }));
+
+    await waitFor(() => {
+      expect(upsertCampaignMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          status: "active",
+          reminderToggleEvents: [
+            expect.objectContaining({ reminderId: "reminder1", enabled: false }),
+          ],
+        }),
+      );
+    });
   });
 
   it("blocks variable changes and saves surrounding copy without status changes", async () => {
@@ -102,7 +152,7 @@ describe("CampaignLiveCopyEditor", () => {
         value: "Hello [@FN@], please service your [@MOD@].",
       },
     });
-    await user.click(screen.getByRole("button", { name: "Save copy" }));
+    await user.click(screen.getByRole("button", { name: "Save changes" }));
 
     await waitFor(() => {
       expect(upsertCampaignMock).toHaveBeenCalledWith(

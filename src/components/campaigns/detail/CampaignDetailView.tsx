@@ -35,7 +35,7 @@ function flashCopy(message: CampaignFlashMessage): string {
     case "draft":
       return `${message.campaignName} saved as a draft.`;
     case "copyUpdated":
-      return `${message.campaignName} copy updated for new and not-yet-sent recipients.`;
+      return `Changes to ${message.campaignName} saved. They apply to new and not-yet-sent recipients.`;
     case "activated":
       return `${message.campaignName} is now active.`;
     case "scheduled":

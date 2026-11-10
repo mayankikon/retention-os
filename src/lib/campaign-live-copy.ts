@@ -59,26 +59,39 @@ export function hasSameMessageVariables(
   );
 }
 
+/**
+ * Live copy for the Edit live copy screen: the initial message plus all three
+ * reminders with their on/off state. Turned-off reminders keep their text.
+ */
 export function getCampaignLiveCopy(campaign: Campaign): CampaignLiveCopy {
-  if (campaign.liveCopy) {
-    return structuredClone(campaign.liveCopy);
-  }
-
   const setupDraft = campaign.setupDraft;
   const template = campaign.messageTemplateId
     ? getCampaignMessageTemplate(campaign.messageTemplateId)
     : undefined;
+  const savedReminderById = new Map(
+    (campaign.liveCopy?.reminders ?? []).map((reminder) => [reminder.id, reminder]),
+  );
 
   const initialMessage =
-    setupDraft?.primaryPromoText ?? template?.primaryPromoText ?? "";
+    campaign.liveCopy?.initialMessage ??
+    setupDraft?.primaryPromoText ??
+    template?.primaryPromoText ??
+    "";
 
-  const reminders = REMINDER_CONFIG.flatMap((config) => {
-    const body = setupDraft?.[config.textKey] ?? template?.[config.textKey] ?? "";
-    const isEnabled = setupDraft
-      ? setupDraft[config.enabledKey]
-      : body.trim().length > 0;
+  const reminders = REMINDER_CONFIG.map((config) => {
+    const saved = savedReminderById.get(config.id);
+    const body =
+      saved?.body ?? setupDraft?.[config.textKey] ?? template?.[config.textKey] ?? "";
+    // Copies saved before reminders could be toggled only listed sending reminders.
+    const enabled = saved
+      ? saved.enabled ?? true
+      : campaign.liveCopy
+        ? false
+        : setupDraft
+          ? setupDraft[config.enabledKey]
+          : body.trim().length > 0;
 
-    return isEnabled ? [{ id: config.id, label: config.label, body }] : [];
+    return { id: config.id, label: config.label, body, enabled };
   });
 
   return { initialMessage, reminders };
@@ -97,6 +110,29 @@ export function applyCampaignLiveCopy(
   const updatedReminderById = new Map(
     copy.reminders.map((reminder) => [reminder.id, reminder]),
   );
+  const reminders = originalCopy.reminders.map((reminder) => {
+    const updated = updatedReminderById.get(reminder.id);
+    return updated
+      ? { ...reminder, body: updated.body, enabled: updated.enabled }
+      : reminder;
+  });
+
+  const textChanged =
+    copy.initialMessage !== originalCopy.initialMessage ||
+    reminders.some(
+      (reminder, index) => reminder.body !== originalCopy.reminders[index].body,
+    );
+  const toggleEvents = reminders
+    .filter(
+      (reminder, index) =>
+        reminder.enabled !== originalCopy.reminders[index].enabled,
+    )
+    .map((reminder) => ({
+      reminderId: reminder.id,
+      label: reminder.label,
+      enabled: reminder.enabled,
+      at: updatedAt,
+    }));
 
   const setupDraft = campaign.setupDraft
     ? structuredClone(campaign.setupDraft)
@@ -105,25 +141,24 @@ export function applyCampaignLiveCopy(
   if (setupDraft) {
     setupDraft.primaryPromoText = copy.initialMessage;
     for (const config of REMINDER_CONFIG) {
-      const updatedReminder = updatedReminderById.get(config.id);
-      if (updatedReminder) {
-        setupDraft[config.textKey] = updatedReminder.body;
-      }
+      const reminder = reminders.find((item) => item.id === config.id);
+      if (!reminder) continue;
+      setupDraft[config.textKey] = reminder.body;
+      setupDraft[config.enabledKey] = reminder.enabled;
     }
   }
 
   return {
     ...campaign,
-    liveCopy: {
-      initialMessage: copy.initialMessage,
-      reminders: originalCopy.reminders.map((reminder) => ({
-        ...reminder,
-        body: updatedReminderById.get(reminder.id)?.body ?? reminder.body,
-      })),
-    },
+    liveCopy: { initialMessage: copy.initialMessage, reminders },
     setupDraft,
     lastUpdatedAt: updatedAt,
-    copyUpdatedAt: updatedAt,
+    // Only wording changes count as a copy edit; on/off has its own events.
+    copyUpdatedAt: textChanged ? updatedAt : campaign.copyUpdatedAt,
+    reminderToggleEvents: [
+      ...(campaign.reminderToggleEvents ?? []),
+      ...toggleEvents,
+    ],
   };
 }
 
@@ -147,12 +182,14 @@ export function validateCampaignLiveCopy(
   const originalReminderById = new Map(
     originalCopy.reminders.map((reminder) => [reminder.id, reminder]),
   );
+  // Reminder text is required (and its variables locked) only while it's on.
   for (const reminder of updatedCopy.reminders) {
+    if (!reminder.enabled) continue;
     const originalReminder = originalReminderById.get(reminder.id);
     if (!reminder.body.trim()) {
-      errors[reminder.id] = `${reminder.label} copy is required.`;
+      errors[reminder.id] = `${reminder.label} text is required while it's turned on.`;
     } else if (
-      originalReminder &&
+      originalReminder?.body.trim() &&
       !hasSameMessageVariables(originalReminder.body, reminder.body)
     ) {
       errors[reminder.id] = "Personalization variables are locked.";

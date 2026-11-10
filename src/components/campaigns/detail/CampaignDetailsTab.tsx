@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { CheckCircle2, Percent, Send, Users } from "lucide-react";
+import { CheckCircle2, MousePointerClick, Percent, Send } from "lucide-react";
 import { getTimeZoneLabel } from "@/data/campaign-setup.defaults";
 import { formatDealershipList, getCampaignDealers } from "@/lib/campaign-dealers";
 import { formatTimestamp } from "@/lib/dates";
@@ -7,10 +7,13 @@ import {
   formatClickThroughRate,
   formatDeliveryRate,
   formatMessageCount,
-  formatOpenRate,
 } from "@/lib/format";
 import type { Campaign } from "@/types/campaign";
 import type { CampaignAnalytics } from "@/types/campaign-detail";
+
+/** Every performance card shows the same empty state until the first send. */
+const EMPTY_VALUE = "—";
+const NO_SENDS_YET = "No sends yet";
 
 interface CampaignDetailsTabProps {
   campaign: Campaign;
@@ -84,38 +87,30 @@ export function CampaignDetailsTab({
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <MetricCard
             label="Sent To"
-            value={formatMessageCount(analytics.recipientsSent)}
-            subtext="Customers Reached"
+            value={hasActivity ? formatMessageCount(analytics.recipientsSent) : EMPTY_VALUE}
+            subtext={hasActivity ? "Customers Reached" : NO_SENDS_YET}
             icon={Send}
           />
           <MetricCard
-            label="Opened"
-            value={formatMessageCount(analytics.openedCount)}
-            subtext={
-              hasActivity
-                ? `${formatOpenRate(analytics.openedCount, analytics.recipientsSent)} Open Rate`
-                : "No Sends Yet"
-            }
-            icon={Users}
-          />
-          <MetricCard
             label="Delivered"
-            value={formatMessageCount(analytics.deliveredCount)}
+            value={hasActivity ? formatMessageCount(analytics.deliveredCount) : EMPTY_VALUE}
             subtext={
               hasActivity
                 ? `${formatDeliveryRate(analytics.deliveredCount, analytics.recipientsSent)} Delivery Rate`
-                : "No Deliveries Yet"
+                : NO_SENDS_YET
             }
             icon={CheckCircle2}
           />
           <MetricCard
+            label="Clicked"
+            value={hasActivity ? formatMessageCount(analytics.clickedCount) : EMPTY_VALUE}
+            subtext={hasActivity ? "Unique Customers Who Tapped the Link" : NO_SENDS_YET}
+            icon={MousePointerClick}
+          />
+          <MetricCard
             label="Click-Through Rate"
-            value={formatClickThroughRate(campaign.clickThroughRate)}
-            subtext={
-              hasActivity
-                ? "Of Customers Sent"
-                : "No Clicks Yet"
-            }
+            value={hasActivity ? formatClickThroughRate(campaign.clickThroughRate) : EMPTY_VALUE}
+            subtext={hasActivity ? "Of Customers Sent" : NO_SENDS_YET}
             icon={Percent}
           />
         </div>

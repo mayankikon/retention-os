@@ -12,8 +12,8 @@ describe("campaign analytics", () => {
     const analytics = getCampaignAnalytics(draft!);
     expect(analytics).toEqual({
       recipientsSent: 0,
-      openedCount: 0,
       deliveredCount: 0,
+      clickedCount: 0,
     });
   });
 
@@ -24,8 +24,12 @@ describe("campaign analytics", () => {
     const analytics = getCampaignAnalytics(active!);
     expect(analytics.recipientsSent).toBe(active!.messages);
     expect(analytics.deliveredCount).toBeGreaterThan(0);
-    expect(analytics.openedCount).toBeGreaterThan(0);
+    expect(analytics.clickedCount).toBe(
+      Math.round((active!.messages * active!.clickThroughRate) / 100),
+    );
+    expect(analytics.clickedCount).toBeLessThanOrEqual(analytics.deliveredCount);
     expect(analytics.deliveredCount).toBeLessThanOrEqual(analytics.recipientsSent);
+    expect(analytics).not.toHaveProperty("openedCount");
   });
 });
 
@@ -60,6 +64,29 @@ describe("campaign changelog", () => {
           "Initial and reminder body copy changed for future eligible sends only.",
       }),
     );
+  });
+});
+
+describe("reminder on/off changelog", () => {
+  it("logs each reminder toggle separately from copy edits", () => {
+    const campaign = mockCampaigns.find((c) => c.id === "cmp-001")!;
+    const at = "2026-08-21T17:00:00.000Z";
+
+    const entries = buildCampaignChangelog({
+      ...campaign,
+      lastUpdatedAt: at,
+      reminderToggleEvents: [
+        { reminderId: "reminder2", label: "Reminder 2", enabled: false, at },
+      ],
+    });
+
+    expect(entries).toContainEqual(
+      expect.objectContaining({
+        action: "reminder_toggled",
+        summary: "Reminder 2 turned off",
+      }),
+    );
+    expect(entries.some((entry) => entry.action === "updated")).toBe(false);
   });
 });
 

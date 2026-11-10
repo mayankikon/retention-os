@@ -3,8 +3,9 @@ import type { CampaignCreator } from "@/types/campaign";
 export interface CampaignAnalytics {
   /** Unique customers the campaign was sent to. */
   recipientsSent: number;
-  openedCount: number;
   deliveredCount: number;
+  /** Unique customers who tapped the link. */
+  clickedCount: number;
 }
 
 export const CHANGELOG_ACTIONS = [
@@ -16,6 +17,7 @@ export const CHANGELOG_ACTIONS = [
   "paused",
   "completed",
   "archived",
+  "reminder_toggled",
 ] as const;
 
 export type ChangelogAction = (typeof CHANGELOG_ACTIONS)[number];

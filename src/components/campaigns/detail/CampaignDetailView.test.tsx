@@ -83,7 +83,7 @@ describe("CampaignDetailView", () => {
     render(<CampaignDetailView campaignId="cmp-live" />);
 
     expect(screen.getByTestId("app-toast")).toHaveTextContent(
-      "Spring Service Reminder copy updated for new and not-yet-sent recipients.",
+      "Changes to Spring Service Reminder saved. They apply to new and not-yet-sent recipients.",
     );
   });
 
@@ -103,7 +103,7 @@ describe("CampaignDetailView", () => {
 
     expect(consumeFlashMock.mock.calls.length).toBeGreaterThan(1);
     expect(screen.getByTestId("app-toast")).toHaveTextContent(
-      "Spring Service Reminder copy updated for new and not-yet-sent recipients.",
+      "Changes to Spring Service Reminder saved. They apply to new and not-yet-sent recipients.",
     );
   });
 });

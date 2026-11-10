@@ -2,6 +2,8 @@
 
 import {
   Button,
+  Checkbox,
+  Label,
   Textarea,
   buttonVariants,
 } from "@ikontechnologies-arlington/nxtg-design-shiftpackage/primitives";
@@ -11,6 +13,10 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { CampaignStatusBadge } from "@/components/campaigns/CampaignStatusBadge";
 import { FormField } from "@/components/campaigns/setup/FormField";
+import {
+  optionCardClassName,
+  optionCardNestedClassName,
+} from "@/components/campaigns/setup/OptionCard";
 import { TitleBar } from "@/components/layout/TitleBar";
 import { useCampaigns } from "@/hooks/use-campaigns";
 import {
@@ -96,6 +102,25 @@ export function CampaignLiveCopyEditor({
     }));
   };
 
+  const handleReminderToggle = (
+    reminderId: CampaignLiveCopy["reminders"][number]["id"],
+    enabled: boolean,
+  ) => {
+    // Turning a reminder off keeps its text so it can be turned back on.
+    setCopy((currentCopy) =>
+      ({
+        ...(currentCopy ?? originalCopy),
+        reminders: (currentCopy ?? originalCopy).reminders.map((reminder) =>
+          reminder.id === reminderId ? { ...reminder, enabled } : reminder,
+        ),
+      }),
+    );
+    setErrors((currentErrors) => ({
+      ...currentErrors,
+      [reminderId]: "",
+    }));
+  };
+
   const handleSave = async () => {
     const validationErrors = validateCampaignLiveCopy(
       originalCopy,
@@ -119,7 +144,7 @@ export function CampaignLiveCopyEditor({
       });
       router.push(detailHref);
     } catch {
-      setSaveError("Copy could not be saved. Review your changes and try again.");
+      setSaveError("Changes could not be saved. Your edits are still here. Try again.");
       setIsSaving(false);
     }
   };
@@ -143,12 +168,16 @@ export function CampaignLiveCopyEditor({
         >
           <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
           <div>
-            <p className="font-medium">Copy-only live edit</p>
+            <p className="font-medium">Live edit</p>
             <p className="mt-1">
               Saving keeps this campaign {campaign.status}. Updated text applies
               only to new or not-yet-sent recipients; previous messages are not
               resent. Consent, STOP, quiet-hours, and suppression rules still
               apply.
+            </p>
+            <p className="mt-1">
+              Unchecked reminders stop sending after you save. Messages already
+              sent aren&apos;t affected.
             </p>
           </div>
         </div>
@@ -163,8 +192,9 @@ export function CampaignLiveCopyEditor({
               <h2 className="text-sm font-semibold">Message bodies</h2>
               <p className="mt-1 text-sm text-muted-foreground">
                 Personalization variables are locked and must remain in the same
-                order. Campaign name, audience, schedule, dealerships, trigger,
-                links, and reminder structure cannot be changed here.
+                order. You can turn reminders on or off; their timing stays the
+                same. Campaign name, audience, schedule, dealerships, trigger,
+                and links cannot be changed here.
               </p>
             </div>
           </div>
@@ -186,25 +216,56 @@ export function CampaignLiveCopyEditor({
             />
           </FormField>
 
-          {editableCopy.reminders.map((reminder) => (
-            <FormField
-              key={reminder.id}
-              label={reminder.label}
-              htmlFor={reminder.id}
-              required
-              error={errors[reminder.id]}
-            >
-              <Textarea
-                id={reminder.id}
-                rows={5}
-                value={reminder.body}
-                onChange={(event) =>
-                  handleReminderChange(reminder.id, event.target.value)
-                }
-                aria-describedby="locked-variable-note"
-              />
-            </FormField>
-          ))}
+          {editableCopy.reminders.map((reminder) => {
+            const checkboxId = `${reminder.id}Enabled`;
+            return (
+              <div
+                key={reminder.id}
+                className={optionCardClassName(reminder.enabled)}
+              >
+                <label className="flex items-center gap-3">
+                  <Checkbox
+                    id={checkboxId}
+                    checked={reminder.enabled}
+                    onCheckedChange={(checked) =>
+                      handleReminderToggle(reminder.id, checked === true)
+                    }
+                  />
+                  <Label
+                    htmlFor={checkboxId}
+                    className="cursor-pointer text-sm font-medium"
+                  >
+                    Send {reminder.label.toLowerCase()}
+                  </Label>
+                </label>
+
+                {reminder.enabled ? (
+                  <div className={optionCardNestedClassName(true)}>
+                    <FormField
+                      label={`${reminder.label} Text`}
+                      htmlFor={reminder.id}
+                      required
+                      error={errors[reminder.id]}
+                    >
+                      <Textarea
+                        id={reminder.id}
+                        rows={5}
+                        value={reminder.body}
+                        onChange={(event) =>
+                          handleReminderChange(reminder.id, event.target.value)
+                        }
+                        aria-describedby="locked-variable-note"
+                      />
+                    </FormField>
+                  </div>
+                ) : (
+                  <p className="mt-1 pl-7 text-xs text-muted-foreground">
+                    Won&apos;t send to new recipients. Its text is kept.
+                  </p>
+                )}
+              </div>
+            );
+          })}
 
           <p
             id="locked-variable-note"
@@ -235,7 +296,7 @@ export function CampaignLiveCopyEditor({
               disabled={isSaving}
               aria-busy={isSaving}
             >
-              {isSaving ? "Saving…" : "Save copy"}
+              {isSaving ? "Saving…" : "Save changes"}
             </Button>
           </div>
         </section>

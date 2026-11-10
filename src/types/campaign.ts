@@ -29,6 +29,16 @@ export interface CampaignLiveCopyReminder {
   id: "reminder1" | "reminder2" | "reminder3";
   label: string;
   body: string;
+  /** Unchecked reminders stop sending to recipients who haven't received them; the body is kept. */
+  enabled: boolean;
+}
+
+/** A reminder turned on or off from Edit live copy (shown in the Change Log). */
+export interface CampaignReminderToggleEvent {
+  reminderId: CampaignLiveCopyReminder["id"];
+  label: string;
+  enabled: boolean;
+  at: string;
 }
 
 export interface Campaign {
@@ -69,6 +79,8 @@ export interface Campaign {
   copyUpdatedAt?: string | null;
   /** Current editable body copy for live campaigns, independent of locked setup. */
   liveCopy?: CampaignLiveCopy | null;
+  /** Reminder on/off changes saved from Edit live copy, oldest first. */
+  reminderToggleEvents?: CampaignReminderToggleEvent[];
   /**
    * Full wizard state for draft resume/edit.
    * Absent on legacy thin drafts and most mock seed rows.

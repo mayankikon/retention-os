@@ -16,20 +16,20 @@ export function getCampaignAnalytics(campaign: Campaign): CampaignAnalytics {
   ) {
     return {
       recipientsSent: 0,
-      openedCount: 0,
       deliveredCount: 0,
+      clickedCount: 0,
     };
   }
 
   const sequence = getCampaignSequence(campaign);
   const deliveryRate = 0.94 + (sequence % 6) * 0.01;
-  const openRate = 0.52 + (sequence % 18) * 0.012;
-  const deliveredCount = Math.round(sent * deliveryRate);
-  const openedCount = Math.round(deliveredCount * openRate);
+  const deliveredCount = Math.min(Math.round(sent * deliveryRate), sent);
+  // Click-through rate is "of customers sent", so clicks derive from it.
+  const clickedCount = Math.round((sent * campaign.clickThroughRate) / 100);
 
   return {
     recipientsSent: sent,
-    deliveredCount: Math.min(deliveredCount, sent),
-    openedCount: Math.min(openedCount, deliveredCount),
+    deliveredCount,
+    clickedCount: Math.min(clickedCount, deliveredCount),
   };
 }

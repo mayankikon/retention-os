@@ -114,8 +114,26 @@ export function buildCampaignChangelog(
     );
   }
 
-  if (campaign.lastUpdatedAt !== campaign.createdAt) {
-    const isLiveCopyUpdate = campaign.copyUpdatedAt === campaign.lastUpdatedAt;
+  const reminderToggleEvents = campaign.reminderToggleEvents ?? [];
+  reminderToggleEvents.forEach((event, index) => {
+    entries.push({
+      id: `${campaign.id}-reminder-toggle-${index}`,
+      timestamp: event.at,
+      actor: campaign.createdBy,
+      action: "reminder_toggled",
+      summary: `${event.label} turned ${event.enabled ? "on" : "off"}`,
+      details: event.enabled
+        ? "Starts sending to recipients who haven't received it yet."
+        : "Stops sending to recipients who haven't received it yet. Messages already sent aren't affected.",
+    });
+  });
+
+  const isLiveCopyUpdate = campaign.copyUpdatedAt === campaign.lastUpdatedAt;
+  const isReminderToggleOnly =
+    !isLiveCopyUpdate &&
+    reminderToggleEvents.some((event) => event.at === campaign.lastUpdatedAt);
+
+  if (campaign.lastUpdatedAt !== campaign.createdAt && !isReminderToggleOnly) {
     entries.push({
       id: `${campaign.id}-updated`,
       timestamp: campaign.lastUpdatedAt,
