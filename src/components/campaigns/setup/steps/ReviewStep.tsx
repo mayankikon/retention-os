@@ -13,6 +13,13 @@ import { SECTION_CARD_CLASS } from "@/components/campaigns/setup/OptionCard";
 import { SuppressionListUpload } from "@/components/campaigns/setup/SuppressionListUpload";
 import { useProductVersion } from "@/contexts/product-version-context";
 import { summarizeAudienceFilters } from "@/lib/audience-filters";
+import {
+  isValidTestPhone,
+  normalizeTestPhone,
+  sendTestMessage,
+  TEST_PHONE_INVALID_ERROR,
+  testSendCopy,
+} from "@/lib/test-message";
 import { cn } from "@/lib/utils";
 import type { CampaignSetupDraft } from "@/types/campaign-setup";
 
@@ -33,13 +40,34 @@ export function ReviewStep({
 }: ReviewStepProps) {
   const { versionId } = useProductVersion();
   const isMvpV10Version = versionId === "mvp_v1_0";
-  const [testStatus, setTestStatus] = useState<"idle" | "sending" | "sent">(
-    "idle",
+  const [testStatus, setTestStatus] = useState<
+    "idle" | "sending" | "failed"
+  >("idle");
+  const [testPhoneError, setTestPhoneError] = useState<string | undefined>();
+  // The number the last successful test went to. Seeded from the wizard so
+  // the confirmation survives leaving and returning to Review.
+  const [sentPhone, setSentPhone] = useState<string | null>(
+    isTestSent && draft.testPhoneNumber.trim() ? draft.testPhoneNumber : null,
   );
+  const isSending = testStatus === "sending";
+  const hasSentToCurrentNumber =
+    sentPhone !== null &&
+    normalizeTestPhone(sentPhone) === normalizeTestPhone(draft.testPhoneNumber);
+
   const handleTestSend = async () => {
+    if (!isValidTestPhone(draft.testPhoneNumber)) {
+      setTestPhoneError(TEST_PHONE_INVALID_ERROR);
+      return;
+    }
+    setTestPhoneError(undefined);
     setTestStatus("sending");
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    setTestStatus("sent");
+    const result = await sendTestMessage(draft.testPhoneNumber);
+    if (!result.ok) {
+      setTestStatus("failed");
+      return;
+    }
+    setTestStatus("idle");
+    setSentPhone(draft.testPhoneNumber);
     onTestSend();
   };
 
@@ -105,47 +133,61 @@ export function ReviewStep({
       <FormField
         label="Test Mobile Number"
         htmlFor="testPhone"
-        error={errors.testPhoneNumber}
+        error={testPhoneError ?? errors.testPhoneNumber}
       >
         <div className="flex gap-2">
           <Input
             id="testPhone"
             type="tel"
+            autoComplete="tel"
             value={draft.testPhoneNumber}
-            onChange={(e) => onChange({ testPhoneNumber: e.target.value })}
+            onChange={(e) => {
+              onChange({ testPhoneNumber: e.target.value });
+              setTestPhoneError(undefined);
+              if (testStatus === "failed") setTestStatus("idle");
+            }}
             placeholder="+1 (555) 000-0000"
-            aria-invalid={Boolean(errors.testPhoneNumber)}
+            disabled={isSending}
+            aria-invalid={Boolean(testPhoneError ?? errors.testPhoneNumber)}
           />
           <Button
             type="button"
             variant="outline"
             onClick={handleTestSend}
-            disabled={testStatus === "sending" || !draft.testPhoneNumber.trim()}
+            disabled={!draft.testPhoneNumber.trim()}
+            loading={isSending}
+            leadingIcon={<Send aria-hidden />}
           >
-            <Send className="mr-2 h-4 w-4" />
-            {testStatus === "sending"
+            {isSending
               ? "Sending…"
-              : testStatus === "sent" || isTestSent
-                ? "Sent"
+              : hasSentToCurrentNumber
+                ? "Send again"
                 : "Send Test"}
           </Button>
         </div>
       </FormField>
 
-      {(isTestSent || testStatus === "sent") && (
-        <p className="flex items-start gap-2 text-sm text-[var(--status-active-fg)]">
-          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
-          Test message queued. Confirm variables and image on your device before
-          activating.
-        </p>
-      )}
-
-      {!isTestSent && testStatus !== "sent" ? (
-        <p className="flex items-start gap-2 text-sm text-amber-800">
-          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
-          Send a test before activating to meet SOP requirements.
-        </p>
-      ) : null}
+      <div aria-live="polite">
+        {testStatus === "failed" ? (
+          <p
+            className="flex items-start gap-2 text-sm text-red-700"
+            role="alert"
+          >
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+            {testSendCopy.reviewFailure(draft.testPhoneNumber)}
+          </p>
+        ) : hasSentToCurrentNumber && !isSending ? (
+          <p className="flex items-start gap-2 text-sm text-[var(--status-active-fg)]">
+            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+            {testSendCopy.reviewSuccess(sentPhone)}
+          </p>
+        ) : !isSending ? (
+          <p className="flex items-start gap-2 text-sm text-amber-800">
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+            {testSendCopy.reviewReminder}
+          </p>
+        ) : null}
+      </div>
     </div>
   );
 }

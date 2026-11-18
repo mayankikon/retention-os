@@ -36,6 +36,11 @@ vi.mock("@/components/layout/TitleBar", () => ({
   ),
 }));
 
+vi.mock("@/components/campaigns/detail/SendTestMessageDialog", () => ({
+  SendTestMessageDialog: ({ open }: { open: boolean }) =>
+    open ? <div role="dialog" aria-label="Send a test message" /> : null,
+}));
+
 vi.mock("@/components/campaigns/CampaignStatusBadge", () => ({
   CampaignStatusBadge: () => <span>status</span>,
 }));
@@ -111,6 +116,30 @@ describe("CampaignDetailHeader", () => {
     );
     expect(screen.getByRole("button", { name: "Resume" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Archive" })).toBeInTheDocument();
+  });
+
+  it("opens the test-send dialog from an active campaign", async () => {
+    const user = userEvent.setup();
+    render(<CampaignDetailHeader campaign={buildCampaign("active")} />);
+    await user.click(screen.getByRole("button", { name: "Send test" }));
+    expect(
+      screen.getByRole("dialog", { name: "Send a test message" }),
+    ).toBeInTheDocument();
+  });
+
+  it("offers Send test on paused campaigns but not completed or draft", () => {
+    render(<CampaignDetailHeader campaign={buildCampaign("paused")} />);
+    expect(screen.getByRole("button", { name: "Send test" })).toBeInTheDocument();
+    cleanup();
+    render(<CampaignDetailHeader campaign={buildCampaign("completed")} />);
+    expect(
+      screen.queryByRole("button", { name: "Send test" }),
+    ).not.toBeInTheDocument();
+    cleanup();
+    render(<CampaignDetailHeader campaign={buildCampaign("draft")} />);
+    expect(
+      screen.queryByRole("button", { name: "Send test" }),
+    ).not.toBeInTheDocument();
   });
 
   it("shows Archive for a completed campaign without pause controls", () => {
